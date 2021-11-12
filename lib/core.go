@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
-	"github.com/guonaihong/gout"
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/tuotoo/qrcode"
@@ -150,7 +149,7 @@ func (c *Core) Login() ([]cookie, error) {
 		return nil, err
 	}
 	img = strings.ReplaceAll(img, "data:image/png;base64,", "")
-	go sendToQQ(img)
+	//go sendToQQ(img)
 	data, err := base64.StdEncoding.DecodeString(img)
 	if err != nil {
 		return nil, err
@@ -211,17 +210,17 @@ func (c *Core) Login() ([]cookie, error) {
 	return cos, err
 }
 
-func sendToQQ(img string) {
-	err := gout.POST("http://127.0.0.1:5700/send_private_msg").SetJSON(map[string]interface{}{
-		"user_id": 3343780376,
-		"message": map[string]interface{}{
-			"type": "image",
-			"data": map[string]interface{}{
-				"file": "base64://" + img,
-			},
-		},
-	}).Do()
-	if err != nil {
-		return
-	}
-}
+//func sendToQQ(img string) {
+//	err := gout.POST("http://127.0.0.1:5700/send_private_msg").SetJSON(map[string]interface{}{
+//		"user_id": int64(3343780376),
+//		"message": map[string]interface{}{
+//			"type": "image",
+//			"data": map[string]interface{}{
+//				"file": "base64://" + img,
+//			},
+//		},
+//	}).Do()
+//	if err != nil {
+//		return
+//	}
+//}
