@@ -1,0 +1,18 @@
+# 刷课模式，默认为1，
+# 1：只刷文章何视频
+# 2：只刷文章和视频和每日答题
+# 3：刷文章和视频和每日答题每周答题和专项答题
+model: 1
+
+# 日志等级
+# panic
+# fatal
+# error
+# warn, warning
+# info
+# debug
+# trace
+log_level: "info"
+
+# 是否显示浏览器
+show_browser: true
