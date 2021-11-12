@@ -43,7 +43,6 @@ func init() {
 }
 
 func main() {
-
 	log.Infoln(`// 刷课模式，默认为1，
  1：只刷文章何视频
  2：只刷文章和视频和每日答题
@@ -66,5 +65,4 @@ func main() {
 		core.RespondDaily(login, "weekly")
 		core.RespondDaily(login, "special")
 	}
-
 }

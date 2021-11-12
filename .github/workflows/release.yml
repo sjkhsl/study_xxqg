@@ -25,17 +25,5 @@ jobs:
           version: latest
           args: release --rm-dist
         env:
-#          main: ./example/main.go
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      #- name: Checkout Dist
-      #  uses: actions/checkout@v2
-      #  with:
-      #    repository: 'gocq/dist'
-      #    ref: master
-      #    ssh-key: ${{ secrets.SSH_KEY }}
-      #    path: upstream/dist
 
-      #- name: Update Dist
-      #  run: |
-      #    chmod +x scripts/upload_dist.sh
-      #    ./scripts/upload_dist.sh
