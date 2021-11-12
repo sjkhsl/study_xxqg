@@ -14,9 +14,10 @@ import (
 )
 
 type Core struct {
-	pw      *playwright.Playwright
-	browser playwright.Browser
-	context playwright.BrowserContext
+	pw          *playwright.Playwright
+	browser     playwright.Browser
+	context     playwright.BrowserContext
+	ShowBrowser bool
 }
 
 type cookie struct {
@@ -62,7 +63,7 @@ func (c *Core) Init() {
 		HandleSIGHUP:    nil,
 		HandleSIGINT:    nil,
 		HandleSIGTERM:   nil,
-		Headless:        playwright.Bool(false),
+		Headless:        playwright.Bool(c.ShowBrowser),
 		Proxy:           nil,
 		SlowMo:          nil,
 		Timeout:         nil,

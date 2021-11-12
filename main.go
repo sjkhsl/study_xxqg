@@ -48,7 +48,7 @@ func main() {
  2：只刷文章和视频和每日答题
  3：刷文章和视频和每日答题每周答题和专项答题`)
 	log.Infoln("检测到模式", config.Model)
-	core := lib.Core{}
+	core := lib.Core{ShowBrowser: config.ShowBrowser}
 	defer core.Quit()
 	core.Init()
 	login, err := core.Login()
