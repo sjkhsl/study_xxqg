@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"os"
 	"path"
 	"time"
@@ -23,11 +25,12 @@ func init() {
 		log.Errorf("rotates init err: %v", err)
 		panic(err)
 	}
-	log.SetOutput(w)
+	log.SetOutput(io.MultiWriter(w, os.Stdout))
 	log.SetFormatter(logFormatter)
 	level, err := log.ParseLevel(config.LogLevel)
 
 	log.SetLevel(level)
+	log.Info(config)
 }
 
 var (
@@ -55,6 +58,7 @@ func main() {
 	if err != nil {
 		return
 	}
+	fmt.Println(config)
 
 	core.LearnArticle(login)
 	core.LearnVideo(login)

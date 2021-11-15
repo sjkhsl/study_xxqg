@@ -63,7 +63,7 @@ func (c *Core) Init() {
 		HandleSIGHUP:    nil,
 		HandleSIGINT:    nil,
 		HandleSIGTERM:   nil,
-		Headless:        playwright.Bool(c.ShowBrowser),
+		Headless:        playwright.Bool(!c.ShowBrowser),
 		Proxy:           nil,
 		SlowMo:          nil,
 		Timeout:         nil,
