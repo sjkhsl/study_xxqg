@@ -27,7 +27,7 @@ model: 3
 # trace
 log_level: "info"
 
-# 是否显示浏览器
+# 是否显示浏览器,linux环境请关闭该选项，否则会引发错误
 show_browser: true
 
 # 推送信息配置，建议使用钉钉
