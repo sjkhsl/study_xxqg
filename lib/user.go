@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"os"
+	"time"
 
 	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
@@ -25,9 +26,10 @@ const (
 )
 
 type User struct {
-	Cookies []cookie `json:"cookies"`
+	Cookies []Cookie `json:"cookies"`
 	Nick    string   `json:"nick"`
 	Uid     string   `json:"uid"`
+	Time    int64    `json:"time"`
 }
 
 func GetUsers() ([]User, error) {
@@ -82,7 +84,7 @@ func SaveUser(user User) error {
 	return err
 }
 
-func GetUserInfo(cookies []cookie) (string, string, error) {
+func GetUserInfo(cookies []Cookie) (string, string, error) {
 	var resp []byte
 	err := gout.GET(user_Info_url).
 		SetCookies(cookieToJar(cookies)...).
@@ -102,14 +104,7 @@ func GetUserInfo(cookies []cookie) (string, string, error) {
 }
 
 func CheckUserCookie(user User) bool {
-	var resp []byte
-	err := gout.GET(`https://pc-api.xuexi.cn/open/api/score/get?_t=1636607911602`).SetCookies(cookieToJar(user.Cookies)...).BindBody(&resp).Do()
-	if err != nil {
-		log.Errorln(err.Error())
-
-		return true
-	}
-	if gjson.GetBytes(resp, "code").Int() == 401 && gjson.GetBytes(resp, "message").String() == "token check failed" {
+	if time.Now().Unix() <= user.Time {
 		return true
 	}
 

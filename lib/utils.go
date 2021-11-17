@@ -6,7 +6,7 @@ import (
 	"github.com/mxschmitt/playwright-go"
 )
 
-func cookieToJar(cookies []cookie) []*http.Cookie {
+func cookieToJar(cookies []Cookie) []*http.Cookie {
 	var (
 		cooks []*http.Cookie
 	)
@@ -26,7 +26,7 @@ func cookieToJar(cookies []cookie) []*http.Cookie {
 	return cooks
 }
 
-func cookieToParam(cookies []cookie) []playwright.SetNetworkCookieParam {
+func cookieToParam(cookies []Cookie) []playwright.SetNetworkCookieParam {
 	var (
 		cooks []playwright.SetNetworkCookieParam
 	)
@@ -34,7 +34,6 @@ func cookieToParam(cookies []cookie) []playwright.SetNetworkCookieParam {
 		cooks = append(cooks, playwright.SetNetworkCookieParam{
 			Name:     c.Name,
 			Value:    c.Value,
-			URL:      playwright.String(""),
 			Domain:   playwright.String(c.Domain),
 			Path:     playwright.String(c.Path),
 			Expires:  playwright.Int(c.Expires),

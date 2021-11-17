@@ -86,7 +86,7 @@ func getLinks(model string) ([]Link, error) {
 	return links, err
 }
 
-func (c *Core) LearnArticle(cookies []cookie) {
+func (c *Core) LearnArticle(cookies []Cookie) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -102,12 +102,12 @@ func (c *Core) LearnArticle(cookies []cookie) {
 	links, _ := getLinks("article")
 	if score.Content["article"].CurrentScore < score.Content["article"].MaxScore {
 		log.Infoln("开始加载文章学习模块")
-		page, err := c.context.NewPage()
+		page, err := (*c.context).NewPage()
 		if err != nil {
 			return
 		}
 
-		err = c.context.AddCookies(cookieToParam(cookies)...)
+		err = (*c.context).AddCookies(cookieToParam(cookies)...)
 		if err != nil {
 			log.Errorln("添加cookie失败" + err.Error())
 			return
@@ -158,7 +158,7 @@ func (c *Core) LearnArticle(cookies []cookie) {
 	}
 }
 
-func (c *Core) LearnVideo(cookies []cookie) {
+func (c *Core) LearnVideo(cookies []Cookie) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -176,7 +176,7 @@ func (c *Core) LearnVideo(cookies []cookie) {
 		// core := Core{}
 		//core.Init()
 
-		page, err := c.context.NewPage()
+		page, err := (*c.context).NewPage()
 		if err != nil {
 			return
 		}
@@ -193,13 +193,13 @@ func (c *Core) LearnVideo(cookies []cookie) {
 		if err != nil {
 			return
 		}
-		err = c.context.AddCookies(cookieToParam(cookies)...)
+		err = (*c.context).AddCookies(cookieToParam(cookies)...)
 		if err != nil {
 			log.Errorln("添加cookie失败" + err.Error())
 			return
 		}
 		tryCount := 0
-		networkCookies, err := c.context.Cookies()
+		networkCookies, err := (*c.context).Cookies()
 		if err != nil {
 			return
 		}

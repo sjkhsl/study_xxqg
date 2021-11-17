@@ -1,8 +1,8 @@
-# 刷课模式，默认为1，
+# 刷课模式，默认为3，
 # 1：只刷文章何视频
 # 2：只刷文章和视频和每日答题
 # 3：刷文章和视频和每日答题每周答题和专项答题
-model: 1
+model: 3
 
 # 日志等级
 # panic
@@ -16,3 +16,16 @@ log_level: "info"
 
 # 是否显示浏览器
 show_browser: true
+
+
+push:
+  ding:
+    enable: false
+    access_token: ""
+    secret: ""
+  tg:
+    enable: false
+    chat_id: ""
+    token: ""
+
+cron: ""

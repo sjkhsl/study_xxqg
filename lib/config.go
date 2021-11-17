@@ -12,6 +12,19 @@ type Config struct {
 	Model       int    `json:"model" yaml:"model"`
 	LogLevel    string `json:"log_level" yaml:"log_level"`
 	ShowBrowser bool   `json:"show_browser" yaml:"show_browser"`
+	Push        struct {
+		Ding struct {
+			Enable      bool   `json:"enable" yaml:"enable"`
+			AccessToken string `json:"access_token" yaml:"access_token"`
+			Secret      string `json:"secret" yaml:"secret"`
+		} `json:"ding" yaml:"ding"`
+		TG struct {
+			Enable bool   `json:"enable" yaml:"enable"`
+			Token  string `json:"token" yaml:"token"`
+			ChatID string `json:"chat_id" yaml:"chat_id"`
+		} `json:"tg" yaml:"tg"`
+	} `json:"push" yaml:"push"`
+	Cron string `json:"cron"`
 }
 
 var (

@@ -19,7 +19,7 @@ type Data struct {
 	MaxScore     int
 }
 
-func GetUserScore(cookies []cookie) (Score, error) {
+func GetUserScore(cookies []Cookie) (Score, error) {
 	var score Score
 	var resp []byte
 	// 获取用户总分

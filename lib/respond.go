@@ -21,7 +21,7 @@ div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-
 div > div.my-points-section > div.my-points-content > div:nth-child(7) > div.my-points-card-footer > div.buttonbox > div`
 )
 
-func (c *Core) RespondDaily(cookies []cookie, model string) {
+func (c *Core) RespondDaily(cookies []Cookie, model string) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -37,13 +37,13 @@ func (c *Core) RespondDaily(cookies []cookie, model string) {
 		return
 	}
 
-	page, err := c.context.NewPage()
+	page, err := (*c.context).NewPage()
 	if err != nil {
 		log.Errorln("创建页面失败" + err.Error())
 
 		return
 	}
-	err = c.context.AddCookies(cookieToParam(cookies)...)
+	err = (*c.context).AddCookies(cookieToParam(cookies)...)
 	if err != nil {
 		log.Errorln("添加cookie信息失败，已退出答题")
 

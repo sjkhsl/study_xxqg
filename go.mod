@@ -8,7 +8,7 @@ require (
 	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f
 	github.com/guonaihong/gout v0.2.9
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/mxschmitt/playwright-go v0.1100.0
+	github.com/mxschmitt/playwright-go v0.1400.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
 	github.com/tidwall/gjson v1.11.0
@@ -22,6 +22,8 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/google/uuid v1.1.1 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/johlanse/ding v0.0.0-20211117082011-7467908ad84f // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
@@ -29,6 +31,7 @@ require (
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect

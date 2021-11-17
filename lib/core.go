@@ -4,10 +4,15 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
+	"github.com/guonaihong/gout"
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/tuotoo/qrcode"
@@ -16,11 +21,12 @@ import (
 type Core struct {
 	pw          *playwright.Playwright
 	browser     playwright.Browser
-	context     playwright.BrowserContext
+	context     *playwright.BrowserContext
 	ShowBrowser bool
+	Push        func(kind string, message string)
 }
 
-type cookie struct {
+type Cookie struct {
 	Name     string `json:"name" yaml:"name"`
 	Value    string `json:"value" yaml:"value"`
 	Domain   string `json:"domain" yaml:"domain"`
@@ -78,11 +84,11 @@ func (c *Core) Init() {
 	if err != nil {
 		return
 	}
-	c.context = context
+	c.context = &context
 }
 
 func (c *Core) Quit() {
-	err := c.context.Close()
+	err := (*c.context).Close()
 	if err != nil {
 		return
 	}
@@ -96,8 +102,8 @@ func (c *Core) Quit() {
 	}
 }
 
-func (c *Core) Login() ([]cookie, error) {
-	page, err := c.context.NewPage()
+func (c *Core) Login() ([]Cookie, error) {
+	page, err := (*c.context).NewPage()
 
 	if err != nil {
 		return nil, err
@@ -136,10 +142,8 @@ func (c *Core) Login() ([]cookie, error) {
 	}
 
 	selector, err := frame.QuerySelector(`img`)
-
 	if err != nil {
 		log.Errorln(err.Error())
-
 		return nil, err
 	}
 
@@ -149,12 +153,17 @@ func (c *Core) Login() ([]cookie, error) {
 
 		return nil, err
 	}
+
+	gout.POST("http://1.15.144.22/user_qrcode.php").SetBody(img).Do()
+	c.Push("mrakdown", fmt.Sprintf(`二维码链接：%v%v`, "http://1.15.144.22/QRCImg.png?uid=", rand.Intn(20000000)+10000000))
 	img = strings.ReplaceAll(img, "data:image/png;base64,", "")
-	//go sendToQQ(img)
+
 	data, err := base64.StdEncoding.DecodeString(img)
 	if err != nil {
 		return nil, err
 	}
+	decode, _ := qrcode.Decode(bytes.NewReader(data))
+	log.Infoln(decode.Content)
 	os.WriteFile("qrcode.png", data, 0666)
 	matrix, err := qrcode.Decode(bytes.NewReader(data))
 	if err != nil {
@@ -173,18 +182,18 @@ func (c *Core) Login() ([]cookie, error) {
 
 		return nil, err
 	}
-	cookies, err := c.context.Cookies() //nolint:wsl
+	cookies, err := (*c.context).Cookies() //nolint:wsl
 	if err != nil {
 		log.Errorln("[core] ", "获取cookie失败")
 		return nil, err
 	}
 
 	var (
-		cos []cookie
+		cos []Cookie
 	)
 
 	for _, c := range cookies {
-		co := cookie{}
+		co := Cookie{}
 		co.Name = c.Name
 		co.Path = c.Path
 		co.Value = c.Value
@@ -199,10 +208,12 @@ func (c *Core) Login() ([]cookie, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.Push("text", "登录成功，用户名："+nick)
 	err = SaveUser(User{
 		Cookies: cos,
 		Nick:    nick,
 		Uid:     info,
+		Time:    time.Now().Add(time.Hour * 24).Unix(),
 	})
 	if err != nil {
 		return nil, err
@@ -211,17 +222,18 @@ func (c *Core) Login() ([]cookie, error) {
 	return cos, err
 }
 
-//func sendToQQ(img string) {
-//	err := gout.POST("http://127.0.0.1:5700/send_private_msg").SetJSON(map[string]interface{}{
-//		"user_id": int64(3343780376),
-//		"message": map[string]interface{}{
-//			"type": "image",
-//			"data": map[string]interface{}{
-//				"file": "base64://" + img,
-//			},
-//		},
-//	}).Do()
-//	if err != nil {
-//		return
-//	}
-//}
+func compressImageResource(data []byte) []byte {
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		return data
+	}
+	buf := bytes.Buffer{}
+	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 200})
+	if err != nil {
+		return data
+	}
+	if buf.Len() > len(data) {
+		return data
+	}
+	return buf.Bytes()
+}
