@@ -47,7 +47,7 @@ push:
     enable: false
     chat_id: ""
     token: ""
-  # 目前仅支持pushplus推送二维码，默认建议实验pushplus推送
+  # 目前仅支持pushplus推送二维码，默认建议使用pushplus推送
   # pushplus使用方法见：http://www.pushplus.plus/
   push_plus:
     enable: true
