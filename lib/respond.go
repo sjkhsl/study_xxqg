@@ -26,6 +26,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		err := recover()
 		if err != nil {
 			log.Errorln("答题模块异常结束")
+			log.Errorln(err)
 		}
 	}()
 

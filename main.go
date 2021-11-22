@@ -107,6 +107,6 @@ func do() {
 		log.Debugln(err.Error())
 		return
 	}
-	message := "学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
+	message := ">学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
 	core.Push("markdown", message)
 }

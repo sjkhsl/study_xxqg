@@ -19,6 +19,8 @@ func GetPush(config lib.Config) func(kind string, message string) {
 			ChatId: config.Push.TG.ChatID,
 		}
 		return t.Init()
+	} else if config.Push.PushPlus.Enable {
+		return (&PushPlus{Token: config.Push.PushPlus.Token}).Init()
 	}
 	return func(kind string, message string) {
 		log.Infoln("")

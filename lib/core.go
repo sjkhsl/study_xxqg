@@ -3,19 +3,23 @@ package lib
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"image"
+	"image/gif"
 	"image/jpeg"
-	"math/rand"
+	"image/png"
+	"io"
 	"os"
 	"strings"
 	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
-	"github.com/guonaihong/gout"
 	"github.com/mxschmitt/playwright-go"
+	"github.com/nfnt/resize"
 	log "github.com/sirupsen/logrus"
 	"github.com/tuotoo/qrcode"
+	"golang.org/x/image/bmp"
 )
 
 type Core struct {
@@ -51,7 +55,7 @@ func (c *Core) Init() {
 			"--disable-extensions",
 			"--disable-gpu",
 			"--no-sandbox",
-			"--window-size=540,400",
+			"--window-size=500,450",
 			"--start-maximized",
 			"--mute-audio",
 			"--window-position=0,0",
@@ -119,7 +123,7 @@ func (c *Core) Login() ([]Cookie, error) {
 
 		return nil, err
 	}
-	log.Infoln("[core] ", "正在等待二维码扫描")
+	log.Infoln("[core] ", "正在等待二维码加载")
 
 	_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `)
 
@@ -140,7 +144,7 @@ func (c *Core) Login() ([]Cookie, error) {
 	if frame == nil {
 		log.Errorln("获取frame失败")
 	}
-
+	removeNode(page)
 	selector, err := frame.QuerySelector(`img`)
 	if err != nil {
 		log.Errorln(err.Error())
@@ -153,17 +157,18 @@ func (c *Core) Login() ([]Cookie, error) {
 
 		return nil, err
 	}
-
-	gout.POST("http://1.15.144.22/user_qrcode.php").SetBody(img).Do()
-	c.Push("mrakdown", fmt.Sprintf(`二维码链接：%v%v`, "http://1.15.144.22/QRCImg.png?uid=", rand.Intn(20000000)+10000000))
+	screen, _ := page.Screenshot()
+	var result []byte
+	buffer := bytes.NewBuffer(result)
+	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 525, 35, 755, 255, 0)
+	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
+	os.WriteFile("screen.png", buffer.Bytes(), 0666)
 	img = strings.ReplaceAll(img, "data:image/png;base64,", "")
-
 	data, err := base64.StdEncoding.DecodeString(img)
 	if err != nil {
 		return nil, err
 	}
-	decode, _ := qrcode.Decode(bytes.NewReader(data))
-	log.Infoln(decode.Content)
+
 	os.WriteFile("qrcode.png", data, 0666)
 	matrix, err := qrcode.Decode(bytes.NewReader(data))
 	if err != nil {
@@ -222,18 +227,73 @@ func (c *Core) Login() ([]Cookie, error) {
 	return cos, err
 }
 
-func compressImageResource(data []byte) []byte {
-	img, _, err := image.Decode(bytes.NewReader(data))
+func removeNode(page playwright.Page) {
+	page.Evaluate(`document.getElementsByClassName("layout-header")[0].remove()`) //nolint:errcheck
+	page.Evaluate(`document.getElementsByClassName("layout-footer")[0].remove()`) //nolint:errcheck
+	page.Evaluate(`document.getElementsByClassName("redflag-2")[0].remove()`)     //nolint:errcheck
+	page.Evaluate(`document.getElementsByClassName("ddlogintext")[0].remove()`)   //nolint:errcheck
+}
+
+// Clip
+//*  图片裁剪
+//* 入参:图片输入、输出、缩略图宽、缩略图高、Rectangle{Pt(x0, y0), Pt(x1, y1)}，精度
+//* 规则:如果精度为0则精度保持不变
+//*
+//* 返回:error
+// */
+func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err error) {
+	err = errors.New("unknow error")
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r)
+		}
+	}()
+	var origin image.Image
+	var fm string
+	origin, fm, err = image.Decode(in)
 	if err != nil {
-		return data
+		log.Println(err)
+		return err
 	}
-	buf := bytes.Buffer{}
-	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 200})
-	if err != nil {
-		return data
+
+	if wi == 0 || hi == 0 {
+		wi = origin.Bounds().Max.X
+		hi = origin.Bounds().Max.Y
 	}
-	if buf.Len() > len(data) {
-		return data
+	var canvas image.Image
+	if wi != origin.Bounds().Max.X {
+		//先缩略
+		canvas = resize.Thumbnail(uint(wi), uint(hi), origin, resize.Lanczos3)
+	} else {
+		canvas = origin
 	}
-	return buf.Bytes()
+
+	switch fm {
+	case "jpeg":
+		img := canvas.(*image.YCbCr)
+		subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.YCbCr)
+		return jpeg.Encode(out, subImg, &jpeg.Options{quality})
+	case "png":
+		switch canvas.(type) {
+		case *image.NRGBA:
+			img := canvas.(*image.NRGBA)
+			subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.NRGBA)
+			return png.Encode(out, subImg)
+		case *image.RGBA:
+			img := canvas.(*image.RGBA)
+			subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.RGBA)
+			return png.Encode(out, subImg)
+		}
+	case "gif":
+		img := canvas.(*image.Paletted)
+		subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.Paletted)
+		return gif.Encode(out, subImg, &gif.Options{})
+	case "bmp":
+		img := canvas.(*image.RGBA)
+		subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.RGBA)
+		return bmp.Encode(out, subImg)
+	default:
+		return errors.New("ERROR FORMAT")
+	}
+	return nil
 }

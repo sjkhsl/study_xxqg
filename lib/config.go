@@ -23,6 +23,10 @@ type Config struct {
 			Token  string `json:"token" yaml:"token"`
 			ChatID string `json:"chat_id" yaml:"chat_id"`
 		} `json:"tg" yaml:"tg"`
+		PushPlus struct {
+			Enable bool   `json:"enable" yaml:"enable"`
+			Token  string `json:"token" yaml:"token"`
+		} `json:"push_plus" yaml:"push_plus"`
 	} `json:"push" yaml:"push"`
 	Cron string `json:"cron"`
 }
