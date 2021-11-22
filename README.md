@@ -12,6 +12,8 @@
 + 首次打开会在 ```config\config.yml```生成默认配置文件
 + 生成配置文件后第一次打开会自动安装无头浏览器，可能需要耐心等待
 + 再次打开即可运行
++ windows环境推荐直接打开浏览器扫码或者在控制台出现二维码后打开当前目录```screen.png```进行扫码
++ 其他无头浏览环境请配置[pushplus](http://www.pushplus.plus/) 推送进行扫码
 
 ## 配置文件
 ```yaml
@@ -31,25 +33,30 @@ model: 3
 # trace
 log_level: "info"
 
-# 是否显示浏览器,linux环境请关闭该选项，否则会引发错误
+# 是否显示浏览器
 show_browser: true
 
-# 推送信息配置，建议使用钉钉
+
 push:
   ding:
     enable: false
     access_token: ""
     secret: ""
+
   tg:
     enable: false
     chat_id: ""
     token: ""
-# 是否启用定时功能
+  # 目前仅支持pushplus推送二维码，默认建议实验pushplus推送
+  # pushplus使用方法见：http://www.pushplus.plus/
+  push_plus:
+    enable: true
+    token: ""
+
+
 cron: ""
 ```
-
-> 已知bug:
-> 偶尔二维码会出现不能扫描的问题，等待解决中
+> 当前控制台二维码扫描可能出现二维码已过期的情况，请直接浏览扫码或者采用[pushplus](http://www.pushplus.plus/) 推送扫码
 
 ##  申明，该项目仅用于学习。
 
