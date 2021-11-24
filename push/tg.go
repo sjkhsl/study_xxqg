@@ -1,56 +1,75 @@
 package push
 
 import (
-	"fmt"
+	"encoding/base64"
+	"net/http"
+	"net/url"
+	"strconv"
 
-	"github.com/guonaihong/gout"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
+//Telegram
+// @Description:
+//
 type Telegram struct {
 	Token  string
 	ChatId string
 }
 
+//TGMsg
+// @Description:
+//
 type TGMsg struct {
 	ChatID    string `json:"chat_id"`
 	Text      string `json:"text"`
 	ParseMode string `json:"parse_mode"`
 }
 
+//Init
+/**
+ * @Description:
+ * @receiver t
+ * @return func(kind string, message string)
+ */
 func (t *Telegram) Init() func(kind string, message string) {
+	uri, err := url.Parse("http://127.0.0.1:7890")
+	bot, err := tgbotapi.NewBotAPIWithClient(t.Token, tgbotapi.APIEndpoint, &http.Client{Transport: &http.Transport{
+		// 设置代理
+		Proxy: http.ProxyURL(uri),
+	}})
+
+	if err != nil {
+		log.Errorln("telegram token鉴权失败")
+		return func(kind string, message string) {}
+	}
+	chatId, err := strconv.ParseInt(t.ChatId, 10, 64)
+	if err != nil {
+		return func(kind string, message string) {}
+	}
 	return func(kind string, message string) {
-		var resp []byte
-		if kind == "markdown" {
-			data := TGMsg{
-				ChatID:    t.ChatId,
-				Text:      message,
-				ParseMode: "MarkdownV2",
-			}
-			log.Infoln(data)
-			err := gout.GET(fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage", t.Token)).BindBody(&resp).SetQuery(data).SetProxy("http://127.0.0.1:7890").Do()
+		if kind == "image" {
+			bytes, _ := base64.StdEncoding.DecodeString(message)
+			photo := tgbotapi.NewPhoto(chatId, tgbotapi.FileBytes{
+				Name:  "123",
+				Bytes: bytes,
+			})
+			_, err := bot.Send(photo)
 			if err != nil {
+				log.Errorln("发送图片信息失败")
+				log.Errorln(err.Error())
 				return
 			}
-			log.Infoln("向tg推送消息成功")
-		} else if kind == "html" {
-			data := TGMsg{
-				ChatID:    t.ChatId,
-				Text:      message,
-				ParseMode: "HTML",
-			}
-			log.Infoln(data)
-			err := gout.POST(fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage", t.Token)).BindBody(&resp).SetProxy("http://127.0.0.1:7890").SetJSON(gout.H{
-				"chat_id":    t.ChatId,
-				"text":       message,
-				"parse_mode": "HTML",
-			}).Do()
-			if err != nil {
-				return
-			}
-			log.Infoln("向tg推送消息成功")
 		}
-		log.Infoln(gjson.GetBytes(resp, "@this|@pretty").String())
+
+		mess := tgbotapi.NewMessage(chatId, message)
+		mess.ParseMode = tgbotapi.ModeMarkdownV2
+		_, err := bot.Send(mess)
+		if err != nil {
+			log.Errorln("发送消息失败")
+			log.Errorln(err.Error())
+			return
+		}
 	}
 }

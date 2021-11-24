@@ -33,7 +33,6 @@ func init() {
 	level, err := log.ParseLevel(config.LogLevel)
 
 	log.SetLevel(level)
-	log.Info(config)
 }
 
 var (
@@ -52,12 +51,21 @@ func main() {
 	if config.Cron != "" {
 		c := cron.New()
 		_, err := c.AddFunc(config.Cron, func() {
+			defer func() {
+				i := recover()
+				if i != nil {
+					log.Errorln(i)
+					log.Errorln("执行定时任务出现异常")
+				}
+			}()
 			do()
 		})
 		if err != nil {
+			log.Errorln(err.Error())
 			return
 		}
 		c.Start()
+		select {}
 	}
 	do()
 }
@@ -107,6 +115,6 @@ func do() {
 		log.Debugln(err.Error())
 		return
 	}
-	message := ">学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
+	message := "学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
 	core.Push("markdown", message)
 }

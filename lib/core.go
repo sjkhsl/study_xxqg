@@ -11,14 +11,14 @@ import (
 	"image/png"
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/mxschmitt/playwright-go"
 	"github.com/nfnt/resize"
 	log "github.com/sirupsen/logrus"
-	"github.com/tuotoo/qrcode"
 	"golang.org/x/image/bmp"
 )
 
@@ -145,38 +145,17 @@ func (c *Core) Login() ([]Cookie, error) {
 		log.Errorln("获取frame失败")
 	}
 	removeNode(page)
-	selector, err := frame.QuerySelector(`img`)
-	if err != nil {
-		log.Errorln(err.Error())
-		return nil, err
-	}
 
-	img, err := selector.GetAttribute(`src`)
-	if err != nil {
-		log.Errorln(err.Error())
-
-		return nil, err
-	}
 	screen, _ := page.Screenshot()
 	var result []byte
 	buffer := bytes.NewBuffer(result)
 	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 525, 35, 755, 255, 0)
 	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
+	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
 	os.WriteFile("screen.png", buffer.Bytes(), 0666)
-	img = strings.ReplaceAll(img, "data:image/png;base64,", "")
-	data, err := base64.StdEncoding.DecodeString(img)
-	if err != nil {
-		return nil, err
-	}
+	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
 
-	os.WriteFile("qrcode.png", data, 0666)
-	matrix, err := qrcode.Decode(bytes.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-
-	qrcodeTerminal.New().Get(matrix.Content).Print()
-
+	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetRawBytes()).Print()
 	_, err = page.WaitForNavigation(playwright.PageWaitForNavigationOptions{
 		Timeout:   playwright.Float(30 * 1000 * 5),
 		URL:       nil,
@@ -296,4 +275,21 @@ func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err
 		return errors.New("ERROR FORMAT")
 	}
 	return nil
+}
+
+func GetPaymentStr(fi io.Reader) (paymentCodeUrl *gozxing.Result) {
+	img, _, err := image.Decode(fi)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// prepare BinaryBitmap
+	bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
+	// decode image
+	qrReader := qrcode.NewQRCodeReader()
+	result, err := qrReader.Decode(bmp, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return result
 }

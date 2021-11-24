@@ -130,8 +130,9 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 				log.Infoln("文章发布时间：" + links[n].PublishTime)
 				log.Infoln("文章学习链接：" + links[n].Url)
 				learnTime := 50 + rand.Intn(5) + 10
-				log.Infoln(fmt.Sprintf("正在进行阅读学习中，剩余%d篇，本篇剩余时间%d秒", score.Content["article"].MaxScore-score.Content["article"].CurrentScore, learnTime))
 				for i := 0; i < learnTime; i++ {
+					fmt.Printf("\r[%v] [INFO]: 正在进行阅读学习中，剩余%d篇，本篇剩余时间%d秒", time.Now().Format("2006-01-02 15:04:05"), score.Content["article"].MaxScore-score.Content["article"].CurrentScore, learnTime-i)
+
 					if rand.Float32() > 0.5 {
 						go func() {
 							_, err = page.Evaluate(fmt.Sprintf(`let h = document.body.scrollHeight/120*%d;document.documentElement.scrollTop=h;`, i))
@@ -142,6 +143,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 					}
 					time.Sleep(1 * time.Second)
 				}
+				fmt.Println()
 
 				if score.Content["article"].CurrentScore >= score.Content["article"].MaxScore {
 					log.Infoln("检测到本次阅读学习分数已满，退出学习")
@@ -223,8 +225,9 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 				log.Infoln("视频发布时间：" + links[n].PublishTime)
 				log.Infoln("视频学习链接：" + links[n].Url)
 				learnTime := 50 + rand.Intn(5) + 10
-				log.Infoln(fmt.Sprintf("正在进行视频学习中，剩余%d个，当前剩余时间%d秒", score.Content["video"].MaxScore-score.Content["video"].CurrentScore, learnTime))
 				for i := 0; i < learnTime; i++ {
+					fmt.Printf("\r[%v] [INFO]: 正在进行视频学习中，剩余%d个，当前剩余时间%d秒", time.Now().Format("2006-01-02 15:04:05"), score.Content["video"].MaxScore-score.Content["video"].CurrentScore, learnTime-i)
+
 					if rand.Float32() > 0.5 {
 						go func() {
 							_, err := page.Evaluate(fmt.Sprintf(`let h = document.body.scrollHeight/120*%d;document.documentElement.scrollTop=h;`, i))
@@ -235,7 +238,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 					}
 					time.Sleep(1 * time.Second)
 				}
-
+				fmt.Println()
 				if score.Content["video"].CurrentScore >= score.Content["video"].MaxScore || score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore {
 					log.Infoln("检测到本次视频学习分数已满，退出学习")
 					break

@@ -26,6 +26,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		err := recover()
 		if err != nil {
 			log.Errorln("答题模块异常结束")
+			time.Sleep(5 * time.Second)
 			log.Errorln(err)
 		}
 	}()
@@ -214,7 +215,6 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		content, err := page.Content()
 		if err != nil {
 			log.Errorln("获取网页全体内容失败" + err.Error())
-
 			return
 		}
 		err = openTips.Click()
@@ -240,18 +240,23 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 			options, err := getOptions(page)
 			if err != nil {
 				log.Errorln("获取选项失败" + err.Error())
-
 				return
 			}
 			log.Infoln("获取到选项答案：", options)
 			log.Infoln("[多选题选项]：", options)
 			var answer []string
-			for _, option := range options {
-				for _, tip := range tips {
-					if strings.Contains(option, tip) {
-						answer = append(answer, option)
+			if len(tips) == 0 {
+				log.Warnln("检测到未成功获取提示信息，将选择ABCD")
+				answer = append(answer, options...)
+			} else {
+				for _, option := range options {
+					for _, tip := range tips {
+						if strings.Contains(option, tip) {
+							answer = append(answer, option)
+						}
 					}
 				}
+				log.Infoln("根据提示分别选择了", answer)
 			}
 			err = radioCheck(page, answer)
 			if err != nil {
@@ -265,15 +270,21 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 				return
 			}
 			log.Infoln("获取到选项答案：", options)
-			log.Infoln("[多选题选项]：", options)
+
 			var answer []string
-			for _, option := range options {
-				for _, tip := range tips {
-					if strings.Contains(option, tip) {
-						answer = append(answer, option)
+			if len(tips) == 0 {
+				log.Warnln("未能获取到提示信息，将自动选择A")
+				answer = append(answer, options[0])
+			} else {
+				for _, option := range options {
+					for _, tip := range tips {
+						if strings.Contains(option, tip) {
+							answer = append(answer, option)
+						}
 					}
 				}
 			}
+			log.Infoln("根据提示分别选择了", answer)
 			err = radioCheck(page, answer)
 			if err != nil {
 				return
