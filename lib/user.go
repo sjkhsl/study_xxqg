@@ -3,7 +3,6 @@ package lib
 import (
 	"encoding/json"
 	"os"
-	"time"
 
 	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
@@ -50,7 +49,7 @@ func GetUsers() ([]User, error) {
 		}
 		log.Infoln("用户" + users[i].Nick + "cookie已失效")
 	}
-	return users, err
+	return newUsers, err
 }
 
 func SaveUser(user User) error {
@@ -104,9 +103,9 @@ func GetUserInfo(cookies []Cookie) (string, string, error) {
 }
 
 func CheckUserCookie(user User) bool {
-	if time.Now().Unix() <= user.Time {
-		return true
+	_, err := GetUserScore(user.Cookies)
+	if err != nil && err.Error() == "token check failed" {
+		return false
 	}
-
-	return false
+	return true
 }

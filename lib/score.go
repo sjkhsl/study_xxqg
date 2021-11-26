@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/guonaihong/gout"
@@ -30,6 +31,11 @@ func GetUserScore(cookies []Cookie) (Score, error) {
 		log.Errorln("获取用户总分错误" + err.Error())
 
 		return Score{}, err
+	}
+	data := string(resp)
+	log.Infoln(data)
+	if !gjson.GetBytes(resp, "ok").Bool() {
+		return Score{}, errors.New("token check failed")
 	}
 	log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TotalScore = int(gjson.GetBytes(resp, "data.score").Int())
@@ -90,9 +96,18 @@ func GetUserScore(cookies []Cookie) (Score, error) {
 	return score, err
 }
 
-func PrintScore(score Score) {
-	log.Infoln(fmt.Sprintf("当前学习总积分：%d  今日得分：%d", score.TodayScore, score.TodayScore))
-	for s, data := range score.Content {
-		log.Infoln(s, ": ", data.CurrentScore, "/", data.MaxScore)
-	}
+func PrintScore(score Score) string {
+	result := ""
+	result += fmt.Sprintf("当前学习总积分：%d  今日得分：%d\n", score.TodayScore, score.TodayScore)
+	result += fmt.Sprintf("登录：%v/%v  文章学习：%v/%v  视频学习：%v/%v  视频时长：%v/%v\n每日答题：%v/%v  每周答题：%v/%v   专项答题：%v/%v",
+		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
+		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
+		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
+		score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
+		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
+		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
+		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
+	)
+	log.Infoln(result)
+	return result
 }
