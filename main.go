@@ -48,7 +48,9 @@ func init() {
 }
 
 func main() {
-	if config.Cron != "" {
+	switch {
+	case config.Cron != "":
+		log.Infoln("已采用定时执行模式")
 		c := cron.New()
 		_, err := c.AddFunc(config.Cron, func() {
 			defer func() {
@@ -66,30 +68,43 @@ func main() {
 		}
 		c.Start()
 		select {}
+	case config.TG.Enable:
+		log.Infoln("已采用tg交互模式")
+		telegram := lib.Telegram{
+			Token:  config.TG.Token,
+			ChatId: config.TG.ChatID,
+			Proxy:  config.TG.Proxy,
+		}
+		telegram.Init()
+		select {}
+	default:
+		log.Infoln("已采用普通学习模式")
+		do()
 	}
-	do()
 }
 
 func do() {
-	log.Infoln(`// 刷课模式，默认为1，
+	log.Infoln(` 刷课模式，默认为1，
  1：只刷文章何视频
  2：只刷文章和视频和每日答题
  3：刷文章和视频和每日答题每周答题和专项答题`)
 	log.Infoln("检测到模式", config.Model)
+
 	getPush := push.GetPush(config)
 	core := lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()
 	var cookies []lib.Cookie
 	users, _ := lib.GetUsers()
-	if len(users) < 1 {
+	switch {
+	case len(users) < 1:
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
 		cookies, _ = core.Login()
-	} else if len(users) == 1 {
+	case len(users) == 1:
 		log.Infoln("检测到1位有效用户信息，采用默认用户")
 		cookies = users[0].Cookies
 		log.Infoln("已选择用户: ", users[0].Nick)
-	} else {
+	default:
 		for i, user := range users {
 			log.Infoln("序号：", i+1, "   ===> ", user.Nick)
 		}

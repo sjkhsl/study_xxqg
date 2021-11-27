@@ -3,6 +3,7 @@ package lib
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
@@ -99,6 +100,24 @@ func GetUserScore(cookies []Cookie) (Score, error) {
 func PrintScore(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d  今日得分：%d\n", score.TodayScore, score.TodayScore)
+	result += fmt.Sprintf("[%v] [INFO]: 登录：%v/%v  文章学习：%v/%v  视频学习：%v/%v  视频时长：%v/%v\n[%v] [INFO]: 每日答题：%v/%v  每周答题：%v/%v   专项答题：%v/%v",
+		time.Now().Format("2006-01-02 15:04:05"),
+		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
+		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
+		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
+		score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
+		time.Now().Format("2006-01-02 15:04:05"),
+		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
+		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
+		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
+	)
+	log.Infoln(result)
+	return result
+}
+
+func foramet_score(score Score) string {
+	result := ""
+	result += fmt.Sprintf("当前学习总积分：%d  今日得分：%d\n", score.TodayScore, score.TodayScore)
 	result += fmt.Sprintf("登录：%v/%v  文章学习：%v/%v  视频学习：%v/%v  视频时长：%v/%v\n每日答题：%v/%v  每周答题：%v/%v   专项答题：%v/%v",
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
@@ -108,6 +127,5 @@ func PrintScore(score Score) string {
 		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
 		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
-	log.Infoln(result)
 	return result
 }

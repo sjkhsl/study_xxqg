@@ -201,13 +201,6 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 			return
 		}
 		tryCount := 0
-		networkCookies, err := (*c.context).Cookies()
-		if err != nil {
-			return
-		}
-		for _, networkCookie := range networkCookies {
-			fmt.Println(networkCookie.Name)
-		}
 
 		for {
 			if tryCount < 20 {

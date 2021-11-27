@@ -23,16 +23,18 @@ push:
     enable: false
     access_token: ""
     secret: ""
-
-  tg:
-    enable: false
-    chat_id: ""
-    token: ""
 # 目前仅支持pushplus推送二维码，默认建议使用pushplus推送
 # pushplus使用方法见：http://www.pushplus.plus/
   push_plus:
     enable: true
     token: ""
+
+# telegram交互模式配置
+tg:
+  enable: false
+  chat_id: 0
+  token: ""
+  proxy: ""
 
 # 设置是否定时执行学习程序，格式为cron格式
 # "9 19 * * *" 每天19点9分执行一次

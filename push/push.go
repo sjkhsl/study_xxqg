@@ -14,13 +14,6 @@ func GetPush(config lib.Config) func(kind string, message string) {
 		}
 		log.Infoln("已配置钉钉推送")
 		return ding.Send()
-	} else if config.Push.TG.Enable {
-		t := &Telegram{
-			Token:  config.Push.TG.Token,
-			ChatId: config.Push.TG.ChatID,
-		}
-		log.Infoln("已配置telegram推送")
-		return t.Init()
 	} else if config.Push.PushPlus.Enable {
 		log.Infoln("已配置pushplus推送")
 		return (&PushPlus{Token: config.Push.PushPlus.Token}).Init()

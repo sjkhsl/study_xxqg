@@ -18,16 +18,17 @@ type Config struct {
 			AccessToken string `json:"access_token" yaml:"access_token"`
 			Secret      string `json:"secret" yaml:"secret"`
 		} `json:"ding" yaml:"ding"`
-		TG struct {
-			Enable bool   `json:"enable" yaml:"enable"`
-			Token  string `json:"token" yaml:"token"`
-			ChatID string `json:"chat_id" yaml:"chat_id"`
-		} `json:"tg" yaml:"tg"`
 		PushPlus struct {
 			Enable bool   `json:"enable" yaml:"enable"`
 			Token  string `json:"token" yaml:"token"`
 		} `json:"push_plus" yaml:"push_plus"`
 	} `json:"push" yaml:"push"`
+	TG struct {
+		Enable bool   `json:"enable" yaml:"enable"`
+		Token  string `json:"token" yaml:"token"`
+		ChatID int64  `json:"chat_id" yaml:"chat_id"`
+		Proxy  string `json:"proxy" yaml:"proxy"`
+	} `json:"tg" yaml:"tg"`
 	Cron string `json:"cron"`
 }
 

@@ -25,7 +25,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			log.Errorln("答题模块异常结束")
+			log.Errorln("答题模块异常结束或答题已完成")
 			time.Sleep(5 * time.Second)
 			log.Errorln(err)
 		}
@@ -51,7 +51,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 		return
 	}
-	log.Infoln("已加载每日答题模块")
+	log.Infoln("已加载答题模块")
 
 	_, err = page.Goto(MyPointsUri, playwright.PageGotoOptions{
 		Referer:   playwright.String(MyPointsUri),
@@ -171,6 +171,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 			return
 		}
+		_ = category.WaitForElementState(`visible`)
 		time.Sleep(1 * time.Second)
 
 		// 获取题目

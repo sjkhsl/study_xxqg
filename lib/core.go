@@ -107,6 +107,13 @@ func (c *Core) Quit() {
 }
 
 func (c *Core) Login() ([]Cookie, error) {
+	defer func() {
+		i := recover()
+		if i != nil {
+			log.Errorln("登录模块出现无法挽救的错误")
+			log.Errorln(i)
+		}
+	}()
 	page, err := (*c.context).NewPage()
 
 	if err != nil {
