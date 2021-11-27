@@ -48,7 +48,8 @@ push:
     enable: true
     token: ""
 
-
+# 通过telegram进行交互模式，当配置tg.enable为true时会自动注册bot命令，
+# telegram_bot使用教程https://www.dazhuanlan.com/leemode/topics/927496
 tg:
   enable: false
   chat_id: 0
