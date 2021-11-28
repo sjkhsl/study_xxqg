@@ -207,7 +207,7 @@ func study(bot *Telegram, args []string) {
 		pw:          nil,
 		browser:     nil,
 		context:     nil,
-		ShowBrowser: true,
+		ShowBrowser: false,
 		Push: func(kind string, message string) {
 			switch {
 			case kind == "image":
