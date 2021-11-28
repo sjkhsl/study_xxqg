@@ -207,7 +207,7 @@ func study(bot *Telegram, args []string) {
 		pw:          nil,
 		browser:     nil,
 		context:     nil,
-		ShowBrowser: false,
+		ShowBrowser: true,
 		Push: func(kind string, message string) {
 			switch {
 			case kind == "image":
@@ -223,6 +223,7 @@ func study(bot *Telegram, args []string) {
 			}
 		},
 	}
+	core.Init()
 	defer core.Quit()
 	core.LearnArticle(cookies)
 	core.LearnVideo(cookies)

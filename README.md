@@ -15,6 +15,7 @@
 + windows环境推荐直接打开浏览器扫码或者在控制台出现二维码后打开当前目录```screen.png```进行扫码
 + 其他无头浏览环境请配置[pushplus](http://www.pushplus.plus/) 推送进行扫码
 
+
 ## 配置文件
 ```yaml
 # 刷课模式，默认为3，
