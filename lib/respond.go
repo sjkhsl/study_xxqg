@@ -26,11 +26,14 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		err := recover()
 		if err != nil {
 			log.Errorln("答题模块异常结束或答题已完成")
+			c.Push("text", "答题模块异常退出或答题已完成")
 			time.Sleep(5 * time.Second)
 			log.Errorln(err)
 		}
 	}()
-
+	if c.IsQuit() {
+		return
+	}
 	// 获取用户成绩
 	score, err := GetUserScore(cookies)
 	if err != nil {
@@ -78,6 +81,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 				return
 			}
+			c.Push("text", "已加载每日答题模块")
 		}
 	case "weekly":
 		{
@@ -93,6 +97,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 				return
 			}
+			c.Push("text", "已加载每周答题模块")
 		}
 	case "special":
 		{
@@ -108,12 +113,16 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 				return
 			}
+			c.Push("text", "已加载专项答题模块")
 		}
 	}
 	time.Sleep(5 * time.Second)
 	getAnswerPage(page, model)
 
 	for true {
+		if c.IsQuit() {
+			return
+		}
 		// 查看是否存在答题按钮，若按钮可用则重新提交答题
 		btn, err := page.QuerySelector(`#app > div > div.layout-body > div > div.detail-body > div.action-row > button`)
 		if err != nil {

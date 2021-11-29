@@ -106,6 +106,10 @@ func (c *Core) Quit() {
 	}
 }
 
+func (c *Core) IsQuit() bool {
+	return !c.browser.IsConnected()
+}
+
 func (c *Core) Login() ([]Cookie, error) {
 	defer func() {
 		i := recover()
@@ -161,6 +165,8 @@ func (c *Core) Login() ([]Cookie, error) {
 	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
 	os.WriteFile("screen.png", buffer.Bytes(), 0666)
 	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
+	c.Push("text", "https://techxuexi.js.org/jump/techxuexi-20211023.html?"+matrix.GetText())
+	c.Push("text", matrix.GetText())
 
 	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetRawBytes()).Print()
 	_, err = page.WaitForNavigation(playwright.PageWaitForNavigationOptions{

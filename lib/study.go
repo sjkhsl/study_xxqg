@@ -91,8 +91,12 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 		err := recover()
 		if err != nil {
 			log.Errorln("文章学习模块异常结束")
+			log.Errorln(err)
 		}
 	}()
+	if c.IsQuit() {
+		return
+	}
 
 	score, err := GetUserScore(cookies)
 	if err != nil {
@@ -127,10 +131,14 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 					log.Errorln("页面跳转失败")
 				}
 				log.Infoln("正在学习文章：" + links[n].Title)
+				c.Push("text", "正在学习文章："+links[n].Title)
 				log.Infoln("文章发布时间：" + links[n].PublishTime)
 				log.Infoln("文章学习链接：" + links[n].Url)
 				learnTime := 50 + rand.Intn(5) + 10
 				for i := 0; i < learnTime; i++ {
+					if c.IsQuit() {
+						return
+					}
 					fmt.Printf("\r[%v] [INFO]: 正在进行阅读学习中，剩余%d篇，本篇剩余时间%d秒", time.Now().Format("2006-01-02 15:04:05"), score.Content["article"].MaxScore-score.Content["article"].CurrentScore, learnTime-i)
 
 					if rand.Float32() > 0.5 {
@@ -165,8 +173,12 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 		err := recover()
 		if err != nil {
 			log.Errorln("视频学习模块异常结束")
+			log.Errorln(err)
 		}
 	}()
+	if c.IsQuit() {
+		return
+	}
 	score, err := GetUserScore(cookies)
 	if err != nil {
 		log.Errorln(err.Error())
@@ -215,10 +227,14 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 					log.Errorln("页面跳转失败")
 				}
 				log.Infoln("正在观看视频：" + links[n].Title)
+				c.Push("text", "正在观看视频："+links[n].Title)
 				log.Infoln("视频发布时间：" + links[n].PublishTime)
 				log.Infoln("视频学习链接：" + links[n].Url)
 				learnTime := 50 + rand.Intn(5) + 10
 				for i := 0; i < learnTime; i++ {
+					if c.IsQuit() {
+						return
+					}
 					fmt.Printf("\r[%v] [INFO]: 正在进行视频学习中，剩余%d个，当前剩余时间%d秒", time.Now().Format("2006-01-02 15:04:05"), score.Content["video"].MaxScore-score.Content["video"].CurrentScore, learnTime-i)
 
 					if rand.Float32() > 0.5 {

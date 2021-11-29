@@ -10,11 +10,13 @@ import (
 	"sync"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 var (
 	handles sync.Map
+	datas   sync.Map
 )
 
 func init() {
@@ -22,6 +24,7 @@ func init() {
 	newPlugin("/get_users", getAllUser)
 	newPlugin("/study", study)
 	newPlugin("/get_scores", getScores)
+	newPlugin("/quit", quit)
 }
 
 //Telegram
@@ -101,6 +104,7 @@ func (t *Telegram) Init() {
 		tgbotapi.BotCommand{Command: "get_users", Description: "获取所有cookie有效的用户"},
 		tgbotapi.BotCommand{Command: "study", Description: "对一个账户进行学习"},
 		tgbotapi.BotCommand{Command: "get_scores", Description: "获取用户成绩"},
+		tgbotapi.BotCommand{Command: "quit", Description: "退出所有正在学习的实例"},
 	))
 	if err != nil {
 		return
@@ -223,6 +227,11 @@ func study(bot *Telegram, args []string) {
 			}
 		},
 	}
+
+	u := uuid.New().String()
+	bot.SendMsg("已创建运行实例：" + u)
+	datas.Store(u, &core)
+	defer datas.Delete(u)
 	core.Init()
 	defer core.Quit()
 	core.LearnArticle(cookies)
@@ -231,6 +240,8 @@ func study(bot *Telegram, args []string) {
 	core.RespondDaily(cookies, "daily")
 	core.RespondDaily(cookies, "weekly")
 	core.RespondDaily(cookies, "special")
+	score, _ := GetUserScore(cookies)
+	bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
 }
 
 func getScores(bot *Telegram, args []string) {
@@ -247,7 +258,18 @@ func getScores(bot *Telegram, args []string) {
 		if err != nil {
 			message += err.Error() + "\n"
 		}
-		message += PrintScore(score) + "\n"
+		message += foramet_score(score) + "\n"
 	}
 	bot.SendMsg(message)
+}
+
+func quit(bot *Telegram, args []string) {
+	if len(args) < 1 {
+		datas.Range(func(key, value interface{}) bool {
+			bot.SendMsg("已退出运行实例" + key.(string))
+			core := value.(*Core)
+			core.Quit()
+			return true
+		})
+	}
 }
