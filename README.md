@@ -62,8 +62,10 @@ tg:
 # "* 10 * * *” 每天早上十点执行一次
 cron: ""
 ```
-> 当前控制台二维码扫描可能出现二维码已过期的情况，请直接浏览扫码或者采用[pushplus](http://www.pushplus.plus/) 推送扫码
 
+
+>telegram推送使用参考
+![](https://raw.githubusercontent.com/johlanse/study_xxqg/main/config/tg.jpg)
 ##  申明，该项目仅用于学习。
 
 ## 鸣谢
