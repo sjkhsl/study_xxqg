@@ -266,8 +266,8 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 						}
 					}
 				}
-				log.Infoln("根据提示分别选择了", answer)
 			}
+			log.Infoln("根据提示分别选择了", RemoveRepByLoop(answer))
 			err = radioCheck(page, answer)
 			if err != nil {
 				return
@@ -508,4 +508,22 @@ func checkNextBotton(page playwright.Page) {
 		}
 		log.Infoln("已成功提交试卷")
 	}
+}
+
+// RemoveRepByLoop 通过两重循环过滤重复元素
+func RemoveRepByLoop(slc []string) []string {
+	var result []string // 存放结果
+	for i := range slc {
+		flag := true
+		for j := range result {
+			if slc[i] == result[j] {
+				flag = false // 存在重复元素，标识为false
+				break
+			}
+		}
+		if flag { // 标识为false，不添加进结果
+			result = append(result, slc[i])
+		}
+	}
+	return result
 }

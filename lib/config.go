@@ -3,6 +3,7 @@ package lib
 import (
 	_ "embed"
 	"os"
+	"runtime"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -57,6 +58,9 @@ func GetConfig() Config {
 	if err != nil {
 		log.Errorln(err.Error())
 		return Config{}
+	}
+	if runtime.GOOS == "linux" {
+		config.ShowBrowser = false
 	}
 	return config
 }

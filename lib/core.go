@@ -50,7 +50,7 @@ func (c *Core) Init() {
 		return
 	}
 	c.pw = pwt
-	browser, err := pwt.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+	browser, err := pwt.WebKit.Launch(playwright.BrowserTypeLaunchOptions{
 		Args: []string{
 			"--disable-extensions",
 			"--disable-gpu",
