@@ -258,17 +258,18 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 			log.Infoln("获取到选项答案：", options)
 			log.Infoln("[多选题选项]：", options)
 			var answer []string
-			if len(tips) == 0 {
-				log.Warnln("检测到未成功获取提示信息，将选择ABCD")
-				answer = append(answer, options...)
-			} else {
-				for _, option := range options {
-					for _, tip := range tips {
-						if strings.Contains(option, tip) {
-							answer = append(answer, option)
-						}
+
+			for _, option := range options {
+				for _, tip := range tips {
+					if strings.Contains(option, tip) {
+						answer = append(answer, option)
 					}
 				}
+			}
+
+			if len(answer) < 1 {
+				answer = append(answer, options...)
+				log.Infoln("无法判断答案，自动选择ABCD")
 			}
 			log.Infoln("根据提示分别选择了", RemoveRepByLoop(answer))
 			err = radioCheck(page, answer)
@@ -285,18 +286,19 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 			log.Infoln("获取到选项答案：", options)
 
 			var answer []string
-			if len(tips) == 0 {
-				log.Warnln("未能获取到提示信息，将自动选择A")
-				answer = append(answer, options[0])
-			} else {
-				for _, option := range options {
-					for _, tip := range tips {
-						if strings.Contains(option, tip) {
-							answer = append(answer, option)
-						}
+
+			for _, option := range options {
+				for _, tip := range tips {
+					if strings.Contains(option, tip) {
+						answer = append(answer, option)
 					}
 				}
 			}
+			if len(answer) < 1 {
+				answer = append(answer, options[0])
+				log.Infoln("无法判断答案，自动选择A")
+			}
+
 			log.Infoln("根据提示分别选择了", answer)
 			err = radioCheck(page, answer)
 			if err != nil {
