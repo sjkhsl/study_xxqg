@@ -69,8 +69,6 @@ archives:
     format_overrides:
       - goos: windows
         format: binary
-      - goos: linux
-        format: binary
   - id: nowin
     builds:
       - nowin
