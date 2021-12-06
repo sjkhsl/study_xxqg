@@ -214,7 +214,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		openTips, err := page.QuerySelector(
 			`#app > div > div.layout-body > div > div.detail-body > div.question > div.q-footer > span`)
 		if err != nil {
-			log.Errorln("为获取到题目提示信息" + err.Error())
+			log.Errorln("未获取到题目提示信息" + err.Error())
 
 			return
 		}
@@ -494,7 +494,7 @@ func checkNextBotton(page playwright.Page) {
 	if len(btns) <= 1 {
 		err := btns[0].Check()
 		if err != nil {
-			log.Errorln("点击吓一题按钮失败")
+			log.Errorln("点击下一题按钮失败")
 
 			return
 		}
