@@ -25,6 +25,7 @@ func init() {
 	newPlugin("/study", study)
 	newPlugin("/get_scores", getScores)
 	newPlugin("/quit", quit)
+	newPlugin("/study_all", studyAll)
 }
 
 //Telegram
@@ -88,7 +89,8 @@ func (t *Telegram) Init() {
 						defer func() {
 							err := recover()
 							if err != nil {
-
+								log.Errorln(err)
+								log.Errorln("handle执行出现了不可挽回的错误")
 							}
 						}()
 						(value.(func(bot *Telegram, args []string)))(t, strings.Split(update.Message.Text, " ")[1:])
@@ -104,7 +106,8 @@ func (t *Telegram) Init() {
 		tgbotapi.BotCommand{Command: "get_users", Description: "获取所有cookie有效的用户"},
 		tgbotapi.BotCommand{Command: "study", Description: "对一个账户进行学习"},
 		tgbotapi.BotCommand{Command: "get_scores", Description: "获取用户成绩"},
-		tgbotapi.BotCommand{Command: "quit", Description: "退出所有正在学习的实例"},
+		tgbotapi.BotCommand{Command: "quit", Description: "退出所有正在学习的实例,或者跟上实例ID退出对应实例"},
+		tgbotapi.BotCommand{Command: "study_all", Description: "对当前所有用户进行按顺序学习"},
 	))
 	if err != nil {
 		return
@@ -130,7 +133,7 @@ func (t *Telegram) SendMsg(message string) {
 }
 
 func login(bot *Telegram, args []string) {
-	log.Infoln(args)
+	config := GetConfig()
 	go func() {
 		defer func() {
 			err := recover()
@@ -142,16 +145,17 @@ func login(bot *Telegram, args []string) {
 			pw:          nil,
 			browser:     nil,
 			context:     nil,
-			ShowBrowser: false,
+			ShowBrowser: config.ShowBrowser,
 			Push: func(kind string, message string) {
-				if kind == "image" {
+				switch {
+				case kind == "image":
 					bytes, _ := base64.StdEncoding.DecodeString(message)
 					bot.SendPhoto(bytes)
-				} else if kind == "markdown" {
+				case kind == "markdown":
 					newMessage := tgbotapi.NewMessage(bot.ChatId, message)
 					newMessage.ParseMode = tgbotapi.ModeMarkdownV2
 					bot.bot.Send(newMessage)
-				} else {
+				default:
 					bot.SendMsg(message)
 				}
 			},
@@ -181,7 +185,62 @@ func getAllUser(bot *Telegram, args []string) {
 	bot.SendMsg(message)
 }
 
+func studyAll(bot *Telegram, args []string) {
+	config := GetConfig()
+	users, err := GetUsers()
+	if err != nil {
+		bot.SendMsg(err.Error())
+		return
+	}
+	if len(users) == 0 {
+		bot.SendMsg("未发现用户信息，请输入/login进行用户登录")
+		return
+	}
+	getAllUser(bot, args)
+	for _, user := range users {
+		s := func() {
+			core := Core{
+				pw:          nil,
+				browser:     nil,
+				context:     nil,
+				ShowBrowser: config.ShowBrowser,
+				Push: func(kind string, message string) {
+					switch {
+					case kind == "image":
+						bytes, _ := base64.StdEncoding.DecodeString(message)
+						bot.SendPhoto(bytes)
+					case kind == "markdown":
+						newMessage := tgbotapi.NewMessage(bot.ChatId, message)
+						newMessage.ParseMode = tgbotapi.ModeMarkdownV2
+						_, _ = bot.bot.Send(newMessage)
+
+					default:
+						bot.SendMsg(message)
+					}
+				},
+			}
+
+			u := uuid.New().String()
+			bot.SendMsg("已创建运行实例：" + u)
+			datas.Store(u, &core)
+			defer datas.Delete(u)
+			core.Init()
+			defer core.Quit()
+			core.LearnArticle(user.Cookies)
+			core.LearnVideo(user.Cookies)
+			core.RespondDaily(user.Cookies, "daily")
+			core.RespondDaily(user.Cookies, "daily")
+			core.RespondDaily(user.Cookies, "weekly")
+			core.RespondDaily(user.Cookies, "special")
+			score, _ := GetUserScore(user.Cookies)
+			bot.SendMsg(fmt.Sprintf("%v当前学习总积分：%v,今日得分：%v", user.Nick, score.TotalScore, score.TodayScore))
+		}
+		s()
+	}
+}
+
 func study(bot *Telegram, args []string) {
+	config := GetConfig()
 	users, err := GetUsers()
 	if err != nil {
 		bot.SendMsg(err.Error())
@@ -195,23 +254,23 @@ func study(bot *Telegram, args []string) {
 		bot.SendMsg("未发现用户信息，请输入/login进行用户登录")
 		return
 	} else {
-		if len(args) < 0 {
-			bot.SendMsg("存在多名用户，未输入用户序号")
-			return
-		} else {
+		if 0 <= len(args) {
 			i, err := strconv.Atoi(args[0])
 			if err != nil {
 				bot.SendMsg(err.Error())
 				return
 			}
 			cookies = users[i].Cookies
+		} else {
+			bot.SendMsg("存在多名用户，未输入用户序号")
+			return
 		}
 	}
 	core := Core{
 		pw:          nil,
 		browser:     nil,
 		context:     nil,
-		ShowBrowser: false,
+		ShowBrowser: config.ShowBrowser,
 		Push: func(kind string, message string) {
 			switch {
 			case kind == "image":
@@ -269,6 +328,14 @@ func quit(bot *Telegram, args []string) {
 			bot.SendMsg("已退出运行实例" + key.(string))
 			core := value.(*Core)
 			core.Quit()
+			return true
+		})
+	} else {
+		datas.Range(func(key, value interface{}) bool {
+			if key.(string) == args[0] {
+				core := value.(*Core)
+				core.Quit()
+			}
 			return true
 		})
 	}
