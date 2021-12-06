@@ -9,7 +9,6 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
 	github.com/google/uuid v1.1.1
 	github.com/guonaihong/gout v0.2.9
-	github.com/johlanse/ding v0.0.0-20211117082011-7467908ad84f
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/makiuchi-d/gozxing v0.1.1
 	github.com/mxschmitt/playwright-go v0.1400.0
