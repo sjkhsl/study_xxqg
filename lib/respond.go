@@ -117,7 +117,10 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		}
 	}
 	time.Sleep(5 * time.Second)
-	getAnswerPage(page, model)
+	// 跳转到答题页面，若返回true则说明已答完
+	if getAnswerPage(page, model) {
+		return
+	}
 
 	for true {
 		if c.IsQuit() {
@@ -304,19 +307,19 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 	}
 }
 
-func getAnswerPage(page playwright.Page, model string) {
+func getAnswerPage(page playwright.Page, model string) bool {
 	selectPages, err := page.QuerySelectorAll(`#app .ant-pagination .ant-pagination-item`)
 	if err != nil {
 		log.Errorln("获取到页码失败")
 
-		return
+		return false
 	}
 	log.Infoln("共获取到", len(selectPages), "页")
 	modelName := ""
 	modelSlector := ""
 	switch model {
 	case "daily":
-		return
+		return false
 	case "weekly":
 		modelName = "每周答题"
 		modelSlector = "button.ant-btn-primary"
@@ -336,7 +339,6 @@ func getAnswerPage(page playwright.Page, model string) {
 			continue
 		}
 		for _, data := range datas {
-			time.Sleep(3 * time.Second)
 			content, err := data.TextContent()
 			if err != nil {
 				continue
@@ -350,7 +352,7 @@ func getAnswerPage(page playwright.Page, model string) {
 				}
 				enabled, err := data.IsEnabled()
 				if err != nil {
-					return
+					return false
 				}
 				if enabled {
 					log.Infoln("按钮可用")
@@ -371,10 +373,12 @@ func getAnswerPage(page playwright.Page, model string) {
 					continue
 				}
 				time.Sleep(3 * time.Second)
-				return
+				return false
 			}
 		}
 	}
+	log.Infoln("检测到每周答题已经完成")
+	return true
 }
 
 func radioCheck(page playwright.Page, answer []string) error {
