@@ -303,7 +303,7 @@ func study(bot *Telegram, args []string) {
 			}
 		},
 	}
-	timer := time.After(time.Minute * 1)
+	timer := time.After(time.Minute * 30)
 	c := make(chan int, 1)
 	go func() {
 		u := uuid.New().String()
