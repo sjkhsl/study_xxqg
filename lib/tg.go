@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
@@ -220,19 +221,36 @@ func studyAll(bot *Telegram, args []string) {
 				},
 			}
 
-			u := uuid.New().String()
-			bot.SendMsg("已创建运行实例：" + u)
-			datas.Store(u, &core)
-			defer datas.Delete(u)
-			core.Init()
-			defer core.Quit()
-			core.LearnArticle(user.Cookies)
-			core.LearnVideo(user.Cookies)
-			core.RespondDaily(user.Cookies, "daily")
-			core.RespondDaily(user.Cookies, "weekly")
-			core.RespondDaily(user.Cookies, "special")
+			timer := time.After(time.Minute * 30)
+			c := make(chan int, 1)
+			go func() {
+				u := uuid.New().String()
+				bot.SendMsg("已创建运行实例：" + u)
+				datas.Store(u, &core)
+				defer datas.Delete(u)
+				core.Init()
+				defer core.Quit()
+				core.LearnArticle(user.Cookies)
+				core.LearnVideo(user.Cookies)
+				core.RespondDaily(user.Cookies, "daily")
+				core.RespondDaily(user.Cookies, "weekly")
+				core.RespondDaily(user.Cookies, "special")
+				c <- 1
+			}()
+
+			select {
+			case <-timer:
+				{
+					bot.SendMsg("学习超时，请重新登录或检查日志")
+					log.Errorln("学习超时，已自动退出")
+					core.Quit()
+				}
+			case <-c:
+				{
+				}
+			}
 			score, _ := GetUserScore(user.Cookies)
-			bot.SendMsg(fmt.Sprintf("%v当前学习总积分：%v,今日得分：%v", user.Nick, score.TotalScore, score.TodayScore))
+			bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
 		}
 		s()
 	}
@@ -285,18 +303,35 @@ func study(bot *Telegram, args []string) {
 			}
 		},
 	}
+	timer := time.After(time.Minute * 1)
+	c := make(chan int, 1)
+	go func() {
+		u := uuid.New().String()
+		bot.SendMsg("已创建运行实例：" + u)
+		datas.Store(u, &core)
+		defer datas.Delete(u)
+		core.Init()
+		defer core.Quit()
+		core.LearnArticle(cookies)
+		core.LearnVideo(cookies)
+		core.RespondDaily(cookies, "daily")
+		core.RespondDaily(cookies, "weekly")
+		core.RespondDaily(cookies, "special")
+		c <- 1
+	}()
 
-	u := uuid.New().String()
-	bot.SendMsg("已创建运行实例：" + u)
-	datas.Store(u, &core)
-	defer datas.Delete(u)
-	core.Init()
-	defer core.Quit()
-	core.LearnArticle(cookies)
-	core.LearnVideo(cookies)
-	core.RespondDaily(cookies, "daily")
-	core.RespondDaily(cookies, "weekly")
-	core.RespondDaily(cookies, "special")
+	select {
+	case <-timer:
+		{
+			log.Errorln("学习超时，已自动退出")
+			bot.SendMsg("学习超时，请重新登录或检查日志")
+			core.Quit()
+		}
+	case <-c:
+		{
+
+		}
+	}
 	score, _ := GetUserScore(cookies)
 	bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
 }
