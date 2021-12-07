@@ -122,7 +122,13 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		return
 	}
 
+	tryCount := 0
 	for true {
+	label:
+		tryCount++
+		if tryCount >= 30 {
+			log.Panicln("多次循环尝试答题，已超出30次，自动退出")
+		}
 		if c.IsQuit() {
 			return
 		}
@@ -213,29 +219,31 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		// 获取答题帮助
 		openTips, err := page.QuerySelector(
 			`#app > div > div.layout-body > div > div.detail-body > div.question > div.q-footer > span`)
-		if err != nil {
-			log.Errorln("未获取到题目提示信息" + err.Error())
+		if err != nil || openTips == nil {
+			log.Errorln("未获取到题目提示信息")
 
-			return
+			goto label
 		}
+		log.Debugln("开始尝试获取打开提示信息按钮")
 		err = openTips.Click()
 		if err != nil {
 			log.Errorln("点击打开提示信息按钮失败" + err.Error())
-
-			return
+			goto label
 		}
-
+		log.Debugln("已打开提示信息")
 		content, err := page.Content()
 		if err != nil {
 			log.Errorln("获取网页全体内容失败" + err.Error())
-			return
+			goto label
 		}
+		log.Debugln("以获取网页内容")
 		err = openTips.Click()
 		if err != nil {
 			log.Errorln("点击打开提示信息按钮失败" + err.Error())
 
-			return
+			goto label
 		}
+		log.Debugln("已关闭提示信息")
 
 		tips := getTips(content)
 		log.Infoln("[提示信息]：", tips)
