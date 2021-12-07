@@ -6,6 +6,7 @@
 
 + [配置参考](./docs/config.md)
 + [推送参考](./docs/push.md)
++ [常见问题](./docs/problem.md)
 
 ## 使用
 
