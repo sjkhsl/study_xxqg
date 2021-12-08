@@ -185,7 +185,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 		return
 	}
 	links, _ := getLinks("video")
-	if score.Content["video"].CurrentScore < score.Content["video"].MaxScore || score.Content["video_time"].CurrentScore < score.Content["video_time"].MaxScore {
+	if !(score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore) {
 		log.Infoln("开始加载视频学习模块")
 		// core := Core{}
 		//core.Init()
@@ -248,7 +248,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 					time.Sleep(1 * time.Second)
 				}
 				fmt.Println()
-				if score.Content["video"].CurrentScore >= score.Content["video"].MaxScore || score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore {
+				if score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore {
 					log.Infoln("检测到本次视频学习分数已满，退出学习")
 					break
 				}

@@ -54,9 +54,9 @@ func (c *Core) Init() {
 		Args: []string{
 			"--disable-extensions",
 			"--disable-gpu",
+			"--start-maximized",
 			"--no-sandbox",
 			"--window-size=500,450",
-			"--start-maximized",
 			"--mute-audio",
 			"--window-position=0,0",
 			"--ignore-certificate-errors",
@@ -84,6 +84,7 @@ func (c *Core) Init() {
 		return
 	}
 	c.browser = browser
+
 	context, err := c.browser.NewContext()
 	if err != nil {
 		return
@@ -158,7 +159,10 @@ func (c *Core) Login() ([]Cookie, error) {
 	removeNode(page)
 
 	screen, _ := page.Screenshot()
+
 	var result []byte
+	os.WriteFile("screen1.png", screen, 0666)
+
 	buffer := bytes.NewBuffer(result)
 	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 525, 35, 755, 255, 0)
 	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
