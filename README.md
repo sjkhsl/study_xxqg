@@ -12,6 +12,7 @@
 
 + [Windows使用](./docs/windows/index.md)
 + [Linux使用](./docs/linux/index.md)
++ [~~源码运行~~](./docs/custom/index.md)
 
 
 ##  申明，该项目仅用于学习。

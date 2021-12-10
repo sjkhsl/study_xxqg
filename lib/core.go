@@ -162,7 +162,10 @@ func (c *Core) Login() ([]Cookie, error) {
 
 	var result []byte
 	buffer := bytes.NewBuffer(result)
-	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 525, 35, 755, 255, 0)
+	//os.WriteFile("screen1.png", screen, 0666)
+	//_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 525, 35, 755, 255, 0)
+	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 529, 70, 748, 284, 0)
+
 	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
 	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
 	os.WriteFile("screen.png", buffer.Bytes(), 0666)
@@ -226,6 +229,7 @@ func removeNode(page playwright.Page) {
 	page.Evaluate(`document.getElementsByClassName("layout-footer")[0].remove()`) //nolint:errcheck
 	page.Evaluate(`document.getElementsByClassName("redflag-2")[0].remove()`)     //nolint:errcheck
 	page.Evaluate(`document.getElementsByClassName("ddlogintext")[0].remove()`)   //nolint:errcheck
+	page.Evaluate(`document.getElementsByClassName("oath")[0].remove()`)
 }
 
 // Clip

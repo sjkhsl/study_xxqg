@@ -116,6 +116,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 			log.Errorln("添加cookie失败" + err.Error())
 			return
 		}
+
 		tryCount := 0
 
 		for {
