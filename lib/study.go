@@ -86,6 +86,12 @@ func getLinks(model string) ([]Link, error) {
 	return links, err
 }
 
+// LearnArticle
+/**
+ * @Description: 文章学习
+ * @receiver c
+ * @param cookies
+ */
 func (c *Core) LearnArticle(cookies []Cookie) {
 	defer func() {
 		err := recover()
@@ -162,6 +168,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 				tryCount++
 			} else {
 				log.Errorln("阅读学习出现异常，稍后可重新学习")
+				return
 			}
 		}
 	} else {
@@ -169,6 +176,12 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 	}
 }
 
+// LearnVideo
+/**
+ * @Description: 视频学习
+ * @receiver c
+ * @param cookies
+ */
 func (c *Core) LearnVideo(cookies []Cookie) {
 	defer func() {
 		err := recover()
@@ -257,6 +270,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 				tryCount++
 			} else {
 				log.Errorln("视频学习出现异常，稍后可重新学习")
+				return
 			}
 		}
 	} else {
