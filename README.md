@@ -2,7 +2,7 @@
 
 
 该项目基于[playwright-go](https://github.com/mxschmitt/playwright-go) 开发，支持*windows*，*linux*,*mac*
-若在使用过程中出现什么不可预料的问题欢迎提交*issue*
+若在使用过程中出现什么不可预料的问题欢迎提交[*issue*](https://github.com/johlanse/study_xxqg/issues)
 
 + [配置参考](./docs/config.md)
 + [推送参考](./docs/push.md)
