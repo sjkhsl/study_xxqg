@@ -1,19 +1,16 @@
-name: push
+name: push-to-techxuexi
 on:
   push:
     branches:
       - main
-
-
 jobs:
-  push:
+  push-to-techxuexi:
     runs-on: ubuntu-18.04
-    if: github.event.repository.owner.id == github.event.sender.id
-    timeout-minutes: 2
-    
     steps:
     - name: check
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Init
       env:
         DEBIAN_FRONTEND: noninteractive
