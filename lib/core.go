@@ -11,6 +11,7 @@ import (
 	"image/png"
 	"io"
 	"os"
+	"runtime"
 	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
@@ -137,7 +138,13 @@ func (c *Core) Login() ([]Cookie, error) {
 	}
 	log.Infoln("[core] ", "正在等待二维码加载")
 
-	_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `)
+	if runtime.GOOS == "windows" {
+		time.Sleep(3 * time.Second)
+	} else {
+		_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
+			State: playwright.WaitForSelectorStateVisible,
+		})
+	}
 
 	_, err = page.Evaluate(`let h = document.body.scrollWidth/2;document.documentElement.scrollTop=h;`)
 
@@ -149,13 +156,14 @@ func (c *Core) Login() ([]Cookie, error) {
 
 	log.Infoln("[core] ", "加载验证码中，请耐心等待")
 
-	frame := page.Frame(playwright.PageFrameOptions{
-		Name: playwright.String(`ddlogin-iframe`),
-		URL:  nil,
-	})
-	if frame == nil {
-		log.Errorln("获取frame失败")
-	}
+	//frame := page.Frame(playwright.PageFrameOptions{
+	//	Name: playwright.String(`ddlogin-iframe`),
+	//	URL:  nil,
+	//})
+	//if frame == nil {
+	//	log.Errorln("获取frame失败")
+	//}
+
 	removeNode(page)
 
 	screen, _ := page.Screenshot()

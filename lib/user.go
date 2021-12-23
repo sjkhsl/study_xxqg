@@ -31,6 +31,12 @@ type User struct {
 	Time    int64    `json:"time"`
 }
 
+// GetUsers
+/**
+ * @Description: 获取所有cookie有效的用户
+ * @return []User
+ * @return error
+ */
 func GetUsers() ([]User, error) {
 	file, err := os.ReadFile(user_path)
 	if err != nil {
@@ -52,6 +58,12 @@ func GetUsers() ([]User, error) {
 	return newUsers, err
 }
 
+// SaveUser
+/**
+ * @Description: 保存用户信息到user.json
+ * @param user
+ * @return error
+ */
 func SaveUser(user User) error {
 	users, err := GetUsers()
 	if err != nil {
@@ -83,6 +95,14 @@ func SaveUser(user User) error {
 	return err
 }
 
+// GetUserInfo
+/**
+ * @Description: 获取用户信息
+ * @param cookies
+ * @return string
+ * @return string
+ * @return error
+ */
 func GetUserInfo(cookies []Cookie) (string, string, error) {
 	var resp []byte
 	err := gout.GET(user_Info_url).
@@ -102,6 +122,12 @@ func GetUserInfo(cookies []Cookie) (string, string, error) {
 	return uid, nick, err
 }
 
+// CheckUserCookie
+/**
+ * @Description: 获取用户成绩
+ * @param user
+ * @return bool
+ */
 func CheckUserCookie(user User) bool {
 	_, err := GetUserScore(user.Cookies)
 	if err != nil && err.Error() == "token check failed" {
