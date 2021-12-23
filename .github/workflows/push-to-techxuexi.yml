@@ -1,0 +1,30 @@
+name: push
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  push:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+    timeout-minutes: 2
+    
+    steps:
+    - name: check
+      uses: actions/checkout@v2
+    - name: Init
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        git config --global user.name 'GitHub' && git config --global user.email 'noreply@github.com'
+        
+    - name: Push Code
+      run: |
+        mkdir -p ~/.ssh
+        echo -e "${{ secrets.SSHKEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com > ~/.ssh/known_hosts
+        git push -f "git@github.com:TechXueXi/study_xxqg.git" "main:main"
+
