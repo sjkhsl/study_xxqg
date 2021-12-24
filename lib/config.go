@@ -3,7 +3,6 @@ package lib
 import (
 	_ "embed"
 	"os"
-	"runtime"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -59,8 +58,8 @@ func GetConfig() Config {
 		log.Errorln(err.Error())
 		return Config{}
 	}
-	if runtime.GOOS == "linux" {
-		config.ShowBrowser = false
+	if config.ShowBrowser {
+		log.Infoln("浏览器无头模式已禁用")
 	}
 	return config
 }
