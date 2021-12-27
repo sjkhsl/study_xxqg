@@ -178,10 +178,11 @@ func (c *Core) Login() ([]Cookie, error) {
 	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
 	os.WriteFile("screen.png", buffer.Bytes(), 0666)
 	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
+	log.Debugln("已获取到二维码内容：" + matrix.GetText())
 	c.Push("text", "https://techxuexi.js.org/jump/techxuexi-20211023.html?"+matrix.GetText())
 	c.Push("text", matrix.GetText())
 
-	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetRawBytes()).Print()
+	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetText()).Print()
 	_, err = page.WaitForNavigation(playwright.PageWaitForNavigationOptions{
 		Timeout:   playwright.Float(30 * 1000 * 5),
 		URL:       nil,
