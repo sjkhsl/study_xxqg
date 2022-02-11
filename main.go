@@ -17,7 +17,10 @@ import (
 	"github.com/huoxue1/study_xxqg/push"
 )
 
+var VERSION = "unknown"
+
 func init() {
+
 	config = lib.GetConfig()
 	logFormatter := &easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
@@ -115,7 +118,7 @@ func do() {
 		log.Infoln("已选择用户: ", users[i-1].Nick)
 	}
 
-	core.LearnArticle(cookies)
+	//core.LearnArticle(cookies)
 	core.LearnVideo(cookies)
 	if config.Model == 2 {
 		core.RespondDaily(cookies, "daily")

@@ -141,7 +141,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 				c.Push("text", "正在学习文章："+links[n].Title)
 				log.Infoln("文章发布时间：" + links[n].PublishTime)
 				log.Infoln("文章学习链接：" + links[n].Url)
-				learnTime := 70 + rand.Intn(30) + 10
+				learnTime := 60 + rand.Intn(15) + 3
 				for i := 0; i < learnTime; i++ {
 					if c.IsQuit() {
 						return
@@ -244,7 +244,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 				c.Push("text", "正在观看视频："+links[n].Title)
 				log.Infoln("视频发布时间：" + links[n].PublishTime)
 				log.Infoln("视频学习链接：" + links[n].Url)
-				learnTime := 70 + rand.Intn(30) + 10
+				learnTime := 60 + rand.Intn(10) + 5
 				for i := 0; i < learnTime; i++ {
 					if c.IsQuit() {
 						return

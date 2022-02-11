@@ -10,8 +10,6 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"os"
-	"runtime"
 	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
@@ -51,20 +49,20 @@ func (c *Core) Init() {
 		return
 	}
 	c.pw = pwt
-	browser, err := pwt.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+	browser, err := pwt.Firefox.Launch(playwright.BrowserTypeLaunchOptions{
 		Args: []string{
 			"--disable-extensions",
-			"--disable-gpu",
+			// "--disable-gpu",
 			"--start-maximized",
 			"--no-sandbox",
 			"--window-size=500,450",
-			"--mute-audio",
+			// "--mute-audio",
 			"--window-position=0,0",
 			"--ignore-certificate-errors",
-			"--ignore-ssl-errors",
-			"--disable-features=RendererCodeIntegrity",
-			"--disable-blink-features",
-			"--disable-blink-features=AutomationControlled",
+			// "--ignore-ssl-errors",
+			// "--disable-features=RendererCodeIntegrity",
+			// "--disable-blink-features",
+			// "--disable-blink-features=AutomationControlled",
 		},
 		Channel:         nil,
 		ChromiumSandbox: nil,
@@ -87,6 +85,7 @@ func (c *Core) Init() {
 	c.browser = browser
 
 	context, err := c.browser.NewContext()
+	c.browser.NewContext()
 	if err != nil {
 		return
 	}
@@ -137,14 +136,14 @@ func (c *Core) Login() ([]Cookie, error) {
 		return nil, err
 	}
 	log.Infoln("[core] ", "正在等待二维码加载")
-
-	if runtime.GOOS == "windows" {
-		time.Sleep(3 * time.Second)
-	} else {
-		_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
-			State: playwright.WaitForSelectorStateVisible,
-		})
-	}
+	c.Push("text", "正在加载二维码")
+	//if runtime.GOOS == "windows" {
+	time.Sleep(3 * time.Second)
+	//} else {
+	//	_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
+	//		State: playwright.WaitForSelectorStateVisible,
+	//	})
+	//}
 
 	_, err = page.Evaluate(`let h = document.body.scrollWidth/2;document.documentElement.scrollTop=h;`)
 
@@ -176,9 +175,10 @@ func (c *Core) Login() ([]Cookie, error) {
 
 	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
 	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
-	os.WriteFile("screen.png", buffer.Bytes(), 0666)
+	//os.WriteFile("screen.png", buffer.Bytes(), 0666)
 	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
 	log.Debugln("已获取到二维码内容：" + matrix.GetText())
+
 	c.Push("text", "https://techxuexi.js.org/jump/techxuexi-20211023.html?"+matrix.GetText())
 	c.Push("text", matrix.GetText())
 
