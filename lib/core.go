@@ -10,6 +10,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"runtime"
 	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
@@ -137,13 +138,13 @@ func (c *Core) Login() ([]Cookie, error) {
 	}
 	log.Infoln("[core] ", "正在等待二维码加载")
 	c.Push("text", "正在加载二维码")
-	//if runtime.GOOS == "windows" {
-	time.Sleep(3 * time.Second)
-	//} else {
-	//	_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
-	//		State: playwright.WaitForSelectorStateVisible,
-	//	})
-	//}
+	if runtime.GOOS == "windows" {
+		time.Sleep(3 * time.Second)
+	} else {
+		_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
+			State: playwright.WaitForSelectorStateVisible,
+		})
+	}
 
 	_, err = page.Evaluate(`let h = document.body.scrollWidth/2;document.documentElement.scrollTop=h;`)
 
