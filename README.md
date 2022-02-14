@@ -7,12 +7,14 @@
 + [配置参考](./docs/config.md)
 + [推送参考](./docs/push.md)
 + [常见问题](./docs/problem.md)
++ 交流群 https://t.me/+VWI88z6d1k45NGJl
 
 ## 使用
 
 + [Windows使用](./docs/windows/index.md)
 + [Linux使用](./docs/linux/index.md)
 + [~~源码运行~~](./docs/custom/index.md)
+
 
 
 ##  申明，该项目仅用于学习。
