@@ -5,9 +5,10 @@ ARG BUILDARCH
 
 ENV CGO_ENABLED="0"
 ENV GOOS="linux"
+ENV GOPROXY="https://goproxy.cn"
 ARG UPX_VERSION="3.96"
 
-RUN apt update && apt install -y xz-utils git gcc curl
+RUN  sed -i "s@http://deb.debian.org@https://mirrors.163.com@g" /etc/apt/sources.list && apt update && apt install -y xz-utils git gcc curl
 COPY / /study_xxqg
 RUN cd /study_xxqg && \
     version=$(git describe --tags --long --always) && \
