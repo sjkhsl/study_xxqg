@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <a id="login" href="#"><h1>点击登录跳转学习强国app</h1></a>
+</div>
+
+</body>
+<script>
+    function load() {
+        let search = window.location.search
+        search = search.substring(1,search.length)
+        document.getElementById("login").setAttribute("href","dtxuexi://appclient/page/study_feeds?url="+search)
+    }
+    load()
+
+</script>
+</html>

@@ -10,6 +10,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"net/url"
 	"runtime"
 	"time"
 
@@ -180,7 +181,7 @@ func (c *Core) Login() ([]Cookie, error) {
 	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
 	log.Debugln("已获取到二维码内容：" + matrix.GetText())
 
-	c.Push("text", "https://techxuexi.js.org/jump/techxuexi-20211023.html?"+matrix.GetText())
+	c.Push("text", "https://techxuexi.js.org/jump/techxuexi-20211023.html?"+url.QueryEscape(matrix.GetText()))
 	c.Push("text", matrix.GetText())
 
 	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetText()).Print()
