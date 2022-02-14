@@ -17,6 +17,9 @@ log_level: "info"
 # 是否显示浏览器
 show_browser: true
 
+# 跳转学习强国的scheme,默认使用本仓库的action自建scheme,若需自行修改，可直接复制仓库下/docs/scheme.html到任意静态文件服务器
+scheme: "https://johlanse.github.io/study_xxqg/scheme.html?"
+
 
 push:
   ding:

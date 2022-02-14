@@ -12,6 +12,7 @@ type Config struct {
 	Model       int    `json:"model" yaml:"model"`
 	LogLevel    string `json:"log_level" yaml:"log_level"`
 	ShowBrowser bool   `json:"show_browser" yaml:"show_browser"`
+	Scheme      string `json:"scheme" yaml:"scheme"`
 	Push        struct {
 		Ding struct {
 			Enable      bool   `json:"enable" yaml:"enable"`

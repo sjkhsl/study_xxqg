@@ -171,18 +171,14 @@ func (c *Core) Login() ([]Cookie, error) {
 
 	var result []byte
 	buffer := bytes.NewBuffer(result)
-	//os.WriteFile("screen1.png", screen, 0666)
-	//_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 525, 35, 755, 255, 0)
 	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 529, 70, 748, 284, 0)
 
 	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
 	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
-	//os.WriteFile("screen.png", buffer.Bytes(), 0666)
 	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
 	log.Debugln("已获取到二维码内容：" + matrix.GetText())
 
-	c.Push("text", "https://techxuexi.js.org/jump/techxuexi-20211023.html?"+url.QueryEscape(matrix.GetText()))
-	c.Push("text", matrix.GetText())
+	c.Push("text", GetConfig().Scheme+url.QueryEscape(matrix.GetText()))
 
 	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetText()).Print()
 	_, err = page.WaitForNavigation(playwright.PageWaitForNavigationOptions{
