@@ -159,12 +159,12 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 					time.Sleep(1 * time.Second)
 				}
 				fmt.Println()
-
+				score, _ = GetUserScore(cookies)
 				if score.Content["article"].CurrentScore >= score.Content["article"].MaxScore {
 					log.Infoln("检测到本次阅读学习分数已满，退出学习")
 					break
 				}
-				score, _ = GetUserScore(cookies)
+
 				tryCount++
 			} else {
 				log.Errorln("阅读学习出现异常，稍后可重新学习")
@@ -262,11 +262,12 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 					time.Sleep(1 * time.Second)
 				}
 				fmt.Println()
+				score, _ = GetUserScore(cookies)
 				if score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore {
 					log.Infoln("检测到本次视频学习分数已满，退出学习")
 					break
 				}
-				score, _ = GetUserScore(cookies)
+
 				tryCount++
 			} else {
 				log.Errorln("视频学习出现异常，稍后可重新学习")

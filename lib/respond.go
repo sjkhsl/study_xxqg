@@ -250,6 +250,9 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		// 填空题
 		switch {
 		case strings.Contains(categoryText, "填空题"):
+			if len(tips) < 1 {
+				tips = append(tips, "不知道")
+			}
 			err := FillBlank(page, tips)
 			if err != nil {
 				log.Errorln("填空题答题失败" + err.Error())

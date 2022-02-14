@@ -306,6 +306,22 @@ func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err
 	return nil
 }
 
+func WaitStudy(user *User) {
+	i := 0
+	for i <= 180 {
+		score, err := GetUserScore(user.Cookies)
+		if err != nil {
+			return
+		}
+		if (score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore) &&
+			score.Content["article"].CurrentScore >= score.Content["article"].MaxScore {
+			return
+		}
+		time.Sleep(10 * time.Second)
+		i++
+	}
+}
+
 func GetPaymentStr(fi io.Reader) (paymentCodeUrl *gozxing.Result) {
 	img, _, err := image.Decode(fi)
 	if err != nil {

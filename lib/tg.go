@@ -264,13 +264,14 @@ func study(bot *Telegram, args []string) {
 		return
 	}
 	var cookies []Cookie
-	if len(users) == 1 {
+	switch {
+	case len(users) == 1:
 		bot.SendMsg("仅存在一名用户信息，自动进行学习")
 		cookies = users[0].Cookies
-	} else if len(users) == 0 {
+	case len(users) == 0:
 		bot.SendMsg("未发现用户信息，请输入/login进行用户登录")
 		return
-	} else {
+	default:
 		if 0 <= len(args) {
 			i, err := strconv.Atoi(args[0])
 			if err != nil {
@@ -314,6 +315,7 @@ func study(bot *Telegram, args []string) {
 		defer core.Quit()
 		core.LearnArticle(cookies)
 		core.LearnVideo(cookies)
+		WaitStudy(&User{Cookies: cookies})
 		core.RespondDaily(cookies, "daily")
 		core.RespondDaily(cookies, "weekly")
 		core.RespondDaily(cookies, "special")

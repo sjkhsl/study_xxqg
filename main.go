@@ -118,8 +118,9 @@ func do() {
 		log.Infoln("已选择用户: ", users[i-1].Nick)
 	}
 
-	//core.LearnArticle(cookies)
-	core.LearnVideo(cookies)
+	go core.LearnArticle(cookies)
+	go core.LearnVideo(cookies)
+	lib.WaitStudy(&lib.User{Cookies: cookies})
 	if config.Model == 2 {
 		core.RespondDaily(cookies, "daily")
 	} else if config.Model == 3 {
@@ -127,6 +128,7 @@ func do() {
 		core.RespondDaily(cookies, "weekly")
 		core.RespondDaily(cookies, "special")
 	}
+
 	score, err := lib.GetUserScore(cookies)
 	if err != nil {
 		log.Errorln("获取成绩失败")
