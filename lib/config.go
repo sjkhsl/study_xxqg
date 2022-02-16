@@ -73,5 +73,8 @@ func GetConfig() Config {
 	if config.ShowBrowser {
 		log.Infoln("浏览器无头模式已禁用")
 	}
+	if config.Scheme == "" {
+		config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"
+	}
 	return config
 }
