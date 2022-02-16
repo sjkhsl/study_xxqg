@@ -30,6 +30,12 @@ type Config struct {
 		ChatID int64  `json:"chat_id" yaml:"chat_id"`
 		Proxy  string `json:"proxy" yaml:"proxy"`
 	} `json:"tg" yaml:"tg"`
+	Web struct {
+		Account  string `json:"account"`
+		Password string `json:"password"`
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+	} `json:"web"`
 	Cron string `json:"cron"`
 }
 
@@ -42,6 +48,11 @@ var (
 //go:embed config_default.yml
 var defaultConfig []byte
 
+// GetConfig
+/**
+ * @Description:
+ * @return Config
+ */
 func GetConfig() Config {
 	file, err := os.ReadFile("./config/config.yml")
 	if err != nil {

@@ -11,14 +11,14 @@ import (
 )
 
 type Score struct {
-	TotalScore int
-	TodayScore int
-	Content    map[string]Data
+	TotalScore int             `json:"total_score"`
+	TodayScore int             `json:"today_score"`
+	Content    map[string]Data `json:"content"`
 }
 
 type Data struct {
-	CurrentScore int
-	MaxScore     int
+	CurrentScore int `json:"current_score"`
+	MaxScore     int `json:"max_score"`
 }
 
 func GetUserScore(cookies []Cookie) (Score, error) {
