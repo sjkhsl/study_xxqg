@@ -20,7 +20,6 @@ import (
 var VERSION = "unknown"
 
 func init() {
-
 	config = lib.GetConfig()
 	logFormatter := &easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
@@ -120,7 +119,7 @@ func do() {
 
 	go core.LearnArticle(cookies)
 	go core.LearnVideo(cookies)
-	lib.WaitStudy(&lib.User{Cookies: cookies})
+	lib.WaitStudy(&lib.User{Cookies: cookies}, "")
 	if config.Model == 2 {
 		core.RespondDaily(cookies, "daily")
 	} else if config.Model == 3 {
