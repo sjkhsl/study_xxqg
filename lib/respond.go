@@ -58,12 +58,11 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 	_, err = page.Goto(MyPointsUri, playwright.PageGotoOptions{
 		Referer:   playwright.String(MyPointsUri),
-		Timeout:   playwright.Float(1000),
+		Timeout:   playwright.Float(10000),
 		WaitUntil: playwright.WaitUntilStateDomcontentloaded,
 	})
 	if err != nil {
 		log.Errorln("跳转页面失败")
-
 		return
 	}
 	switch model {
