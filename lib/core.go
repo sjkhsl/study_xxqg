@@ -121,6 +121,7 @@ func (c *Core) Login() ([]Cookie, error) {
 			log.Errorln(i)
 		}
 	}()
+	c.Push("text", "开始添加用户")
 	page, err := (*c.context).NewPage()
 
 	if err != nil {

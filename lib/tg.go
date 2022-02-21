@@ -84,6 +84,13 @@ func (t *Telegram) Init() {
 	go func() {
 		for {
 			update := <-channel
+			if update.Message == nil {
+				update.Message = &tgbotapi.Message{Text: update.CallbackQuery.Data}
+				t.bot.Send(tgbotapi.NewDeleteMessage(config.TG.ChatID, update.CallbackQuery.Message.MessageID))
+				log.Infoln(update.CallbackQuery.Data)
+			}
+			log.Infoln("收到tg消息  ", update)
+
 			handles.Range(func(key, value interface{}) bool {
 				if strings.Split(update.Message.Text, " ")[0] == key.(string) {
 					go func() {
@@ -128,9 +135,13 @@ func (t *Telegram) SendPhoto(image []byte) {
 	}
 }
 
-func (t *Telegram) SendMsg(message string) {
+func (t *Telegram) SendMsg(message string) int {
 	msg := tgbotapi.NewMessage(t.ChatId, message)
-	t.bot.Send(msg)
+	messa, err := t.bot.Send(msg)
+	if err != nil {
+		return 0
+	}
+	return messa.MessageID
 }
 
 func login(bot *Telegram, args []string) {
@@ -272,7 +283,7 @@ func study(bot *Telegram, args []string) {
 		bot.SendMsg("未发现用户信息，请输入/login进行用户登录")
 		return
 	default:
-		if 0 <= len(args) {
+		if 0 < len(args) {
 			i, err := strconv.Atoi(args[0])
 			if err != nil {
 				bot.SendMsg(err.Error())
@@ -280,7 +291,17 @@ func study(bot *Telegram, args []string) {
 			}
 			cookies = users[i].Cookies
 		} else {
-			bot.SendMsg("存在多名用户，未输入用户序号")
+			msgID := bot.SendMsg("存在多名用户，未输入用户序号")
+			markup := tgbotapi.InlineKeyboardMarkup{}
+			for i, user := range users {
+				markup.InlineKeyboard = append(markup.InlineKeyboard, append([]tgbotapi.InlineKeyboardButton{}, tgbotapi.NewInlineKeyboardButtonData(user.Nick, "/study "+strconv.Itoa(i))))
+			}
+
+			replyMarkup := tgbotapi.NewEditMessageReplyMarkup(config.TG.ChatID, msgID, markup)
+			_, err := bot.bot.Send(replyMarkup)
+			if err != nil {
+				return
+			}
 			return
 		}
 	}
