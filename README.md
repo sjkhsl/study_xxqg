@@ -7,6 +7,7 @@
 + [配置参考](./docs/config.md)
 + [推送参考](./docs/push.md)
 + [常见问题](./docs/problem.md)
++ [删除老版本文件](./docs/delete_old_file.md)
 + 交流群 https://t.me/+VWI88z6d1k45NGJl
 
 ## 使用
