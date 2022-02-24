@@ -36,7 +36,8 @@ type Config struct {
 		Host     string `json:"host"`
 		Port     int    `json:"port"`
 	} `json:"web"`
-	Cron string `json:"cron"`
+	Cron     string `json:"cron"`
+	EdgePath string `json:"edge_path"`
 }
 
 var (

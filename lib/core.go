@@ -11,6 +11,7 @@ import (
 	"image/png"
 	"io"
 	"net/url"
+	"os"
 	"runtime"
 	"time"
 
@@ -23,6 +24,9 @@ import (
 	"golang.org/x/image/bmp"
 )
 
+// Core
+// @Description:
+//
 type Core struct {
 	pw          *playwright.Playwright
 	browser     playwright.Browser
@@ -31,6 +35,9 @@ type Core struct {
 	Push        func(kind string, message string)
 }
 
+// Cookie
+// @Description:
+//
 type Cookie struct {
 	Name     string `json:"name" yaml:"name"`
 	Value    string `json:"value" yaml:"value"`
@@ -42,8 +49,98 @@ type Cookie struct {
 	SameSite string `json:"same_site" yaml:"same_site"`
 }
 
+// Init
+/**
+ * @Description:
+ * @receiver c
+ */
 func (c *Core) Init() {
-	pwt, err := playwright.Run()
+	if runtime.GOOS == "windows" {
+		c.initWondows()
+	} else {
+		c.initNotWindows()
+	}
+}
+
+func (c *Core) initWondows() {
+	dir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	pwt, err := playwright.Run(&playwright.RunOptions{
+		DriverDirectory:     dir + "/tools/driver/",
+		SkipInstallBrowsers: true,
+		Browsers:            []string{"msedge"},
+	})
+	if err != nil {
+		log.Errorln("[core]", "初始化playwright失败")
+		log.Errorln("[core] ", err.Error())
+
+		return
+	}
+	c.pw = pwt
+	path := GetConfig().EdgePath
+	if path == "" {
+		path = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+	}
+	browser, err := pwt.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+		Args: []string{
+			"--disable-extensions",
+			"--disable-gpu",
+			"--start-maximized",
+			"--no-sandbox",
+			"--window-size=500,450",
+			// "--mute-audio",
+			"--window-position=0,0",
+			"--ignore-certificate-errors",
+			// "--ignore-ssl-errors",
+			// "--disable-features=RendererCodeIntegrity",
+			// "--disable-blink-features",
+			// "--disable-blink-features=AutomationControlled",
+		},
+		Channel:         nil,
+		ChromiumSandbox: nil,
+		Devtools:        nil,
+		DownloadsPath:   nil,
+		ExecutablePath:  playwright.String(path),
+		HandleSIGHUP:    nil,
+		HandleSIGINT:    nil,
+		HandleSIGTERM:   nil,
+		Headless:        playwright.Bool(!c.ShowBrowser),
+		Proxy:           nil,
+		SlowMo:          nil,
+		Timeout:         nil,
+	})
+	if err != nil {
+		log.Errorln("[core] ", "初始化chrome失败")
+		log.Errorln("[core] ", err.Error())
+		return
+	}
+	c.browser = browser
+
+	context, err := c.browser.NewContext()
+	c.browser.NewContext()
+	if err != nil {
+		return
+	}
+	c.context = &context
+}
+
+func (c *Core) initNotWindows() {
+	dir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	err = os.Setenv("PLAYWRIGHT_BROWSERS_PATH", dir+"/tools/browser/")
+	if err != nil {
+		log.Errorln("设置环境变量PLAYWRIGHT_BROWSERS_PATH失败" + err.Error())
+		err = nil
+	}
+	pwt, err := playwright.Run(&playwright.RunOptions{
+		DriverDirectory:     dir + "/tools/driver/",
+		SkipInstallBrowsers: false,
+		Browsers:            []string{"firefox"},
+	})
 	if err != nil {
 		log.Errorln("[core]", "初始化playwright失败")
 		log.Errorln("[core] ", err.Error())
@@ -54,7 +151,7 @@ func (c *Core) Init() {
 	browser, err := pwt.Firefox.Launch(playwright.BrowserTypeLaunchOptions{
 		Args: []string{
 			"--disable-extensions",
-			// "--disable-gpu",
+			"--disable-gpu",
 			"--start-maximized",
 			"--no-sandbox",
 			"--window-size=500,450",
