@@ -345,6 +345,7 @@ func getAnswerPage(page playwright.Page, model string) bool {
 		if err1 != nil {
 			log.Errorln("点击页码失败")
 		}
+		time.Sleep(2 * time.Second)
 		datas, err := page.QuerySelectorAll(modelSlector)
 		if err != nil {
 			log.Errorln("获取页面内容失败")
@@ -353,6 +354,7 @@ func getAnswerPage(page playwright.Page, model string) bool {
 		for _, data := range datas {
 			content, err := data.TextContent()
 			if err != nil {
+				log.Errorln("获取按钮文本失败" + err.Error())
 				continue
 			}
 			if strings.Contains(content, "重新") || strings.Contains(content, "满分") {
@@ -369,6 +371,8 @@ func getAnswerPage(page playwright.Page, model string) bool {
 				if enabled {
 					log.Infoln("按钮可用")
 				}
+				data.WaitForElementState("stable", playwright.ElementHandleWaitForElementStateOptions{Timeout: playwright.Float(10000)})
+				time.Sleep(5 * time.Second)
 				err = data.Click(playwright.ElementHandleClickOptions{
 					Button:      nil,
 					ClickCount:  playwright.Int(2),
