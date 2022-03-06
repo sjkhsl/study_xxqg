@@ -101,7 +101,7 @@ func do() {
 	switch {
 	case len(users) < 1:
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
-		cookies, _ = core.Login()
+		cookies, _ = core.L()
 	case len(users) == 1:
 		log.Infoln("检测到1位有效用户信息，采用默认用户")
 		cookies = users[0].Cookies

@@ -94,7 +94,7 @@ func binaryName() string {
 	}
 	ext := "tar.gz"
 	if runtime.GOOS == "windows" {
-		ext = "zip"
+		ext = "exe"
 	}
 	return fmt.Sprintf("study_xxqg_%v_%v.%v", runtime.GOOS, goarch, ext)
 }

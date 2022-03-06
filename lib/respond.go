@@ -48,8 +48,10 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 		return
 	}
+	page.Goto("https://pc.xuexi.cn/points/my-points.html")
 	err = (*c.context).AddCookies(cookieToParam(cookies)...)
 	if err != nil {
+		log.Errorln(err.Error())
 		log.Errorln("添加cookie信息失败，已退出答题")
 
 		return
@@ -148,6 +150,19 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 			err := btn.Click()
 			if err != nil {
 				log.Errorln("提交答案失败")
+			}
+		}
+		handle, _ := page.QuerySelector("#nc_mask > div")
+		if handle != nil {
+			log.Infoln(handle)
+			en, err := handle.IsVisible()
+			if err != nil {
+				return
+			}
+			if en {
+				log.Infoln("可能存在滑块")
+				c.Push("text", "答题过程出现滑块")
+				return
 			}
 		}
 		switch model {

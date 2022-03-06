@@ -18,3 +18,11 @@ func TestName(t *testing.T) {
 	}
 	fmt.Println(score)
 }
+
+func TestLogin(t *testing.T) {
+	core := Core{}
+	core.Push = func(kind string, message string) {
+		fmt.Println(message)
+	}
+	core.L()
+}

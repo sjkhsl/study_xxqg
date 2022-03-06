@@ -13,9 +13,12 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
+	"github.com/google/uuid"
+	"github.com/imroc/req/v3"
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/mxschmitt/playwright-go"
@@ -49,6 +52,29 @@ type Cookie struct {
 	SameSite string `json:"same_site" yaml:"same_site"`
 }
 
+type signResp struct {
+	Data struct {
+		Sign string `json:"sign"`
+	} `json:"data"`
+	Message string      `json:"message"`
+	Code    int         `json:"code"`
+	Error   interface{} `json:"error"`
+	Ok      bool        `json:"ok"`
+}
+type gennerateResp struct {
+	Success   bool        `json:"success"`
+	ErrorCode interface{} `json:"errorCode"`
+	ErrorMsg  interface{} `json:"errorMsg"`
+	Result    string      `json:"result"`
+	Arguments interface{} `json:"arguments"`
+}
+type checkQrCodeResp struct {
+	Code    string `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    string `json:"data"`
+}
+
 // Init
 /**
  * @Description:
@@ -60,6 +86,110 @@ func (c *Core) Init() {
 	} else {
 		c.initNotWindows()
 	}
+}
+
+func (c *Core) L() ([]Cookie, error) {
+	client := req.C()
+	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
+		return nil
+	})
+	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
+
+	s := new(signResp)
+	_, err := client.R().SetResult(s).Get("https://pc-api.xuexi.cn/open/api/sns/sign")
+	if err != nil {
+		log.Errorln(err.Error())
+		return nil, err
+	}
+	log.Debugln("获取sign成功==》" + s.Data.Sign)
+	g := new(gennerateResp)
+	_, err = client.R().SetResult(g).Get("https://login.xuexi.cn/user/qrcode/generate")
+	if err != nil {
+		log.Errorln(err.Error())
+		return nil, err
+	}
+	log.Infoln(g.Result)
+	codeURL := fmt.Sprintf("https://login.xuexi.cn/login/qrcommit?showmenu=false&code=%v&appId=dingoankubyrfkttorhpou", g.Result)
+
+	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
+	qrCodeString.Print()
+	c.Push("text", "https://johlanse.github.io/study_xxqg/scheme.html?"+url.QueryEscape(codeURL))
+	checkQrCode := func() (bool, string) {
+		res := new(checkQrCodeResp)
+		_, err := client.R().SetResult(res).SetFormData(map[string]string{
+			"qrCode":   g.Result,
+			"goto":     "https://oa.xuexi.cn",
+			"pdmToken": ""}).SetHeader("content-type", "application/x-www-form-urlencoded;charset=UTF-8").Post("https://login.xuexi.cn/login/login_with_qr")
+		if err != nil {
+			return false, ""
+		}
+		if res.Success {
+			return true, res.Data
+		} else {
+			return false, ""
+		}
+	}
+	for i := 0; i < 150; i++ {
+		code, data := checkQrCode()
+		if code {
+			s2 := strings.Split(data, "=")[1]
+			response, err := client.R().SetQueryParams(map[string]string{
+				"code":  s2,
+				"state": s.Data.Sign + uuid.New().String(),
+			}).Get("https://pc-api.xuexi.cn/login/secure_check")
+			if err != nil {
+				return nil, err
+			}
+			var (
+				cos []Cookie
+			)
+
+			for _, c := range response.Cookies() {
+				co := Cookie{}
+				co.Name = c.Name
+				co.Path = c.Path
+				co.Value = c.Value
+				co.Domain = c.Domain
+				co.Expires = int(c.Expires.Unix())
+				co.SameSite = "Strict"
+				co.HTTPOnly = c.HttpOnly
+				co.Secure = c.Secure
+				cos = append(cos, co)
+			}
+			resp, err := client.R().Get("https://pc.xuexi.cn/points/my-points.html")
+			if err != nil {
+				return nil, err
+			}
+			for _, c := range resp.Cookies() {
+				co := Cookie{}
+				co.Name = c.Name
+				co.Path = c.Path
+				co.Value = c.Value
+				co.Domain = c.Domain
+				co.Expires = int(c.Expires.Unix())
+				co.SameSite = "Strict"
+				co.HTTPOnly = c.HttpOnly
+				co.Secure = c.Secure
+				cos = append(cos, co)
+			}
+			info, nick, err := GetUserInfo(cos)
+			if err != nil {
+				return cos, err
+			}
+			c.Push("text", "登录成功，用户名："+nick)
+			err = SaveUser(User{
+				Cookies: cos,
+				Nick:    nick,
+				Uid:     info,
+				Time:    time.Now().Add(time.Hour * 24).Unix(),
+			})
+			if err != nil {
+				return cos, err
+			}
+			return cos, err
+		}
+	}
+	return nil, errors.New("time out")
 }
 
 func (c *Core) initWondows() {
