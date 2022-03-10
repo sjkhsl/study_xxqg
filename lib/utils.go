@@ -21,6 +21,7 @@ func cookieToJar(cookies []Cookie) []*http.Cookie {
 				Domain:   c.Domain,
 				Secure:   c.Secure,
 				HttpOnly: c.HTTPOnly,
+				SameSite: http.SameSiteDefaultMode,
 			},
 		)
 	}

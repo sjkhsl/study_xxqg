@@ -37,6 +37,16 @@ func init() {
 	log.SetLevel(level)
 }
 
+func init() {
+	pid := os.Getpid()
+	pi := strconv.Itoa(pid)
+	err := os.WriteFile("pid.pid", []byte(pi), 0666)
+	if err != nil {
+		log.Errorln("pid写入失败")
+		return
+	}
+}
+
 var (
 	config lib.Config
 )

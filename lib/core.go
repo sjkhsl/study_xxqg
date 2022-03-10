@@ -24,6 +24,7 @@ import (
 	"github.com/mxschmitt/playwright-go"
 	"github.com/nfnt/resize"
 	log "github.com/sirupsen/logrus"
+	goqrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/image/bmp"
 )
 
@@ -110,6 +111,14 @@ func (c *Core) L() ([]Cookie, error) {
 	}
 	log.Infoln(g.Result)
 	codeURL := fmt.Sprintf("https://login.xuexi.cn/login/qrcommit?showmenu=false&code=%v&appId=dingoankubyrfkttorhpou", g.Result)
+
+	err = goqrcode.WriteFile(codeURL, goqrcode.Medium, 128, "qrcode.png")
+	if err != nil {
+		log.Errorln("图片生成错误" + err.Error())
+		err = nil
+	} else {
+		log.Infoln("二维码已生成到目录下的qrcode.png")
+	}
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()

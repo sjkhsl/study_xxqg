@@ -48,6 +48,9 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 
 		return
 	}
+	defer func() {
+		page.Close()
+	}()
 	page.Goto("https://pc.xuexi.cn/points/my-points.html")
 	err = (*c.context).AddCookies(cookieToParam(cookies)...)
 	if err != nil {
@@ -160,9 +163,15 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 				return
 			}
 			if en {
+				page.Mouse().Move(496, 422)
+				time.Sleep(1 * time.Second)
+				page.Mouse().Down()
+
+				page.Mouse().Move(772, 416, playwright.MouseMoveOptions{})
+				page.Mouse().Up()
+				time.Sleep(10 * time.Second)
 				log.Infoln("可能存在滑块")
-				c.Push("text", "答题过程出现滑块")
-				return
+				c.Push("text", "答题过程出现滑块，正在尝试滑动")
 			}
 		}
 		switch model {

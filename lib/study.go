@@ -116,6 +116,9 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 		if err != nil {
 			return
 		}
+		defer func() {
+			page.Close()
+		}()
 
 		err = (*c.context).AddCookies(cookieToParam(cookies)...)
 		if err != nil {
@@ -208,7 +211,9 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 		if err != nil {
 			return
 		}
-
+		defer func() {
+			page.Close()
+		}()
 		var resp string
 		err = gout.GET("http://1.15.144.22/stealth.min.js").BindBody(&resp).Do()
 		if err != nil {
