@@ -43,5 +43,3 @@ tg:
 # "9 19 * * *" 每天19点9分执行一次
 # "* 10 * * *” 每天早上十点执行一次
 cron: ""
-
-edge_path: "C:\\Program Files (x86)\\Microsoft\Edge\\Application\\msedge.exe"
