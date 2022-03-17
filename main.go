@@ -14,6 +14,7 @@ import (
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 
 	"github.com/huoxue1/study_xxqg/lib"
+	"github.com/huoxue1/study_xxqg/model"
 	"github.com/huoxue1/study_xxqg/push"
 )
 
@@ -106,15 +107,15 @@ func do() {
 	core := lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()
-	var cookies []lib.Cookie
-	users, _ := lib.GetUsers()
+	var user *model.User
+	users, _ := model.Query()
 	switch {
 	case len(users) < 1:
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
-		cookies, _ = core.L()
+		user, _ = core.L()
 	case len(users) == 1:
 		log.Infoln("检测到1位有效用户信息，采用默认用户")
-		cookies = users[0].Cookies
+		user = users[0]
 		log.Infoln("已选择用户: ", users[0].Nick)
 	default:
 		for i, user := range users {
@@ -123,22 +124,22 @@ func do() {
 		log.Infoln("请输入对应序号选择对应账户")
 		var i int
 		_, _ = fmt.Scanln(&i)
-		cookies = users[i-1].Cookies
+		user = users[i-1]
 		log.Infoln("已选择用户: ", users[i-1].Nick)
 	}
 
-	go core.LearnArticle(cookies)
-	go core.LearnVideo(cookies)
-	lib.WaitStudy(&lib.User{Cookies: cookies}, "")
+	go core.LearnArticle(user)
+	go core.LearnVideo(user)
+	lib.WaitStudy(user, "")
 	if config.Model == 2 {
-		core.RespondDaily(cookies, "daily")
+		core.RespondDaily(user, "daily")
 	} else if config.Model == 3 {
-		core.RespondDaily(cookies, "daily")
-		core.RespondDaily(cookies, "weekly")
-		core.RespondDaily(cookies, "special")
+		core.RespondDaily(user, "daily")
+		core.RespondDaily(user, "weekly")
+		core.RespondDaily(user, "special")
 	}
 
-	score, err := lib.GetUserScore(cookies)
+	score, err := lib.GetUserScore(user.ToCookies())
 	if err != nil {
 		log.Errorln("获取成绩失败")
 		log.Debugln(err.Error())

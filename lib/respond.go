@@ -8,6 +8,8 @@ import (
 
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/huoxue1/study_xxqg/model"
 )
 
 const (
@@ -21,7 +23,7 @@ div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-
 div > div.my-points-section > div.my-points-content > div:nth-child(7) > div.my-points-card-footer > div.buttonbox > div`
 )
 
-func (c *Core) RespondDaily(cookies []Cookie, model string) {
+func (c *Core) RespondDaily(user *model.User, model string) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -35,7 +37,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 		return
 	}
 	// 获取用户成绩
-	score, err := GetUserScore(cookies)
+	score, err := GetUserScore(user.ToCookies())
 	if err != nil {
 		log.Errorln("获取分数失败，停止每日答题", err.Error())
 
@@ -51,14 +53,15 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 	defer func() {
 		page.Close()
 	}()
-	page.Goto("https://pc.xuexi.cn/points/my-points.html")
-	err = (*c.context).AddCookies(cookieToParam(cookies)...)
+	log.Infoln(user.ToBrowserCookies())
+	err = (*c.context).AddCookies(user.ToBrowserCookies()...)
 	if err != nil {
 		log.Errorln(err.Error())
 		log.Errorln("添加cookie信息失败，已退出答题")
-
 		return
 	}
+	page.Goto("https://pc.xuexi.cn/points/my-points.html")
+
 	log.Infoln("已加载答题模块")
 
 	_, err = page.Goto(MyPointsUri, playwright.PageGotoOptions{
@@ -172,6 +175,14 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 				time.Sleep(10 * time.Second)
 				log.Infoln("可能存在滑块")
 				c.Push("text", "答题过程出现滑块，正在尝试滑动")
+				en, err = handle.IsVisible()
+				if err != nil {
+					return
+				}
+				if en {
+					page.Evaluate("__nc.reset()")
+					goto label
+				}
 			}
 		}
 		switch model {
@@ -339,7 +350,7 @@ func (c *Core) RespondDaily(cookies []Cookie, model string) {
 				return
 			}
 		}
-		score, _ = GetUserScore(cookies)
+		score, _ = GetUserScore(user.ToCookies())
 	}
 }
 

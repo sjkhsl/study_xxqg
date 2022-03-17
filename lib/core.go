@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"bytes"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"image"
@@ -26,6 +24,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	goqrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/image/bmp"
+
+	"github.com/huoxue1/study_xxqg/model"
 )
 
 // Core
@@ -89,7 +89,7 @@ func (c *Core) Init() {
 	}
 }
 
-func (c *Core) L() ([]Cookie, error) {
+func (c *Core) L() (*model.User, error) {
 	client := req.C()
 	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
 		return nil
@@ -149,53 +149,32 @@ func (c *Core) L() ([]Cookie, error) {
 			if err != nil {
 				return nil, err
 			}
-			var (
-				cos []Cookie
-			)
 
-			for _, c := range response.Cookies() {
-				co := Cookie{}
-				co.Name = c.Name
-				co.Path = c.Path
-				co.Value = c.Value
-				co.Domain = c.Domain
-				co.Expires = int(c.Expires.Unix())
-				co.SameSite = "Strict"
-				co.HTTPOnly = c.HttpOnly
-				co.Secure = c.Secure
-				cos = append(cos, co)
-			}
-			resp, err := client.R().Get("https://pc.xuexi.cn/points/my-points.html")
+			uid, nick, err := GetUserInfo(response.Cookies())
 			if err != nil {
 				return nil, err
 			}
-			for _, c := range resp.Cookies() {
-				co := Cookie{}
-				co.Name = c.Name
-				co.Path = c.Path
-				co.Value = c.Value
-				co.Domain = c.Domain
-				co.Expires = int(c.Expires.Unix())
-				co.SameSite = "Strict"
-				co.HTTPOnly = c.HttpOnly
-				co.Secure = c.Secure
-				cos = append(cos, co)
+			user := &model.User{
+				Nick:      nick,
+				UID:       uid,
+				Token:     response.Cookies()[0].Value,
+				LoginTime: time.Now().UnixNano(),
 			}
-			info, nick, err := GetUserInfo(cos)
+			err = model.AddUser(user)
 			if err != nil {
-				return cos, err
+				return nil, err
 			}
 			c.Push("text", "登录成功，用户名："+nick)
-			err = SaveUser(User{
-				Cookies: cos,
-				Nick:    nick,
-				Uid:     info,
-				Time:    time.Now().Add(time.Hour * 24).Unix(),
-			})
-			if err != nil {
-				return cos, err
-			}
-			return cos, err
+			//model.AddUser(&model.User{
+			//	Nick:      nick,
+			//	UID:       info,
+			//	Token:     resp.Cookies()[],
+			//	LoginTime: 0,
+			//})
+			//if err != nil {
+			//	return cos, err
+			//}
+			return user, err
 		}
 	}
 	return nil, errors.New("time out")
@@ -349,124 +328,124 @@ func (c *Core) IsQuit() bool {
 	return !c.browser.IsConnected()
 }
 
-func (c *Core) Login() ([]Cookie, error) {
-	defer func() {
-		i := recover()
-		if i != nil {
-			log.Errorln("登录模块出现无法挽救的错误")
-			log.Errorln(i)
-		}
-	}()
-	c.Push("text", "开始添加用户")
-	page, err := (*c.context).NewPage()
-
-	if err != nil {
-		return nil, err
-	}
-	_, err = page.Goto("https://pc.xuexi.cn/points/login.html", playwright.PageGotoOptions{
-		Referer:   nil,
-		Timeout:   playwright.Float(30000),
-		WaitUntil: playwright.WaitUntilStateDomcontentloaded,
-	})
-	if err != nil {
-		log.Errorln("[core] ", "打开登录页面失败")
-		log.Errorln("[core] ", err.Error())
-
-		return nil, err
-	}
-	log.Infoln("[core] ", "正在等待二维码加载")
-	c.Push("text", "正在加载二维码")
-	if runtime.GOOS == "windows" {
-		time.Sleep(3 * time.Second)
-	} else {
-		_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
-			State: playwright.WaitForSelectorStateVisible,
-		})
-	}
-
-	_, err = page.Evaluate(`let h = document.body.scrollWidth/2;document.documentElement.scrollTop=h;`)
-
-	if err != nil {
-		fmt.Println(err.Error())
-
-		return nil, err
-	}
-
-	log.Infoln("[core] ", "加载验证码中，请耐心等待")
-
-	//frame := page.Frame(playwright.PageFrameOptions{
-	//	Name: playwright.String(`ddlogin-iframe`),
-	//	URL:  nil,
-	//})
-	//if frame == nil {
-	//	log.Errorln("获取frame失败")
-	//}
-
-	removeNode(page)
-
-	screen, _ := page.Screenshot()
-
-	var result []byte
-	buffer := bytes.NewBuffer(result)
-	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 529, 70, 748, 284, 0)
-
-	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
-	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
-	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
-	log.Debugln("已获取到二维码内容：" + matrix.GetText())
-
-	c.Push("text", GetConfig().Scheme+url.QueryEscape(matrix.GetText()))
-
-	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetText()).Print()
-	_, err = page.WaitForNavigation(playwright.PageWaitForNavigationOptions{
-		Timeout:   playwright.Float(30 * 1000 * 5),
-		URL:       nil,
-		WaitUntil: nil,
-	})
-	if err != nil {
-		log.Errorln(err.Error())
-
-		return nil, err
-	}
-	cookies, err := (*c.context).Cookies() //nolint:wsl
-	if err != nil {
-		log.Errorln("[core] ", "获取cookie失败")
-		return nil, err
-	}
-
-	var (
-		cos []Cookie
-	)
-
-	for _, c := range cookies {
-		co := Cookie{}
-		co.Name = c.Name
-		co.Path = c.Path
-		co.Value = c.Value
-		co.Domain = c.Domain
-		co.Expires = c.Expires
-		co.HTTPOnly = c.HttpOnly
-		co.SameSite = c.SameSite
-		co.Secure = c.Secure
-		cos = append(cos, co)
-	}
-	info, nick, err := GetUserInfo(cos)
-	if err != nil {
-		return nil, err
-	}
-	c.Push("text", "登录成功，用户名："+nick)
-	err = SaveUser(User{
-		Cookies: cos,
-		Nick:    nick,
-		Uid:     info,
-		Time:    time.Now().Add(time.Hour * 24).Unix(),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return cos, err
-}
+//func (c *Core) Login() ([]Cookie, error) {
+//	defer func() {
+//		i := recover()
+//		if i != nil {
+//			log.Errorln("登录模块出现无法挽救的错误")
+//			log.Errorln(i)
+//		}
+//	}()
+//	c.Push("text", "开始添加用户")
+//	page, err := (*c.context).NewPage()
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//	_, err = page.Goto("https://pc.xuexi.cn/points/login.html", playwright.PageGotoOptions{
+//		Referer:   nil,
+//		Timeout:   playwright.Float(30000),
+//		WaitUntil: playwright.WaitUntilStateDomcontentloaded,
+//	})
+//	if err != nil {
+//		log.Errorln("[core] ", "打开登录页面失败")
+//		log.Errorln("[core] ", err.Error())
+//
+//		return nil, err
+//	}
+//	log.Infoln("[core] ", "正在等待二维码加载")
+//	c.Push("text", "正在加载二维码")
+//	if runtime.GOOS == "windows" {
+//		time.Sleep(3 * time.Second)
+//	} else {
+//		_, _ = page.WaitForSelector(`#app > div > div.login_content > div > div.login_qrcode `, playwright.PageWaitForSelectorOptions{
+//			State: playwright.WaitForSelectorStateVisible,
+//		})
+//	}
+//
+//	_, err = page.Evaluate(`let h = document.body.scrollWidth/2;document.documentElement.scrollTop=h;`)
+//
+//	if err != nil {
+//		fmt.Println(err.Error())
+//
+//		return nil, err
+//	}
+//
+//	log.Infoln("[core] ", "加载验证码中，请耐心等待")
+//
+//	//frame := page.Frame(playwright.PageFrameOptions{
+//	//	Name: playwright.String(`ddlogin-iframe`),
+//	//	URL:  nil,
+//	//})
+//	//if frame == nil {
+//	//	log.Errorln("获取frame失败")
+//	//}
+//
+//	removeNode(page)
+//
+//	screen, _ := page.Screenshot()
+//
+//	var result []byte
+//	buffer := bytes.NewBuffer(result)
+//	_ = Clip(bytes.NewReader(screen), buffer, 0, 0, 529, 70, 748, 284, 0)
+//
+//	c.Push("markdown", fmt.Sprintf("![screenshot](%v) \n>点开查看登录二维码\n>请在五分钟内完成扫码", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(buffer.Bytes())))
+//	c.Push("image", base64.StdEncoding.EncodeToString(buffer.Bytes()))
+//	matrix := GetPaymentStr(bytes.NewReader(buffer.Bytes()))
+//	log.Debugln("已获取到二维码内容：" + matrix.GetText())
+//
+//	c.Push("text", GetConfig().Scheme+url.QueryEscape(matrix.GetText()))
+//
+//	qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(matrix.GetText()).Print()
+//	_, err = page.WaitForNavigation(playwright.PageWaitForNavigationOptions{
+//		Timeout:   playwright.Float(30 * 1000 * 5),
+//		URL:       nil,
+//		WaitUntil: nil,
+//	})
+//	if err != nil {
+//		log.Errorln(err.Error())
+//
+//		return nil, err
+//	}
+//	cookies, err := (*c.context).Cookies() //nolint:wsl
+//	if err != nil {
+//		log.Errorln("[core] ", "获取cookie失败")
+//		return nil, err
+//	}
+//
+//	var (
+//		cos []Cookie
+//	)
+//
+//	for _, c := range cookies {
+//		co := Cookie{}
+//		co.Name = c.Name
+//		co.Path = c.Path
+//		co.Value = c.Value
+//		co.Domain = c.Domain
+//		co.Expires = c.Expires
+//		co.HTTPOnly = c.HttpOnly
+//		co.SameSite = c.SameSite
+//		co.Secure = c.Secure
+//		cos = append(cos, co)
+//	}
+//	info, nick, err := GetUserInfo(cos)
+//	if err != nil {
+//		return nil, err
+//	}
+//	c.Push("text", "登录成功，用户名："+nick)
+//	err = SaveUser(User{
+//		Cookies: cos,
+//		Nick:    nick,
+//		Uid:     info,
+//		Time:    time.Now().Add(time.Hour * 24).Unix(),
+//	})
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return cos, err
+//}
 
 func removeNode(page playwright.Page) {
 	page.Evaluate(`document.getElementsByClassName("layout-header")[0].remove()`) //nolint:errcheck
@@ -540,10 +519,10 @@ func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err
 	return nil
 }
 
-func WaitStudy(user *User, id string) {
+func WaitStudy(user *model.User, id string) {
 	i := 0
 	for i <= 180 {
-		score, err := GetUserScore(user.Cookies)
+		score, err := GetUserScore(user.ToCookies())
 		if err != nil {
 			return
 		}

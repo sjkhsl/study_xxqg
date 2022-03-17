@@ -11,6 +11,8 @@ import (
 	"github.com/guonaihong/gout"
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/huoxue1/study_xxqg/model"
 )
 
 var (
@@ -92,7 +94,7 @@ func getLinks(model string) ([]Link, error) {
  * @receiver c
  * @param cookies
  */
-func (c *Core) LearnArticle(cookies []Cookie) {
+func (c *Core) LearnArticle(user *model.User) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -104,7 +106,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 		return
 	}
 
-	score, err := GetUserScore(cookies)
+	score, err := GetUserScore(user.ToCookies())
 	if err != nil {
 		log.Errorln(err.Error())
 		return
@@ -120,7 +122,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 			page.Close()
 		}()
 
-		err = (*c.context).AddCookies(cookieToParam(cookies)...)
+		err = (*c.context).AddCookies(user.ToBrowserCookies()...)
 		if err != nil {
 			log.Errorln("添加cookie失败" + err.Error())
 			return
@@ -162,7 +164,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
 					time.Sleep(1 * time.Second)
 				}
 				fmt.Println()
-				score, _ = GetUserScore(cookies)
+				score, _ = GetUserScore(user.ToCookies())
 				if score.Content["article"].CurrentScore >= score.Content["article"].MaxScore {
 					log.Infoln("检测到本次阅读学习分数已满，退出学习")
 					break
@@ -185,7 +187,7 @@ func (c *Core) LearnArticle(cookies []Cookie) {
  * @receiver c
  * @param cookies
  */
-func (c *Core) LearnVideo(cookies []Cookie) {
+func (c *Core) LearnVideo(user *model.User) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -196,7 +198,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 	if c.IsQuit() {
 		return
 	}
-	score, err := GetUserScore(cookies)
+	score, err := GetUserScore(user.ToCookies())
 	if err != nil {
 		log.Errorln(err.Error())
 		return
@@ -226,13 +228,13 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 		if err != nil {
 			return
 		}
-		err = (*c.context).AddCookies(cookieToParam(cookies)...)
+
+		err = (*c.context).AddCookies(user.ToBrowserCookies()...)
 		if err != nil {
 			log.Errorln("添加cookie失败" + err.Error())
 			return
 		}
 		tryCount := 0
-
 		for {
 			if tryCount < 20 {
 				PrintScore(score)
@@ -267,7 +269,7 @@ func (c *Core) LearnVideo(cookies []Cookie) {
 					time.Sleep(1 * time.Second)
 				}
 				fmt.Println()
-				score, _ = GetUserScore(cookies)
+				score, _ = GetUserScore(user.ToCookies())
 				if score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore {
 					log.Infoln("检测到本次视频学习分数已满，退出学习")
 					break

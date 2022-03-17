@@ -3,6 +3,7 @@ package lib
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/guonaihong/gout"
@@ -21,11 +22,11 @@ type Data struct {
 	MaxScore     int `json:"max_score"`
 }
 
-func GetUserScore(cookies []Cookie) (Score, error) {
+func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	var score Score
 	var resp []byte
 	// 获取用户总分
-	err := gout.GET(user_totalScore_url).SetCookies(cookieToJar(cookies)...).SetHeader(gout.H{
+	err := gout.GET(user_totalScore_url).SetCookies(cookies...).SetHeader(gout.H{
 		"Cache-Control": "no-cache",
 	}).BindBody(&resp).Do()
 	if err != nil {
@@ -42,7 +43,7 @@ func GetUserScore(cookies []Cookie) (Score, error) {
 	score.TotalScore = int(gjson.GetBytes(resp, "data.score").Int())
 
 	// 获取用户今日得分
-	err = gout.GET(user_todayTotalScore_url).SetCookies(cookieToJar(cookies)...).SetHeader(gout.H{
+	err = gout.GET(user_todayTotalScore_url).SetCookies(cookies...).SetHeader(gout.H{
 		"Cache-Control": "no-cache",
 	}).BindBody(&resp).Do()
 	if err != nil {
@@ -53,7 +54,7 @@ func GetUserScore(cookies []Cookie) (Score, error) {
 	log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TodayScore = int(gjson.GetBytes(resp, "data.score").Int())
 
-	err = gout.GET(user_rateScore_url).SetCookies(cookieToJar(cookies)...).SetHeader(gout.H{
+	err = gout.GET(user_rateScore_url).SetCookies(cookies...).SetHeader(gout.H{
 		"Cache-Control": "no-cache",
 	}).BindBody(&resp).Do()
 	if err != nil {

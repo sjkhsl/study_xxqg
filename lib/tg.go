@@ -13,6 +13,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/huoxue1/study_xxqg/model"
 )
 
 var (
@@ -80,7 +82,7 @@ func (t *Telegram) Init() {
 	}
 
 	channel := t.bot.GetUpdatesChan(tgbotapi.NewUpdate(1))
-
+	t.SendMsg("你的学习强国小助手上线了！")
 	go func() {
 		for {
 			update := <-channel
@@ -184,7 +186,7 @@ func login(bot *Telegram, args []string) {
 }
 
 func getAllUser(bot *Telegram, args []string) {
-	users, err := GetUsers()
+	users, err := model.Query()
 	if err != nil {
 		bot.SendMsg("获取用户失败" + err.Error())
 		return
@@ -199,7 +201,7 @@ func getAllUser(bot *Telegram, args []string) {
 
 func studyAll(bot *Telegram, args []string) {
 	config := GetConfig()
-	users, err := GetUsers()
+	users, err := model.Query()
 	if err != nil {
 		bot.SendMsg(err.Error())
 		return
@@ -241,11 +243,11 @@ func studyAll(bot *Telegram, args []string) {
 				defer datas.Delete(u)
 				core.Init()
 				defer core.Quit()
-				core.LearnArticle(user.Cookies)
-				core.LearnVideo(user.Cookies)
-				core.RespondDaily(user.Cookies, "daily")
-				core.RespondDaily(user.Cookies, "weekly")
-				core.RespondDaily(user.Cookies, "special")
+				core.LearnArticle(user)
+				core.LearnVideo(user)
+				core.RespondDaily(user, "daily")
+				core.RespondDaily(user, "weekly")
+				core.RespondDaily(user, "special")
 				c <- 1
 			}()
 
@@ -260,7 +262,7 @@ func studyAll(bot *Telegram, args []string) {
 				{
 				}
 			}
-			score, _ := GetUserScore(user.Cookies)
+			score, _ := GetUserScore(user.ToCookies())
 			bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
 		}
 		s()
@@ -269,16 +271,16 @@ func studyAll(bot *Telegram, args []string) {
 
 func study(bot *Telegram, args []string) {
 	config := GetConfig()
-	users, err := GetUsers()
+	users, err := model.Query()
 	if err != nil {
 		bot.SendMsg(err.Error())
 		return
 	}
-	var cookies []Cookie
+	var user *model.User
 	switch {
 	case len(users) == 1:
 		bot.SendMsg("仅存在一名用户信息，自动进行学习")
-		cookies = users[0].Cookies
+		user = users[0]
 	case len(users) == 0:
 		bot.SendMsg("未发现用户信息，请输入/login进行用户登录")
 		return
@@ -289,7 +291,7 @@ func study(bot *Telegram, args []string) {
 				bot.SendMsg(err.Error())
 				return
 			}
-			cookies = users[i].Cookies
+			user = users[i]
 		} else {
 			msgID := bot.SendMsg("存在多名用户，未输入用户序号")
 			markup := tgbotapi.InlineKeyboardMarkup{}
@@ -334,11 +336,11 @@ func study(bot *Telegram, args []string) {
 		defer datas.Delete(u)
 		core.Init()
 		defer core.Quit()
-		core.LearnArticle(cookies)
-		core.LearnVideo(cookies)
-		core.RespondDaily(cookies, "daily")
-		core.RespondDaily(cookies, "weekly")
-		core.RespondDaily(cookies, "special")
+		core.LearnArticle(user)
+		core.LearnVideo(user)
+		core.RespondDaily(user, "daily")
+		core.RespondDaily(user, "weekly")
+		core.RespondDaily(user, "special")
 		c <- 1
 	}()
 
@@ -354,12 +356,12 @@ func study(bot *Telegram, args []string) {
 
 		}
 	}
-	score, _ := GetUserScore(cookies)
+	score, _ := GetUserScore(user.ToCookies())
 	bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
 }
 
 func getScores(bot *Telegram, args []string) {
-	users, err := GetUsers()
+	users, err := model.Query()
 	if err != nil {
 		log.Errorln(err.Error())
 		bot.SendMsg("获取用户信息失败" + err.Error())
@@ -368,7 +370,7 @@ func getScores(bot *Telegram, args []string) {
 	message := fmt.Sprintf("共获取到%v个有效用户信息\n", len(users))
 	for _, user := range users {
 		message += user.Nick + "\n"
-		score, err := GetUserScore(user.Cookies)
+		score, err := GetUserScore(user.ToCookies())
 		if err != nil {
 			message += err.Error() + "\n"
 		}
