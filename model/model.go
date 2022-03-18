@@ -3,7 +3,7 @@ package model
 import (
 	"database/sql"
 
-	_ "github.com/fumiama/sqlite3"
+	_ "modernc.org/sqlite"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -14,7 +14,7 @@ var (
 
 func init() {
 	var err error
-	db, err = sql.Open("sqlite3", "./config/user.db")
+	db, err = sql.Open("sqlite", "./config/user.db")
 	if err != nil {
 		log.Errorln("用户数据库打开失败，请检查config目录权限")
 		log.Panicln(err.Error())
