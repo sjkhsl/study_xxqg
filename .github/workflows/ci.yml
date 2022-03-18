@@ -41,6 +41,7 @@ jobs:
           if [ $GOOS = "windows" ]; then export BINARY_SUFFIX="$BINARY_SUFFIX.exe"; fi
           if $IS_PR ; then echo $PR_PROMPT; fi
           export BINARY_NAME="$BINARY_PREFIX$GOOS_$GOARCH$BINARY_SUFFIX"
+          go mod tidy
           go build -o "output/$BINARY_NAME" ./
       - name: Upload artifact
         uses: actions/upload-artifact@v2
