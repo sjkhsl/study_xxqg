@@ -40,7 +40,6 @@ builds:
     goarch:
       - 386
       - amd64
-      - arm
     goarm:
       - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
