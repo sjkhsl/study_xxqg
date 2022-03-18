@@ -25,19 +25,10 @@ require (
 )
 
 require (
-	fyne.io/fyne v1.4.3 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/flopp/go-findfont v0.1.0 // indirect
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/fyne-io/mobile v0.1.2 // indirect
-	github.com/go-gl/gl v0.0.0-20190320180904-bf2b1f2f34d7 // indirect
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200625191551-73d3c3675aa3 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
-	github.com/godbus/dbus/v5 v5.0.3 // indirect
-	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -46,12 +37,9 @@ require (
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
-	github.com/srwiley/oksvg v0.0.0-20200311192757-870daf9aa564 // indirect
-	github.com/srwiley/rasterx v0.0.0-20200120212402-85cb7272f5e9 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
@@ -60,8 +48,8 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 	modernc.org/libc v1.14.5 // indirect
 	modernc.org/mathutil v1.4.1 // indirect
 	modernc.org/memory v1.0.5 // indirect
