@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"image"
@@ -89,6 +90,13 @@ func (c *Core) Init() {
 	}
 }
 
+// L
+/**
+ * @Description:
+ * @receiver c
+ * @return *model.User
+ * @return error
+ */
 func (c *Core) L() (*model.User, error) {
 	client := req.C()
 	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
@@ -118,6 +126,10 @@ func (c *Core) L() (*model.User, error) {
 		err = nil
 	} else {
 		log.Infoln("二维码已生成到目录下的qrcode.png")
+	}
+	if GetConfig().QrCOde {
+		data, _ := os.ReadFile("qrcode.png")
+		c.Push("markdown", fmt.Sprintf("![](%v)", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(data)))
 	}
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
@@ -208,13 +220,13 @@ func (c *Core) initWondows() {
 			"--start-maximized",
 			"--no-sandbox",
 			"--window-size=500,450",
-			// "--mute-audio",
+			"--mute-audio",
 			"--window-position=0,0",
 			"--ignore-certificate-errors",
-			// "--ignore-ssl-errors",
-			// "--disable-features=RendererCodeIntegrity",
-			// "--disable-blink-features",
-			// "--disable-blink-features=AutomationControlled",
+			"--ignore-ssl-errors",
+			"--disable-features=RendererCodeIntegrity",
+			"--disable-blink-features",
+			"--disable-blink-features=AutomationControlled",
 		},
 		Channel:         nil,
 		ChromiumSandbox: nil,
@@ -234,6 +246,7 @@ func (c *Core) initWondows() {
 		log.Errorln("[core] ", err.Error())
 		return
 	}
+
 	c.browser = browser
 
 	context, err := c.browser.NewContext()

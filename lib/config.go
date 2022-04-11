@@ -31,13 +31,14 @@ type Config struct {
 		Proxy  string `json:"proxy" yaml:"proxy"`
 	} `json:"tg" yaml:"tg"`
 	Web struct {
-		Account  string `json:"account"`
-		Password string `json:"password"`
-		Host     string `json:"host"`
-		Port     int    `json:"port"`
+		Account  string `json:"account" yaml:"account"`
+		Password string `json:"password" yaml:"password"`
+		Host     string `json:"host" yaml:"host"`
+		Port     int    `json:"port" yaml:"port"`
 	} `json:"web"`
-	Cron     string `json:"cron"`
-	EdgePath string `json:"edge_path"`
+	Cron     string `json:"cron" yaml:"cron"`
+	EdgePath string `json:"edge_path" yaml:"edge_path"`
+	QrCOde   bool   `json:"qr_code" yaml:"qr_code"`
 }
 
 var (
