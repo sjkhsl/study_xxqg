@@ -5,3 +5,4 @@
 *.log
 /config/config.yml
 /chromium-857950/
+/web/

@@ -61,6 +61,10 @@ func init() {
 }
 
 func main() {
+	if config.StartWait > 0 {
+		log.Infoln(fmt.Sprintf("将等待%d秒后启动程序", config.StartWait))
+		time.Sleep(time.Second * time.Duration(config.StartWait))
+	}
 	switch {
 	case config.Cron != "":
 		log.Infoln("已采用定时执行模式")

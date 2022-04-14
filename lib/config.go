@@ -36,9 +36,10 @@ type Config struct {
 		Host     string `json:"host" yaml:"host"`
 		Port     int    `json:"port" yaml:"port"`
 	} `json:"web"`
-	Cron     string `json:"cron" yaml:"cron"`
-	EdgePath string `json:"edge_path" yaml:"edge_path"`
-	QrCOde   bool   `json:"qr_code" yaml:"qr_code"`
+	Cron      string `json:"cron" yaml:"cron"`
+	EdgePath  string `json:"edge_path" yaml:"edge_path"`
+	QrCOde    bool   `json:"qr_code" yaml:"qr_code"`
+	StartWait int    `json:"start_wait" yaml:"start_wait"`
 }
 
 var (

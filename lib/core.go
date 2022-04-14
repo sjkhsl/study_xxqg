@@ -231,7 +231,7 @@ func (c *Core) initWondows() {
 		Channel:         nil,
 		ChromiumSandbox: nil,
 		Devtools:        nil,
-		DownloadsPath:   nil,
+		DownloadsPath:   playwright.String("./tools/temp/"),
 		ExecutablePath:  playwright.String(path),
 		HandleSIGHUP:    nil,
 		HandleSIGINT:    nil,
@@ -250,7 +250,8 @@ func (c *Core) initWondows() {
 	c.browser = browser
 
 	context, err := c.browser.NewContext()
-	c.browser.NewContext()
+	_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
+		Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
 	if err != nil {
 		return
 	}
@@ -313,9 +314,9 @@ func (c *Core) initNotWindows() {
 		return
 	}
 	c.browser = browser
-
 	context, err := c.browser.NewContext()
-	c.browser.NewContext()
+	_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
+		Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
 	if err != nil {
 		return
 	}
