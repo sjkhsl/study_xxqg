@@ -134,7 +134,7 @@ func (c *Core) L() (*model.User, error) {
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
-	c.Push("text", "https://johlanse.github.io/study_xxqg/scheme.html?"+url.QueryEscape(codeURL))
+	c.Push("text", config.Scheme+url.QueryEscape(codeURL))
 	checkQrCode := func() (bool, string) {
 		res := new(checkQrCodeResp)
 		_, err := client.R().SetResult(res).SetFormData(map[string]string{
