@@ -4,18 +4,27 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="qrcode.js"></script>
+    <style>
+        .wx{
+            font-size: 30px;
+            color: red;
+        }
+    </style>
 </head>
 <body>
 <div>
     <button><a id="login" href="#"><h1>点击登录跳转学习强国app</h1></a></button>
 </div>
-<div id="wx"></div>
+<div id="wx" class="wx"></div>
 <div id="qrcode" style="margin-top: 10px">
     <img id="img" src="#"  alt="#"/>
 </div>
 </body>
 <script>
     function load() {
+        if (isWechat()){
+            document.getElementById("wx").innerText = "当前为微信环境，请点击右上角浏览器中打开"
+        }
         let search = window.location.search
         search = search.substring(1,search.length)
         document.getElementById("login").setAttribute("href","dtxuexi://appclient/page/study_feeds?url="+search)
@@ -24,16 +33,9 @@
         document.getElementById("img").setAttribute("src",imgBase64)
         document.getElementById("login").click()
     }
-    function isWeixin () {
-        let user= navigator.userAgent.toLowerCase();
-        if(user.match(/MicroMessenger/i)==="micromessenger") {
-            console.log('微信')
-            document.getElementById("wx").innerText = "检测到微信环境，请单击右上角选择浏览器打开跳转"
-        } else {
-            console.log('非微信')
-        }
+    function isWechat() {
+        return /MicroMessenger/i.test(window.navigator.userAgent);
     }
-    isWeixin()
     load()
 
 </script>
