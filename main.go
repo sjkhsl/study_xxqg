@@ -16,6 +16,7 @@ import (
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
 	"github.com/huoxue1/study_xxqg/push"
+	"github.com/huoxue1/study_xxqg/web"
 )
 
 var VERSION = "unknown"
@@ -61,6 +62,16 @@ func init() {
 }
 
 func main() {
+	if config.Web.Enable {
+		engine := web.RouterInit()
+		go func() {
+			err := engine.Run(fmt.Sprintf("%s:%d", config.Web.Host, config.Web.Port))
+			if err != nil {
+				return
+			}
+		}()
+	}
+
 	if config.StartWait > 0 {
 		log.Infoln(fmt.Sprintf("将等待%d秒后启动程序", config.StartWait))
 		time.Sleep(time.Second * time.Duration(config.StartWait))

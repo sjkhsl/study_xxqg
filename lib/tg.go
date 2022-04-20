@@ -22,16 +22,7 @@ var (
 	datas   sync.Map
 )
 
-func init() {
-	newPlugin("/login", login)
-	newPlugin("/get_users", getAllUser)
-	newPlugin("/study", study)
-	newPlugin("/get_scores", getScores)
-	newPlugin("/quit", quit)
-	newPlugin("/study_all", studyAll)
-}
-
-//Telegram
+// Telegram
 // @Description:
 //
 type Telegram struct {
@@ -63,14 +54,25 @@ func newPlugin(command string, handle func(bot *Telegram, args []string)) {
 	handles.Store(command, handle)
 }
 
-//Init
+// Init
 /**
  * @Description:
  * @receiver t
  * @return func(kind string, message string)
  */
 func (t *Telegram) Init() {
+	newPlugin("/login", login)
+	newPlugin("/get_users", getAllUser)
+	newPlugin("/study", study)
+	newPlugin("/get_scores", getScores)
+	newPlugin("/quit", quit)
+	newPlugin("/study_all", studyAll)
+
 	uri, err := url.Parse(t.Proxy)
+	if err != nil {
+		log.Errorln("代理解析失败" + err.Error())
+		err = nil
+	}
 	t.bot, err = tgbotapi.NewBotAPIWithClient(t.Token, tgbotapi.APIEndpoint, &http.Client{Transport: &http.Transport{
 		// 设置代理
 		Proxy: http.ProxyURL(uri),
@@ -374,7 +376,7 @@ func getScores(bot *Telegram, args []string) {
 		if err != nil {
 			message += err.Error() + "\n"
 		}
-		message += foramet_score(score) + "\n"
+		message += formatScore(score) + "\n"
 	}
 	bot.SendMsg(message)
 }

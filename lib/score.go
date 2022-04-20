@@ -116,7 +116,7 @@ func PrintScore(score Score) string {
 	return result
 }
 
-func foramet_score(score Score) string {
+func formatScore(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d  今日得分：%d\n", score.TotalScore, score.TodayScore)
 	result += fmt.Sprintf("登录：%v/%v  文章学习：%v/%v  视频学习：%v/%v  视频时长：%v/%v\n每日答题：%v/%v  每周答题：%v/%v   专项答题：%v/%v",

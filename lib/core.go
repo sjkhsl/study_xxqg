@@ -90,6 +90,43 @@ func (c *Core) Init() {
 	}
 }
 
+func GetToken(code, sign string) (bool, error) {
+	client := req.C()
+	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
+	response, err := client.R().SetQueryParams(map[string]string{
+		"code":  code,
+		"state": sign + uuid.New().String(),
+	}).Get("https://pc-api.xuexi.cn/login/secure_check")
+	if err != nil {
+		log.Errorln(err.Error())
+		return false, err
+	}
+	uid, nick, err := GetUserInfo(response.Cookies())
+	if err != nil {
+		log.Errorln(err.Error())
+		return false, err
+	}
+	var token string
+
+	for _, cookie := range response.Cookies() {
+		if cookie.Name == "token" {
+			token = cookie.Value
+		}
+	}
+	user := &model.User{
+		Nick:      nick,
+		UID:       uid,
+		Token:     token,
+		LoginTime: time.Now().UnixNano(),
+	}
+	err = model.AddUser(user)
+	if err != nil {
+		log.Errorln(err.Error())
+	}
+	log.Infoln("添加数据库成功")
+	return true, err
+}
+
 // L
 /**
  * @Description:
@@ -129,7 +166,7 @@ func (c *Core) L() (*model.User, error) {
 	}
 	if GetConfig().QrCOde {
 		data, _ := os.ReadFile("qrcode.png")
-		c.Push("markdown", fmt.Sprintf("![](%v)", "data:image/png;base64,"+base64.StdEncoding.EncodeToString(data)))
+		c.Push("image", base64.StdEncoding.EncodeToString(data))
 	}
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
@@ -177,13 +214,13 @@ func (c *Core) L() (*model.User, error) {
 				return nil, err
 			}
 			c.Push("text", "登录成功，用户名："+nick)
-			//model.AddUser(&model.User{
+			// model.AddUser(&model.User{
 			//	Nick:      nick,
 			//	UID:       info,
 			//	Token:     resp.Cookies()[],
 			//	LoginTime: 0,
-			//})
-			//if err != nil {
+			// })
+			// if err != nil {
 			//	return cos, err
 			//}
 			return user, err
@@ -342,7 +379,7 @@ func (c *Core) IsQuit() bool {
 	return !c.browser.IsConnected()
 }
 
-//func (c *Core) Login() ([]Cookie, error) {
+// func (c *Core) Login() ([]Cookie, error) {
 //	defer func() {
 //		i := recover()
 //		if i != nil {
@@ -470,11 +507,11 @@ func removeNode(page playwright.Page) {
 }
 
 // Clip
-//*  图片裁剪
-//* 入参:图片输入、输出、缩略图宽、缩略图高、Rectangle{Pt(x0, y0), Pt(x1, y1)}，精度
-//* 规则:如果精度为0则精度保持不变
+// *  图片裁剪
+// * 入参:图片输入、输出、缩略图宽、缩略图高、Rectangle{Pt(x0, y0), Pt(x1, y1)}，精度
+// * 规则:如果精度为0则精度保持不变
 //*
-//* 返回:error
+// * 返回:error
 // */
 func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err error) {
 	err = errors.New("unknow error")
@@ -497,7 +534,7 @@ func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err
 	}
 	var canvas image.Image
 	if wi != origin.Bounds().Max.X {
-		//先缩略
+		// 先缩略
 		canvas = resize.Thumbnail(uint(wi), uint(hi), origin, resize.Lanczos3)
 	} else {
 		canvas = origin

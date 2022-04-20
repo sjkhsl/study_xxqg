@@ -1,6 +1,8 @@
 package push
 
 import (
+	"fmt"
+
 	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
 )
@@ -12,7 +14,7 @@ type PushPlus struct {
 func (p *PushPlus) Init() func(kind, message string) {
 	return func(kind, message string) {
 		if kind == "image" {
-			return
+			message = fmt.Sprintf("![](%v)", "data:image/png;base64,"+message)
 		}
 		err := gout.POST("http://www.pushplus.plus/send").SetJSON(gout.H{
 			"token":    p.Token,

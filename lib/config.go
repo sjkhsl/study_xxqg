@@ -5,9 +5,12 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
+// Config
+//  @Description:
+//
 type Config struct {
 	Model       int    `json:"model" yaml:"model"`
 	LogLevel    string `json:"log_level" yaml:"log_level"`
@@ -30,7 +33,10 @@ type Config struct {
 		ChatID int64  `json:"chat_id" yaml:"chat_id"`
 		Proxy  string `json:"proxy" yaml:"proxy"`
 	} `json:"tg" yaml:"tg"`
+	QQ struct {
+	}
 	Web struct {
+		Enable   bool   `json:"enable" yaml:"enable"`
 		Account  string `json:"account" yaml:"account"`
 		Password string `json:"password" yaml:"password"`
 		Host     string `json:"host" yaml:"host"`

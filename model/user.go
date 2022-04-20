@@ -106,7 +106,7 @@ func AddUser(user *User) error {
  */
 func UpdateUser(user *User) error {
 	ping()
-	_, err := db.Exec("update user set token=? where uid = ?", user.Token, user.UID)
+	_, err := db.Exec("update user set token=?,login_time=? where uid = ?", user.Token, time.Now().Unix(), user.UID)
 	if err != nil {
 		log.Errorln("更新数据失败")
 		log.Errorln(err.Error())
@@ -150,6 +150,20 @@ func (u *User) ToCookies() []*http.Cookie {
 	cookie := &http.Cookie{
 		Name:     "token",
 		Value:    u.Token,
+		Path:     "/",
+		Domain:   "xuexi.cn",
+		Expires:  time.Now().Add(time.Hour * 12),
+		Secure:   false,
+		HttpOnly: false,
+		SameSite: http.SameSiteStrictMode,
+	}
+	return []*http.Cookie{cookie}
+}
+
+func TokenToCookies(token string) []*http.Cookie {
+	cookie := &http.Cookie{
+		Name:     "token",
+		Value:    token,
 		Path:     "/",
 		Domain:   "xuexi.cn",
 		Expires:  time.Now().Add(time.Hour * 12),

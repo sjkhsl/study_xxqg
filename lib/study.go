@@ -207,7 +207,7 @@ func (c *Core) LearnVideo(user *model.User) {
 	if !(score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore) {
 		log.Infoln("开始加载视频学习模块")
 		// core := Core{}
-		//core.Init()
+		// core.Init()
 
 		page, err := (*c.context).NewPage()
 		if err != nil {
