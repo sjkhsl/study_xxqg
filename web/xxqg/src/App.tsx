@@ -116,7 +116,7 @@ class Router extends Component<any, any>{
     },1000*300)
 
     let element = document.createElement("a");
-    element.href = "dtxuexi://appclient/page/study_feeds?url="+data.url
+    element.href = "dtxuexi://appclient/page/study_feeds?url="+escape(data.url)
     element.click()
   }
 }
