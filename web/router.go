@@ -18,6 +18,9 @@ func RouterInit() *gin.Engine {
 	router.Use(Cors())
 
 	router.StaticFS("/static", http.FS(static))
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.Redirect(301, "/static/xxqg/build/home.html")
+	})
 	user := router.Group("/user")
 	// 添加用户
 	user.POST("/", addUser())
