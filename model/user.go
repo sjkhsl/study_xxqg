@@ -59,6 +59,7 @@ func Query() ([]*User, error) {
 			users = append(users, u)
 		} else {
 			log.Infoln("用户" + u.Nick + "cookie已失效")
+			_ = DeleteUser(u.UID)
 		}
 	}
 	return users, err
