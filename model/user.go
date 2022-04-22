@@ -4,14 +4,20 @@ package model
 
 import (
 	"database/sql"
+	"math/rand"
 	"net/http"
 	"time"
 
 	"github.com/guonaihong/gout"
+	"github.com/imroc/req/v3"
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
+
+func init() {
+	go check()
+}
 
 // User
 /**
@@ -208,4 +214,31 @@ func CheckUserCookie(user *User) bool {
 		return false
 	}
 	return true
+}
+
+func check() {
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Errorf("%v 出现错误，%v", "auth check", err)
+		}
+	}()
+	for {
+		users, _ := Query()
+		for _, user := range users {
+			response, _ := req.R().SetCookies(user.ToCookies()...).Get("https://pc-api.xuexi.cn/open/api/auth/check")
+			token := ""
+			for _, cookie := range response.Cookies() {
+				if cookie.Name == "token" {
+					token = cookie.Value
+				}
+			}
+			if token != "" {
+				user.Token = token
+				user.LoginTime = time.Now().Unix()
+				_ = UpdateUser(user)
+			}
+		}
+		time.Sleep(time.Hour * time.Duration(rand.Intn(3)))
+	}
 }
