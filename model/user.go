@@ -39,7 +39,7 @@ type User struct {
 func Query() ([]*User, error) {
 	var users []*User
 	ping()
-	results, err := db.Query("select * from user")
+	var results, err = db.Query("select * from user")
 	if err != nil {
 		return nil, err
 	}

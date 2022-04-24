@@ -1,5 +1,21 @@
 ## 推送配置
 
+### web推送
+> 适用于部署在服务器上或者家里有公网IP的设备上
+
+配置config.yml的如下部分
+```yaml
+web:
+  # 启用web
+  enable: true
+  # 监听的ip,若只需要本机访问则设置为127.0.0.1，监听本机所有ip为0.0.0.0
+  host: 0.0.0.0
+  # 监听的端口号 0-65535可选
+  port: 8081
+```
+
+开启后通过浏览器访问 *http://ip:port*即可打开网址 
+
 ### 钉钉推送
 配置config.yml的如下部分,具体使用教程详情参考[钉钉](https://developers.dingtalk.com/document/robots/custom-robot-access?spm=ding_open_doc.document.0.0.7f875e5903iVpC#topic-2026027)
 ```yaml

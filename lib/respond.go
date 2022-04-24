@@ -152,7 +152,6 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			continue
 		}
 		if enabled {
-			log.Infoln("检测到有答案未提交，将重新提交")
 			err := btn.Click()
 			if err != nil {
 				log.Errorln("提交答案失败")
@@ -270,6 +269,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			log.Errorln("获取网页全体内容失败" + err.Error())
 			goto label
 		}
+		time.Sleep(time.Second * time.Duration(rand2.Intn(3)))
 		log.Debugln("以获取网页内容")
 		err = openTips.Click()
 		if err != nil {
