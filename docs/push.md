@@ -12,6 +12,10 @@ web:
   host: 0.0.0.0
   # 监听的端口号 0-65535可选
   port: 8081
+  # web端登录得账号
+  account： admin
+  # web端登录的密码
+  password: admin
 ```
 
 开启后通过浏览器访问 *http://ip:port*即可打开网址 
