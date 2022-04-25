@@ -14,11 +14,66 @@ import (
 
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
+	"github.com/huoxue1/study_xxqg/utils"
 )
 
 var (
 	state = sync.Map{}
 )
+
+func CheckToken() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.Param("token")
+		config := lib.GetConfig()
+		md5 := utils.StrMd5(config.Web.Account + config.Web.Password)
+		if md5 == token {
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "",
+				Data:    nil,
+				Success: true,
+				Error:   "",
+			})
+		} else {
+			ctx.JSON(200, Resp{
+				Code:    403,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   "",
+			})
+		}
+	}
+}
+
+func Login() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		type user struct {
+			Account  string `json:"account"`
+			Password string `json:"password"`
+		}
+		u := new(user)
+		_ = ctx.BindJSON(u)
+		config := lib.GetConfig()
+		if u.Account == config.Web.Account && u.Password == config.Web.Password {
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "登录成功",
+				Data:    utils.StrMd5(u.Account + u.Password),
+				Success: true,
+				Error:   "",
+			})
+		} else {
+			ctx.JSON(200, Resp{
+				Code:    403,
+				Message: "登录失败，请联系管理员",
+				Data:    "",
+				Success: false,
+				Error:   "",
+			})
+		}
+	}
+}
 
 func getScore() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -213,22 +268,7 @@ func sign() gin.HandlerFunc {
 
 func generate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		remote, _ := url.Parse("https://login.xuexi.cn/user/qrcode/generate")
-		proxy := httputil.NewSingleHostReverseProxy(remote)
-		proxy.Director = func(req *http.Request) {
-			req.Header = ctx.Request.Header
-			req.Host = remote.Host
-			req.URL.Scheme = remote.Scheme
-			req.URL.Host = remote.Host
-			req.URL.Path = ctx.Param("proxyPath")
-		}
-		proxy.ServeHTTP(ctx.Writer, ctx.Request)
-	}
-}
-
-func checkQrCode() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		remote, _ := url.Parse("https://login.xuexi.cn/login/login_with_qr")
+		remote, _ := url.Parse("https://login.xuexi.cn/")
 		proxy := httputil.NewSingleHostReverseProxy(remote)
 		proxy.Director = func(req *http.Request) {
 			req.Header = ctx.Request.Header

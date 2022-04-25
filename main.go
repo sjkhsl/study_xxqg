@@ -112,6 +112,15 @@ func main() {
 }
 
 func do() {
+
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Errorln("do 方法执行错误")
+			log.Errorln(err)
+		}
+	}()
+
 	log.Infoln(` 刷课模式，默认为1，
  1：只刷文章何视频
  2：只刷文章和视频和每日答题
@@ -127,7 +136,12 @@ func do() {
 	switch {
 	case len(users) < 1:
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
-		user, _ = core.L()
+		u, err := core.L()
+		if err != nil {
+			log.Errorln(err.Error())
+			return
+		}
+		user = u
 	case len(users) == 1:
 		log.Infoln("检测到1位有效用户信息，采用默认用户")
 		user = users[0]

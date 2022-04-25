@@ -46,6 +46,10 @@ web:
   #
   host: 0.0.0.0
   port: 80
+  # 网页端登录账号
+  account: admin
+  # 网页端登录密码
+  password: admin
 
 # 设置是否定时执行学习程序，格式为cron格式
 # "9 19 * * *" 每天19点9分执行一次

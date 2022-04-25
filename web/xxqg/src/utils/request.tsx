@@ -15,7 +15,16 @@ class Http {
     constructor(config:TAxiosOption) {
         this.service = axios.create(config);
         this.service.defaults.withCredentials = true
+        this.service.interceptors.request.use(
+            (value)=>{
+               if (value.headers !== null){
+                   // @ts-ignore
+                   value.headers.xxqg_token = localStorage.getItem("xxqg_token")
+               }
+               return value
+        },()=>{
 
+        })
     }
 
     get<T>(url: string, params?: object, _object = {}): Promise<IResponseData<T>> {

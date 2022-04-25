@@ -69,6 +69,7 @@ func GetConfig() Config {
 		err := os.WriteFile("./config/config.yml", defaultConfig, 0666)
 		if err != nil {
 			log.Errorln("写入到配置文件出现错误")
+			log.Errorln(err.Error())
 			return Config{}
 		}
 		log.Infoln("成功写入到配置文件,请重启应用")
@@ -78,9 +79,6 @@ func GetConfig() Config {
 	if err != nil {
 		log.Errorln(err.Error())
 		return Config{}
-	}
-	if config.ShowBrowser {
-		log.Infoln("浏览器无头模式已禁用")
 	}
 	if config.Scheme == "" {
 		config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"

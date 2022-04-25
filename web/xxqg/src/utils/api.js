@@ -7,7 +7,7 @@ let http = new Http({
 
 let base = process.env.REACT_APP_BASE_URL
 
-export async function login(){
+export async function getLink(){
     console.log(http)
     let data = await http.get(base+"/sign/");
     console.log(data.data.data.sign)
@@ -16,6 +16,21 @@ export async function login(){
     let codeURL = "https://login.xuexi.cn/login/qrcommit?showmenu=false&code="+
         resp.data.result+"&appId=dingoankubyrfkttorhpou"
     return {"url":codeURL, "sign":data.data.data.sign,"code":resp.data.result}
+}
+
+export async function checkToken() {
+    let token = window.localStorage.getItem("xxqg_token")
+    if (token === null) {
+        return false
+    }
+    let responseData = await http.post(base + "/auth/check/"+token);
+    return responseData.data.success;
+
+}
+
+export async function login(data) {
+    let responseData = await http.post(base+"/auth/login",data);
+    return responseData.data;
 }
 
 export async function checkQrCode(code) {
