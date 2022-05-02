@@ -35,7 +35,9 @@ func init() {
 	log.SetOutput(io.MultiWriter(w, os.Stdout))
 	log.SetFormatter(logFormatter)
 	level, err := log.ParseLevel(config.LogLevel)
-
+	if err != nil {
+		log.SetLevel(log.DebugLevel)
+	}
 	log.SetLevel(level)
 }
 
@@ -56,7 +58,7 @@ var (
 func init() {
 	_, err := os.Stat(`./config/`)
 	if err != nil {
-		os.Mkdir("./config/", 0666)
+		os.Mkdir("./config/", 0666) //nolint:errcheck
 		return
 	}
 }
@@ -76,43 +78,64 @@ func main() {
 		log.Infoln(fmt.Sprintf("将等待%d秒后启动程序", config.StartWait))
 		time.Sleep(time.Second * time.Duration(config.StartWait))
 	}
-	switch {
-	case config.Cron != "":
-		log.Infoln("已采用定时执行模式")
-		c := cron.New()
-		_, err := c.AddFunc(config.Cron, func() {
+
+	if config.Cron != "" {
+		go func() {
 			defer func() {
-				i := recover()
-				if i != nil {
-					log.Errorln(i)
-					log.Errorln("执行定时任务出现异常")
+				err := recover()
+				if err != nil {
+					log.Errorln("定时任务执行出现问题")
+					log.Errorln(err)
 				}
 			}()
-			do()
-		})
-		if err != nil {
-			log.Errorln(err.Error())
-			return
-		}
-		c.Start()
-		select {}
-	case config.TG.Enable:
-		log.Infoln("已采用tg交互模式")
-		telegram := lib.Telegram{
-			Token:  config.TG.Token,
-			ChatId: config.TG.ChatID,
-			Proxy:  config.TG.Proxy,
-		}
-		telegram.Init()
-		select {}
-	default:
+			log.Infoln("已采用定时执行模式")
+			c := cron.New()
+			_, err := c.AddFunc(config.Cron, func() {
+				defer func() {
+					i := recover()
+					if i != nil {
+						log.Errorln(i)
+						log.Errorln("执行定时任务出现异常")
+					}
+				}()
+				do()
+			})
+			if err != nil {
+				log.Errorln(err.Error())
+				return
+			}
+			c.Start()
+			select {}
+		}()
+	}
+
+	if config.TG.Enable {
+		go func() {
+			defer func() {
+				err := recover()
+				if err != nil {
+					log.Errorln("TG模式执行出现问题")
+					log.Errorln(err)
+				}
+			}()
+			log.Infoln("已采用tg交互模式")
+			telegram := lib.Telegram{
+				Token:  config.TG.Token,
+				ChatId: config.TG.ChatID,
+				Proxy:  config.TG.Proxy,
+			}
+			telegram.Init()
+			select {}
+		}()
+	}
+
+	if !config.TG.Enable && config.Cron == "" {
 		log.Infoln("已采用普通学习模式")
 		do()
 	}
 }
 
 func do() {
-
 	defer func() {
 		err := recover()
 		if err != nil {
