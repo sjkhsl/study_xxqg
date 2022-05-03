@@ -19,6 +19,9 @@ log_level: "info"
 # 是否显示浏览器
 show_browser: true
 
+# 跳转学习强国的scheme,默认使用本仓库的action自建scheme,若需自行修改，可直接复制仓库下/docs/scheme.html到任意静态文件服务器
+scheme: "https://johlanse.github.io/study_xxqg/scheme.html?"
+
 
 push:
   ding:
@@ -31,13 +34,24 @@ push:
     enable: true
     token: ""
 
-# 通过telegram进行交互模式，当配置tg.enable为true时会自动注册bot命令，
-# telegram_bot使用教程https://www.dazhuanlan.com/leemode/topics/927496
+# telegram交互模式配置
 tg:
   enable: false
   chat_id: 0
   token: ""
   proxy: ""
+
+# 网页端配置
+web:
+  # 是否启用网页
+  enable: true
+  #
+  host: 0.0.0.0
+  port: 80
+  # 网页端登录账号
+  account: admin
+  # 网页端登录密码
+  password: admin
 
 # 登录重试配置
 retry:
@@ -48,9 +62,17 @@ retry:
   intervals: 5
 
 
-
 # 设置是否定时执行学习程序，格式为cron格式
 # "9 19 * * *" 每天19点9分执行一次
 # "* 10 * * *” 每天早上十点执行一次
 cron: ""
+
+#windows环境自定义浏览器路径，仅支持chromium系列
+edge_path: ""
+
+# 是否推送二维码
+qr_code: false
+
+# 启动时等待时间，为了防止代理启动比软件慢而报错，默认不等待，单位秒
+start_wait: 0
 ```
