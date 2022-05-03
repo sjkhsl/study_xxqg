@@ -84,7 +84,7 @@ type checkQrCodeResp struct {
  */
 func (c *Core) Init() {
 	if runtime.GOOS == "windows" {
-		c.initWondows()
+		c.initWindows()
 	} else {
 		c.initNotWindows()
 	}
@@ -117,7 +117,7 @@ func GetToken(code, sign string) (bool, error) {
 		Nick:      nick,
 		UID:       uid,
 		Token:     token,
-		LoginTime: time.Now().UnixNano(),
+		LoginTime: time.Now().Unix(),
 	}
 	err = model.AddUser(user)
 	if err != nil {
@@ -134,7 +134,7 @@ func GetToken(code, sign string) (bool, error) {
  * @return *model.User
  * @return error
  */
-func (c *Core) L() (*model.User, error) {
+func (c *Core) L(retryTimes int) (*model.User, error) {
 	client := req.C()
 	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
 		return nil
@@ -183,9 +183,8 @@ func (c *Core) L() (*model.User, error) {
 		}
 		if res.Success {
 			return true, res.Data
-		} else {
-			return false, ""
 		}
+		return false, ""
 	}
 	for i := 0; i < 150; i++ {
 		code, data := checkQrCode()
@@ -207,29 +206,28 @@ func (c *Core) L() (*model.User, error) {
 				Nick:      nick,
 				UID:       uid,
 				Token:     response.Cookies()[0].Value,
-				LoginTime: time.Now().UnixNano(),
+				LoginTime: time.Now().Unix(),
 			}
 			err = model.AddUser(user)
 			if err != nil {
 				return nil, err
 			}
 			c.Push("text", "登录成功，用户名："+nick)
-			// model.AddUser(&model.User{
-			//	Nick:      nick,
-			//	UID:       info,
-			//	Token:     resp.Cookies()[],
-			//	LoginTime: 0,
-			// })
-			// if err != nil {
-			//	return cos, err
-			//}
 			return user, err
 		}
 	}
-	return nil, errors.New("time out")
+	if retryTimes == 0 {
+		return nil, errors.New("time out")
+	} else {
+		// 等待几分钟后重新执行
+		time.Sleep(time.Duration(GetConfig().Retry.Intervals) * time.Minute)
+		c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
+		return c.L(retryTimes - 1)
+	}
+
 }
 
-func (c *Core) initWondows() {
+func (c *Core) initWindows() {
 	dir, err := os.Getwd()
 	if err != nil {
 		return

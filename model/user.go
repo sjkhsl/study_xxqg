@@ -55,7 +55,13 @@ func Query() ([]*User, error) {
 		if err != nil {
 			return nil, err
 		}
+		// login := time.Unix(u.LoginTime, 0)
+		// sub := time.Now().Sub(login)
 		if CheckUserCookie(u) {
+			// if lib.GetConfig().ForceExpiration != 0 && sub.Hours() > float64(lib.GetConfig().ForceExpiration) {
+			//	log.Infoln("用户" + u.Nick + "cookie已强制失效")
+			//	continue
+			// }
 			users = append(users, u)
 		} else {
 			log.Infoln("用户" + u.Nick + "cookie已失效")
@@ -113,7 +119,7 @@ func AddUser(user *User) error {
  */
 func UpdateUser(user *User) error {
 	ping()
-	_, err := db.Exec("update user set token=?,login_time=? where uid = ?", user.Token, time.Now().Unix(), user.UID)
+	_, err := db.Exec("update user set token=? where uid = ?", user.Token, user.UID)
 	if err != nil {
 		log.Errorln("更新数据失败")
 		log.Errorln(err.Error())

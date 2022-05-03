@@ -159,7 +159,7 @@ func do() {
 	switch {
 	case len(users) < 1:
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
-		u, err := core.L()
+		u, err := core.L(config.Retry.Times)
 		if err != nil {
 			log.Errorln(err.Error())
 			return

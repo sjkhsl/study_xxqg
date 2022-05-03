@@ -46,6 +46,14 @@ type Config struct {
 	EdgePath  string `json:"edge_path" yaml:"edge_path"`
 	QrCOde    bool   `json:"qr_code" yaml:"qr_code"`
 	StartWait int    `json:"start_wait" yaml:"start_wait"`
+	// cookie强制过期时间，单位为h
+	ForceExpiration int `json:"force_expiration" yaml:"force_expiration"`
+	Retry           struct {
+		// 重试次数
+		Times int `json:"times" yaml:"times"`
+		// 重试时间
+		Intervals int `json:"intervals" yaml:"intervals"`
+	} `json:"retry" yaml:"retry"`
 }
 
 var (
