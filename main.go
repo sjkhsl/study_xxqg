@@ -132,6 +132,8 @@ func main() {
 	if !config.TG.Enable && config.Cron == "" {
 		log.Infoln("已采用普通学习模式")
 		do()
+	} else {
+		select {}
 	}
 }
 
