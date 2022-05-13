@@ -224,7 +224,6 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 		c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
 		return c.L(retryTimes - 1)
 	}
-
 }
 
 func (c *Core) initWindows() {

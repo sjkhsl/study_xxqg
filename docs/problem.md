@@ -39,3 +39,38 @@
 ```yaml
 偶尔出现视频和文章无法加分的bug,可以进行等待一段时间后重启程序再次测试，目前尚不清楚造成原因
 ```
+
++ ### Host system is missing
+报错大概为这样：
+```
+[ERROR]: [core]  初始化chrome失败 
+[2022-05-13 13:43:47] [ERROR]: [core]  could not send message: could not send message to server: Host system is missing dependencies!
+
+  Missing libraries are:
+      libgtk-3.so.0
+      libgdk-3.so.0
+      libX11-xcb.so.1
+      libXcomposite.so.1
+      libXcursor.so.1
+      libXdamage.so.1
+      libXfixes.so.3
+      libXi.so.6
+      libXrender.so.1
+      libpangocairo-1.0.so.0
+      libpango-1.0.so.0
+      libharfbuzz.so.0
+      libatk-1.0.so.0
+      libcairo-gobject.so.2
+      libcairo.so.2
+      libgdk_pixbuf-2.0.so.0
+      libdbus-glib-1.so.2
+      libxcb-shm.so.0
+      libpangoft2-1.0.so.0
+      libXt.so.6
+
+```
+
+在debian11的系统上解决方式为：
+```
+sudo apt-get install -y libx11-xcb1 && apt-get install -y libgtk-3-0 && apt-get install -y libxt6 && apt-get install -y libdbus-glib-1.2
+```
