@@ -98,7 +98,7 @@ func main() {
 						log.Errorln("执行定时任务出现异常")
 					}
 				}()
-				do()
+				do("cron")
 			})
 			if err != nil {
 				log.Errorln(err.Error())
@@ -131,13 +131,13 @@ func main() {
 
 	if !config.TG.Enable && config.Cron == "" {
 		log.Infoln("已采用普通学习模式")
-		do()
+		do("normal")
 	} else {
 		select {}
 	}
 }
 
-func do() {
+func do(m string) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -158,8 +158,9 @@ func do() {
 	core.Init()
 	var user *model.User
 	users, _ := model.Query()
-	switch {
-	case len(users) < 1:
+
+	// 用户小于1时自动登录
+	if len(users) < 1 {
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
 		u, err := core.L(config.Retry.Times)
 		if err != nil {
@@ -167,20 +168,77 @@ func do() {
 			return
 		}
 		user = u
-	case len(users) == 1:
-		log.Infoln("检测到1位有效用户信息，采用默认用户")
-		user = users[0]
-		log.Infoln("已选择用户: ", users[0].Nick)
-	default:
+	} else {
+		// 如果为定时模式则直接循环所以用户依次运行
+		if m == "cron" {
+			for _, u := range users {
+				go core.LearnArticle(u)
+				go core.LearnVideo(u)
+				lib.WaitStudy(u, "")
+				if config.Model == 2 {
+					core.RespondDaily(u, "daily")
+				} else if config.Model == 3 {
+					core.RespondDaily(u, "daily")
+					core.RespondDaily(u, "weekly")
+					core.RespondDaily(u, "special")
+				}
+				score, err := lib.GetUserScore(u.ToCookies())
+				if err != nil {
+					log.Errorln("获取成绩失败")
+					log.Debugln(err.Error())
+					return
+				}
+				message := u.Nick + " 学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
+				core.Push("markdown", message)
+			}
+			return
+		}
+
 		for i, user := range users {
 			log.Infoln("序号：", i+1, "   ===> ", user.Nick)
 		}
-		log.Infoln("请输入对应序号选择对应账户")
+		log.Infoln("请输入对应序号选择对应账户，输入0添加用户：")
 		var i int
 		_, _ = fmt.Scanln(&i)
-		user = users[i-1]
-		log.Infoln("已选择用户: ", users[i-1].Nick)
+		if i == 0 {
+			u, err := core.L(config.Retry.Times)
+			if err != nil {
+				log.Errorln(err.Error())
+				return
+			}
+			user = u
+		} else {
+			user = users[i-1]
+			log.Infoln("已选择用户: ", users[i-1].Nick)
+		}
 	}
+
+	//switch {
+	//case len(users) < 1:
+	//	log.Infoln("未检测到有效用户信息，将采用登录模式")
+	//	u, err := core.L(config.Retry.Times)
+	//	if err != nil {
+	//		log.Errorln(err.Error())
+	//		return
+	//	}
+	//	user = u
+	//case len(users) == 1:
+	//	log.Infoln("检测到1位有效用户信息，采用默认用户")
+	//	user = users[0]
+	//	log.Infoln("已选择用户: ", users[0].Nick)
+	//default:
+	//	if m == "cron" {
+	//
+	//	}
+	//	for i, user := range users {
+	//		log.Infoln("序号：", i+1, "   ===> ", user.Nick)
+	//	}
+	//	log.Infoln("请输入对应序号选择对应账户")
+	//	var i int
+	//	_, _ = fmt.Scanln(&i)
+	//	user = users[i-1]
+	//	log.Infoln("已选择用户: ", users[i-1].Nick)
+	//}
 
 	go core.LearnArticle(user)
 	go core.LearnVideo(user)
