@@ -213,8 +213,8 @@ func do(m string) {
 		}
 	}
 
-	//switch {
-	//case len(users) < 1:
+	// switch {
+	// case len(users) < 1:
 	//	log.Infoln("未检测到有效用户信息，将采用登录模式")
 	//	u, err := core.L(config.Retry.Times)
 	//	if err != nil {
@@ -259,4 +259,5 @@ func do(m string) {
 	}
 	message := "学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
 	core.Push("markdown", message)
+	core.Push("flush", "学习完成")
 }
