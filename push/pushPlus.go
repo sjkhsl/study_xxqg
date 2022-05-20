@@ -12,9 +12,9 @@ type PushPlus struct {
 	Token string
 }
 
-func (p *PushPlus) Init() func(kind, message string) {
-	var datas []string
+var datas []string
 
+func (p *PushPlus) Init() func(kind, message string) {
 	send := func(data string) {
 		err := gout.POST("http://www.pushplus.plus/send").SetJSON(gout.H{
 			"token":    p.Token,
@@ -30,15 +30,18 @@ func (p *PushPlus) Init() func(kind, message string) {
 	}
 
 	return func(kind, message string) {
-		if kind == "image" {
+		switch {
+		case kind == "image":
 			message = fmt.Sprintf("![](%v)", "data:image/png;base64,"+message)
 			send(message)
-		} else if kind == "flush" {
+		case kind == "flush":
 			send(strings.Join(datas, "\n"))
-		} else {
-			datas = append(datas, message)
+		default:
 			if len(datas) > 10 {
 				send(strings.Join(datas, "\n"))
+				datas = []string{}
+			} else {
+				datas = append(datas, message)
 			}
 		}
 	}
