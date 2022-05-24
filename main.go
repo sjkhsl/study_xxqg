@@ -153,11 +153,35 @@ func do(m string) {
 	log.Infoln("检测到模式", config.Model)
 
 	getPush := push.GetPush(config)
-	core := lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
+	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()
 	var user *model.User
 	users, _ := model.Query()
+	for i := 0; i < 25; i++ {
+		core.Push("text", "登录")
+	}
+	study := func(core2 *lib.Core, u *model.User) {
+		go core2.LearnArticle(u)
+		go core2.LearnVideo(u)
+		lib.WaitStudy(u, "")
+		if config.Model == 2 {
+			core2.RespondDaily(u, "daily")
+		} else if config.Model == 3 {
+			core2.RespondDaily(u, "daily")
+			core2.RespondDaily(u, "weekly")
+			core2.RespondDaily(u, "special")
+		}
+		score, err := lib.GetUserScore(u.ToCookies())
+		if err != nil {
+			log.Errorln("获取成绩失败")
+			log.Debugln(err.Error())
+			return
+		}
+		message := u.Nick + " 学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
+		core2.Push("markdown", message)
+		core2.Push("flush", "")
+	}
 
 	// 用户小于1时自动登录
 	if len(users) < 1 {
@@ -172,24 +196,15 @@ func do(m string) {
 		// 如果为定时模式则直接循环所以用户依次运行
 		if m == "cron" {
 			for _, u := range users {
-				go core.LearnArticle(u)
-				go core.LearnVideo(u)
-				lib.WaitStudy(u, "")
-				if config.Model == 2 {
-					core.RespondDaily(u, "daily")
-				} else if config.Model == 3 {
-					core.RespondDaily(u, "daily")
-					core.RespondDaily(u, "weekly")
-					core.RespondDaily(u, "special")
-				}
-				score, err := lib.GetUserScore(u.ToCookies())
+				study(core, u)
+			}
+			if len(users) < 1 {
+				user, err := core.L(config.Retry.Times)
 				if err != nil {
-					log.Errorln("获取成绩失败")
-					log.Debugln(err.Error())
+					core.Push("msg", "登录超时")
 					return
 				}
-				message := u.Nick + " 学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
-				core.Push("markdown", message)
+				study(core, user)
 			}
 			return
 		}
@@ -198,8 +213,27 @@ func do(m string) {
 			log.Infoln("序号：", i+1, "   ===> ", user.Nick)
 		}
 		log.Infoln("请输入对应序号选择对应账户，输入0添加用户：")
+
+		inputChan := make(chan int, 1)
+		go func(c chan int) {
+			var i int
+			_, _ = fmt.Scanln(&i)
+			c <- i
+		}(inputChan)
+
 		var i int
-		_, _ = fmt.Scanln(&i)
+		select {
+		case i = <-inputChan:
+			log.Infoln("已获取到输入")
+		case <-time.After(time.Minute):
+			log.Errorln("获取输入超时，默认选择第一个用户")
+			if len(users) < 1 {
+				return
+			} else {
+				i = 1
+			}
+		}
+
 		if i == 0 {
 			u, err := core.L(config.Retry.Times)
 			if err != nil {
@@ -213,51 +247,6 @@ func do(m string) {
 		}
 	}
 
-	// switch {
-	// case len(users) < 1:
-	//	log.Infoln("未检测到有效用户信息，将采用登录模式")
-	//	u, err := core.L(config.Retry.Times)
-	//	if err != nil {
-	//		log.Errorln(err.Error())
-	//		return
-	//	}
-	//	user = u
-	//case len(users) == 1:
-	//	log.Infoln("检测到1位有效用户信息，采用默认用户")
-	//	user = users[0]
-	//	log.Infoln("已选择用户: ", users[0].Nick)
-	//default:
-	//	if m == "cron" {
-	//
-	//	}
-	//	for i, user := range users {
-	//		log.Infoln("序号：", i+1, "   ===> ", user.Nick)
-	//	}
-	//	log.Infoln("请输入对应序号选择对应账户")
-	//	var i int
-	//	_, _ = fmt.Scanln(&i)
-	//	user = users[i-1]
-	//	log.Infoln("已选择用户: ", users[i-1].Nick)
-	//}
-
-	go core.LearnArticle(user)
-	go core.LearnVideo(user)
-	lib.WaitStudy(user, "")
-	if config.Model == 2 {
-		core.RespondDaily(user, "daily")
-	} else if config.Model == 3 {
-		core.RespondDaily(user, "daily")
-		core.RespondDaily(user, "weekly")
-		core.RespondDaily(user, "special")
-	}
-
-	score, err := lib.GetUserScore(user.ToCookies())
-	if err != nil {
-		log.Errorln("获取成绩失败")
-		log.Debugln(err.Error())
-		return
-	}
-	message := "学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
-	core.Push("markdown", message)
-	core.Push("flush", "学习完成")
+	study(core, user)
+	core.Push("flush", "")
 }

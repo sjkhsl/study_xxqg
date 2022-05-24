@@ -171,7 +171,7 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
-	c.Push("text", config.Scheme+url.QueryEscape(codeURL))
+	c.Push("flush", "登录链接：\r\n"+config.Scheme+url.QueryEscape(codeURL))
 	checkQrCode := func() (bool, string) {
 		res := new(checkQrCodeResp)
 		_, err := client.R().SetResult(res).SetFormData(map[string]string{

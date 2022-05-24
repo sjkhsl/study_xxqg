@@ -35,10 +35,17 @@ func (p *PushPlus) Init() func(kind, message string) {
 			message = fmt.Sprintf("![](%v)", "data:image/png;base64,"+message)
 			send(message)
 		case kind == "flush":
-			send(strings.Join(datas, "\n"))
+			if message == "" {
+				send(strings.Join(datas, " <br/> "))
+				datas = []string{}
+				return
+			}
+			datas = append(datas, message)
+			send(strings.Join(datas, " <br/> "))
+			datas = []string{}
 		default:
 			if len(datas) > 10 {
-				send(strings.Join(datas, "\n"))
+				send(strings.Join(datas, " <br/> "))
 				datas = []string{}
 			} else {
 				datas = append(datas, message)
