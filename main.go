@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -16,12 +17,21 @@ import (
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
 	"github.com/huoxue1/study_xxqg/push"
+	"github.com/huoxue1/study_xxqg/utils/update"
 	"github.com/huoxue1/study_xxqg/web"
+)
+
+var (
+	u bool
 )
 
 var VERSION = "unknown"
 
 func init() {
+
+	flag.BoolVar(&u, "u", false, "update the study_xxqg")
+	flag.Parse()
+
 	config = lib.GetConfig()
 	logFormatter := &easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
@@ -64,6 +74,14 @@ func init() {
 }
 
 func main() {
+	go update.CheckUpdate(VERSION)
+
+	if u {
+		update.SelfUpdate("", VERSION)
+		log.Infoln("请重启应用")
+		os.Exit(1)
+	}
+
 	if config.Web.Enable {
 		engine := web.RouterInit()
 		go func() {

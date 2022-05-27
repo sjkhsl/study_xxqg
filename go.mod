@@ -6,11 +6,14 @@ replace github.com/willf/bitset v1.2.1 => github.com/bits-and-blooms/bitset v1.2
 
 require (
 	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f
+	github.com/dustin/go-humanize v1.0.0
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
 	github.com/google/uuid v1.3.0
 	github.com/guonaihong/gout v0.2.9
 	github.com/imroc/req/v3 v3.8.2
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
+	github.com/klauspost/compress v1.15.5
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/makiuchi-d/gozxing v0.1.1
 	github.com/mxschmitt/playwright-go v0.1400.0

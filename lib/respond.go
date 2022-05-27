@@ -60,7 +60,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		log.Errorln("添加cookie信息失败，已退出答题")
 		return
 	}
-	page.Goto("https://pc.xuexi.cn/points/my-points.html")
+	_, _ = page.Goto("https://pc.xuexi.cn/points/my-points.html")
 
 	log.Infoln("已加载答题模块")
 
@@ -70,7 +70,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		WaitUntil: playwright.WaitUntilStateDomcontentloaded,
 	})
 	if err != nil {
-		log.Errorln("跳转页面失败")
+		log.Errorln("跳转页面失败" + err.Error())
 		return
 	}
 	switch model {

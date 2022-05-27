@@ -43,8 +43,9 @@ jobs:
           if [ $GOOS = "windows" ]; then export BINARY_SUFFIX="$BINARY_SUFFIX.exe"; fi
           if $IS_PR ; then echo $PR_PROMPT; fi
           export BINARY_NAME="$BINARY_PREFIX$GOOS_$GOARCH$BINARY_SUFFIX"
+          export LD_FLAGS="-w -s -X main.Version=${COMMIT_ID::7}"
           go mod tidy
-          go build -o "output/$BINARY_NAME" ./
+          go build -o "output/$BINARY_NAME" -trimpath -ldflags "$LD_FLAGS" ./
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         if: ${{ !github.head_ref }}
