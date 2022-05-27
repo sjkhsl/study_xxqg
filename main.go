@@ -158,9 +158,6 @@ func do(m string) {
 	core.Init()
 	var user *model.User
 	users, _ := model.Query()
-	for i := 0; i < 25; i++ {
-		core.Push("text", "登录")
-	}
 	study := func(core2 *lib.Core, u *model.User) {
 		go core2.LearnArticle(u)
 		go core2.LearnVideo(u)

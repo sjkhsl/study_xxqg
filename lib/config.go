@@ -54,6 +54,8 @@ type Config struct {
 		// 重试时间
 		Intervals int `json:"intervals" yaml:"intervals"`
 	} `json:"retry" yaml:"retry"`
+	// 专项答题可接受的最小值
+	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
 }
 
 var (
@@ -90,6 +92,9 @@ func GetConfig() Config {
 	}
 	if config.Scheme == "" {
 		config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"
+	}
+	if config.SpecialMinScore == 0 {
+		config.SpecialMinScore = 10
 	}
 	return config
 }
