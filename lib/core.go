@@ -309,7 +309,7 @@ func (c *Core) initNotWindows() {
 	pwt, err := playwright.Run(&playwright.RunOptions{
 		DriverDirectory:     dir + "/tools/driver/",
 		SkipInstallBrowsers: false,
-		Browsers:            []string{"msedge", "chromium"},
+		Browsers:            []string{"chromium"},
 	})
 	if err != nil {
 		log.Errorln("[core]", "初始化playwright失败")
