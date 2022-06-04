@@ -297,15 +297,19 @@ func (c *Core) initNotWindows() {
 	if err != nil {
 		return
 	}
-	err = os.Setenv("PLAYWRIGHT_BROWSERS_PATH", dir+"/tools/browser/")
-	if err != nil {
-		log.Errorln("设置环境变量PLAYWRIGHT_BROWSERS_PATH失败" + err.Error())
-		err = nil
+	_, b := os.LookupEnv("PLAYWRIGHT_BROWSERS_PATH")
+	if !b {
+		err = os.Setenv("PLAYWRIGHT_BROWSERS_PATH", dir+"/tools/browser/")
+		if err != nil {
+			log.Errorln("设置环境变量PLAYWRIGHT_BROWSERS_PATH失败" + err.Error())
+			err = nil
+		}
 	}
+
 	pwt, err := playwright.Run(&playwright.RunOptions{
 		DriverDirectory:     dir + "/tools/driver/",
 		SkipInstallBrowsers: false,
-		Browsers:            []string{"firefox"},
+		Browsers:            []string{"msedge", "chromium"},
 	})
 	if err != nil {
 		log.Errorln("[core]", "初始化playwright失败")
@@ -314,20 +318,20 @@ func (c *Core) initNotWindows() {
 		return
 	}
 	c.pw = pwt
-	browser, err := pwt.Firefox.Launch(playwright.BrowserTypeLaunchOptions{
+	browser, err := pwt.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
 		Args: []string{
 			"--disable-extensions",
 			"--disable-gpu",
 			"--start-maximized",
 			"--no-sandbox",
 			"--window-size=500,450",
-			// "--mute-audio",
+			"--mute-audio",
 			"--window-position=0,0",
 			"--ignore-certificate-errors",
-			// "--ignore-ssl-errors",
-			// "--disable-features=RendererCodeIntegrity",
-			// "--disable-blink-features",
-			// "--disable-blink-features=AutomationControlled",
+			"--ignore-ssl-errors",
+			"--disable-features=RendererCodeIntegrity",
+			"--disable-blink-features",
+			"--disable-blink-features=AutomationControlled",
 		},
 		Channel:         nil,
 		ChromiumSandbox: nil,
