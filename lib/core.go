@@ -127,32 +127,25 @@ func GetToken(code, sign string) (bool, error) {
 	return true, err
 }
 
-// L
-/**
- * @Description:
+// GenerateCode
+/* @Description: 生成二维码
  * @receiver c
- * @return *model.User
+ * @return string 二维码连接
+ * @return string 二维码回调查询的code
  * @return error
  */
-func (c *Core) L(retryTimes int) (*model.User, error) {
+func (c *Core) GenerateCode() (string, string, error) {
 	client := req.C()
 	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
 		return nil
 	})
 	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
 
-	s := new(signResp)
-	_, err := client.R().SetResult(s).Get("https://pc-api.xuexi.cn/open/api/sns/sign")
-	if err != nil {
-		log.Errorln(err.Error())
-		return nil, err
-	}
-	log.Debugln("获取sign成功==》" + s.Data.Sign)
 	g := new(gennerateResp)
-	_, err = client.R().SetResult(g).Get("https://login.xuexi.cn/user/qrcode/generate")
+	_, err := client.R().SetResult(g).Get("https://login.xuexi.cn/user/qrcode/generate")
 	if err != nil {
 		log.Errorln(err.Error())
-		return nil, err
+		return "", "", err
 	}
 	log.Infoln(g.Result)
 	codeURL := fmt.Sprintf("https://login.xuexi.cn/login/qrcommit?showmenu=false&code=%v&appId=dingoankubyrfkttorhpou", g.Result)
@@ -172,10 +165,20 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
 	c.Push("flush", "登录链接：\r\n"+config.Scheme+url.QueryEscape(codeURL))
+	return codeURL, g.Result, err
+}
+
+func (c *Core) CheckQrCode(code string) (*model.User, bool, error) {
+	client := req.C()
+	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
+		return nil
+	})
+	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
+
 	checkQrCode := func() (bool, string) {
 		res := new(checkQrCodeResp)
 		_, err := client.R().SetResult(res).SetFormData(map[string]string{
-			"qrCode":   g.Result,
+			"qrCode":   code,
 			"goto":     "https://oa.xuexi.cn",
 			"pdmToken": ""}).SetHeader("content-type", "application/x-www-form-urlencoded;charset=UTF-8").Post("https://login.xuexi.cn/login/login_with_qr")
 		if err != nil {
@@ -186,33 +189,65 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 		}
 		return false, ""
 	}
-	for i := 0; i < 150; i++ {
-		code, data := checkQrCode()
-		if code {
-			s2 := strings.Split(data, "=")[1]
-			response, err := client.R().SetQueryParams(map[string]string{
-				"code":  s2,
-				"state": s.Data.Sign + uuid.New().String(),
-			}).Get("https://pc-api.xuexi.cn/login/secure_check")
-			if err != nil {
-				return nil, err
-			}
+	qrCode, s := checkQrCode()
+	if !qrCode {
+		return nil, false, nil
+	} else {
+		sign := new(signResp)
+		_, err := client.R().SetResult(s).Get("https://pc-api.xuexi.cn/open/api/sns/sign")
+		if err != nil {
+			log.Errorln(err.Error())
+			return nil, false, err
+		}
+		s2 := strings.Split(s, "=")[1]
+		response, err := client.R().SetQueryParams(map[string]string{
+			"code":  s2,
+			"state": sign.Data.Sign + uuid.New().String(),
+		}).Get("https://pc-api.xuexi.cn/login/secure_check")
+		if err != nil {
+			return nil, false, err
+		}
 
-			uid, nick, err := GetUserInfo(response.Cookies())
-			if err != nil {
-				return nil, err
-			}
-			user := &model.User{
-				Nick:      nick,
-				UID:       uid,
-				Token:     response.Cookies()[0].Value,
-				LoginTime: time.Now().Unix(),
-			}
-			err = model.AddUser(user)
-			if err != nil {
-				return nil, err
-			}
-			c.Push("text", "登录成功，用户名："+nick)
+		uid, nick, err := GetUserInfo(response.Cookies())
+		if err != nil {
+			return nil, false, err
+		}
+		user := &model.User{
+			Nick:      nick,
+			UID:       uid,
+			Token:     response.Cookies()[0].Value,
+			LoginTime: time.Now().Unix(),
+		}
+		err = model.AddUser(user)
+		if err != nil {
+			return nil, false, err
+		}
+		c.Push("text", "登录成功，用户名："+nick)
+		return user, true, err
+	}
+}
+
+// L
+/**
+ * @Description:
+ * @receiver c
+ * @return *model.User
+ * @return error
+ */
+func (c *Core) L(retryTimes int) (*model.User, error) {
+	_, codeData, err := c.GenerateCode()
+	if err != nil {
+		return nil, err
+	}
+	client := req.C()
+	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
+		return nil
+	})
+	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
+
+	for i := 0; i < 150; i++ {
+		user, b, err := c.CheckQrCode(codeData)
+		if b && err == nil {
 			return user, err
 		}
 	}

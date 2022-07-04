@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 
+	//"github.com/huoxue1/study_xxqg/gui"
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
 	"github.com/huoxue1/study_xxqg/push"
@@ -23,13 +24,14 @@ import (
 
 var (
 	u bool
+	i bool
 )
 
 var VERSION = "unknown"
 
 func init() {
-
 	flag.BoolVar(&u, "u", false, "update the study_xxqg")
+	flag.BoolVar(&i, "init", false, "init the app")
 	flag.Parse()
 
 	config = lib.GetConfig()
@@ -74,6 +76,13 @@ func init() {
 }
 
 func main() {
+	if i {
+		core := &lib.Core{}
+		core.Init()
+		core.Quit()
+		return
+	}
+
 	go update.CheckUpdate(VERSION)
 
 	if u {
@@ -123,7 +132,6 @@ func main() {
 				return
 			}
 			c.Start()
-			select {}
 		}()
 	}
 
@@ -143,7 +151,6 @@ func main() {
 				Proxy:  config.TG.Proxy,
 			}
 			telegram.Init()
-			select {}
 		}()
 	}
 
@@ -151,6 +158,7 @@ func main() {
 		log.Infoln("已采用普通学习模式")
 		do("normal")
 	} else {
+		//gui.InitWindow()
 		select {}
 	}
 }

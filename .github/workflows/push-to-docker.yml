@@ -1,0 +1,38 @@
+name: docker build
+
+on: [push, pull_request]
+
+env:
+  BINARY_PREFIX: "study_xxqg_"
+  BINARY_SUFFIX: ""
+  PR_PROMPT: "::warning:: Build artifact will not be uploaded due to the workflow is trigged by pull request."
+  LD_FLAGS: "-w -s"
+
+jobs:
+  build:
+    name: Build binary CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Go environment
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: 1.17
+      - name: Build binary file
+        run: |
+          export LD_FLAGS="-w -s -X main.VERSION=${COMMIT_ID::7}"
+          go mod tidy
+          go build -o "output/study_xxqg" -trimpath -ldflags "$LD_FLAGS" ./
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: push to docker
+        run: |
+          docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_PASSWORD}}
+          ls -R
+          pwd
+          docker build -t jolanse/study_xxqg ./
+          docker push jolanse/study_xxqg
+
