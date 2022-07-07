@@ -10,4 +10,6 @@
 
 ## docker运行
 
-+ 等待docker大佬贡献docker教程
+```
+docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  jolanse/study_xxqg
+```
