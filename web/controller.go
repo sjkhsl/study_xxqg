@@ -217,12 +217,17 @@ func study() gin.HandlerFunc {
 		}
 		core.Init()
 		state.Store(uid, core)
+		config := lib.GetConfig()
 		go func() {
 			core.LearnArticle(user)
 			core.LearnVideo(user)
-			core.RespondDaily(user, "daily")
-			core.RespondDaily(user, "weekly")
-			core.RespondDaily(user, "special")
+			if config.Model == 2 {
+				core.RespondDaily(user, "daily")
+			} else if config.Model == 3 {
+				core.RespondDaily(user, "daily")
+				core.RespondDaily(user, "weekly")
+				core.RespondDaily(user, "special")
+			}
 			state.Delete(uid)
 		}()
 	}
