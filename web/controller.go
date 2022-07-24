@@ -14,6 +14,7 @@ import (
 
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
+	"github.com/huoxue1/study_xxqg/push"
 	"github.com/huoxue1/study_xxqg/utils"
 )
 
@@ -117,7 +118,9 @@ func addUser() gin.HandlerFunc {
 			})
 			return
 		}
-		_, err = lib.GetToken(p.Code, p.State)
+		registerID, _ := ctx.GetQuery("register_id")
+		log.Infoln("the jpush register id is " + registerID)
+		_, err = lib.GetToken(p.Code, p.State, registerID)
 		if err != nil {
 			ctx.JSON(403, Resp{
 				Code:    403,
@@ -228,8 +231,21 @@ func study() gin.HandlerFunc {
 				core.RespondDaily(user, "weekly")
 				core.RespondDaily(user, "special")
 			}
+			score, _ := lib.GetUserScore(user.ToCookies())
+			content := lib.FormatScore(score)
+			err := push.PushMessage(user.Nick+"学习情况", content, "score", user.PushId)
+			if err != nil {
+				log.Errorln(err.Error())
+			}
 			state.Delete(uid)
 		}()
+		ctx.JSON(200, Resp{
+			Code:    200,
+			Message: "",
+			Data:    "",
+			Success: true,
+			Error:   "",
+		})
 	}
 }
 

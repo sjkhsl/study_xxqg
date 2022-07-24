@@ -376,7 +376,7 @@ func getScores(bot *Telegram, args []string) {
 		if err != nil {
 			message += err.Error() + "\n"
 		}
-		message += formatScore(score) + "\n"
+		message += FormatScore(score) + "\n"
 	}
 	bot.SendMsg(message)
 }

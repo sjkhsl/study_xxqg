@@ -164,6 +164,7 @@ func main() {
 }
 
 func do(m string) {
+
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -202,6 +203,13 @@ func do(m string) {
 			return
 		}
 		message := u.Nick + " 学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
+		score, _ = lib.GetUserScore(user.ToCookies())
+		content := lib.FormatScore(score)
+		err = push.PushMessage(user.Nick+"学习情况", content, "score", user.PushId)
+		if err != nil {
+			log.Errorln(err.Error())
+			err = nil
+		}
 		core2.Push("markdown", message)
 		core2.Push("flush", "")
 	}

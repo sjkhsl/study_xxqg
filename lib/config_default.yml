@@ -76,3 +76,10 @@ start_wait: 0
 
 # 专项答题可接受的最小分值，因一天重复运行的时候，若专项答题未能答满会继续答新的一套题，会浪费题
 special_min_score: 10
+
+weekly_min_score:
+
+ji_guang_push:
+  enable: false
+  secret: ""
+  app_key: ""

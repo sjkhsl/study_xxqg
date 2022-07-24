@@ -101,7 +101,6 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			err = page.Click(WEEKEND)
 			if err != nil {
 				log.Errorln("跳转到积分页面错误")
-
 				return
 			}
 			c.Push("text", "已加载每周答题模块")

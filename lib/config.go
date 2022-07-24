@@ -56,6 +56,12 @@ type Config struct {
 	} `json:"retry" yaml:"retry"`
 	// 专项答题可接受的最小值
 	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
+
+	JiGuangPush struct {
+		Enable bool   `json:"enable" yaml:"enable"`
+		Secret string `json:"secret" yaml:"secret"`
+		AppKey string `json:"app_key" yaml:"app_key"`
+	} `json:"ji_guang_push" yaml:"ji_guang_push"`
 }
 
 var (

@@ -90,7 +90,7 @@ func (c *Core) Init() {
 	}
 }
 
-func GetToken(code, sign string) (bool, error) {
+func GetToken(code, sign, pushId string) (bool, error) {
 	client := req.C()
 	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
 	response, err := client.R().SetQueryParams(map[string]string{
@@ -118,6 +118,7 @@ func GetToken(code, sign string) (bool, error) {
 		UID:       uid,
 		Token:     token,
 		LoginTime: time.Now().Unix(),
+		PushId:    pushId,
 	}
 	err = model.AddUser(user)
 	if err != nil {

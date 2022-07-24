@@ -17,7 +17,7 @@ var static embed.FS
 // @Description:
 // @return *gin.Engine
 func RouterInit() *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
 	router.Use(Cors())
 
 	router.StaticFS("/static", http.FS(static))
@@ -35,7 +35,7 @@ func RouterInit() *gin.Engine {
 
 	user := router.Group("/user", check())
 	// 添加用户
-	user.POST("/", addUser())
+	user.POST("", addUser())
 
 	user.GET("/", getUsers())
 

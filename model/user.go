@@ -28,6 +28,7 @@ type User struct {
 	UID       string `json:"uid"`
 	Token     string `json:"token"`
 	LoginTime int64  `json:"login_time"`
+	PushId    string `json:"push_id"`
 }
 
 // Query
@@ -51,7 +52,7 @@ func Query() ([]*User, error) {
 	}(results)
 	for results.Next() {
 		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime)
+		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId)
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +80,7 @@ func Query() ([]*User, error) {
  */
 func Find(uid string) *User {
 	u := new(User)
-	err := db.QueryRow("select * from user where uid=?;", uid).Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime)
+	err := db.QueryRow("select * from user where uid=?;", uid).Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId)
 	if err != nil {
 		return nil
 	}
@@ -96,7 +97,7 @@ func AddUser(user *User) error {
 	ping()
 	count := UserCount(user.UID)
 	if count < 1 {
-		_, err := db.Exec("insert into user (nick, uid, token, login_time) values (?,?,?,?)", user.Nick, user.UID, user.Token, user.LoginTime)
+		_, err := db.Exec("insert into user (nick, uid, token, login_time,push_id) values (?,?,?,?,?)", user.Nick, user.UID, user.Token, user.LoginTime, user.PushId)
 		if err != nil {
 			log.Errorln("数据库插入失败")
 			log.Errorln(err.Error())
@@ -119,7 +120,7 @@ func AddUser(user *User) error {
  */
 func UpdateUser(user *User) error {
 	ping()
-	_, err := db.Exec("update user set token=? where uid = ?", user.Token, user.UID)
+	_, err := db.Exec("update user set token=?,login_time=?,push_id=? where uid = ?", user.Token, user.LoginTime, user.PushId, user.UID)
 	if err != nil {
 		log.Errorln("更新数据失败")
 		log.Errorln(err.Error())
@@ -242,10 +243,9 @@ func check() {
 			}
 			if token != "" {
 				user.Token = token
-				user.LoginTime = time.Now().Unix()
 				_ = UpdateUser(user)
 			}
 		}
-		time.Sleep(time.Hour * time.Duration(rand.Intn(3)))
+		time.Sleep(time.Hour * time.Duration(rand.Intn(6)))
 	}
 }

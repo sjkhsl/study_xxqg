@@ -26,7 +26,8 @@ func init() {
         constraint user_pk
             primary key,
     token      TEXT    not null,
-    login_time integer not null
+    login_time integer not null,
+    push_id TEXT
 );
 `)
 }
