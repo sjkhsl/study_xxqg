@@ -4,8 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 
-	"github.com/imroc/req/v3"
-
 	"github.com/huoxue1/study_xxqg/lib"
 )
 
@@ -15,7 +13,6 @@ func PushMessage(title, content, message, pushID string) error {
 	}
 
 	c := req.C()
-	c.SetProxyURL("http://127.0.0.1:8898")
 	response, err := c.R().SetBodyJsonMarshal(map[string]interface{}{
 		"platform": "all",
 		"audience": map[string][]string{
