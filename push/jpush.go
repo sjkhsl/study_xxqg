@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"errors"
 
+	"github.com/imroc/req/v3"
+
 	"github.com/huoxue1/study_xxqg/lib"
 )
 
