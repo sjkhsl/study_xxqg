@@ -515,7 +515,7 @@ func FillBlank(page playwright.Page, tips []string) error {
 			temp += tip
 		}
 		answer = strings.Split(temp, ",")
-		log.Infoln("答案已合并处理" + err.Error())
+		log.Infoln("答案已合并处理")
 	}
 	for i := 0; i < len(inouts); i++ {
 		err := inouts[i].Fill(answer[i])
