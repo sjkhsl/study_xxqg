@@ -442,12 +442,14 @@ func radioCheck(page playwright.Page, answer []string) error {
 	for _, radio := range radios {
 		textContent, err := radio.TextContent()
 		if err != nil {
+			log.Errorln("获取选项答案文本出现错误" + err.Error())
 			return err
 		}
 		for _, s := range answer {
 			if textContent == s {
 				err := radio.Click()
 				if err != nil {
+					log.Errorln("点击选项出现错误" + err.Error())
 					return err
 				}
 				r := rand2.Intn(2)
