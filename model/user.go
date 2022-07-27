@@ -13,6 +13,8 @@ import (
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/huoxue1/study_xxqg/push"
 )
 
 func init() {
@@ -66,6 +68,7 @@ func Query() ([]*User, error) {
 			users = append(users, u)
 		} else {
 			log.Infoln("用户" + u.Nick + "cookie已失效")
+			push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
 			_ = DeleteUser(u.UID)
 		}
 	}
