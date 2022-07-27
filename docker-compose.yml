@@ -1,0 +1,20 @@
+version: "3.5"
+services:
+  xuexi-auto:
+    image: jolanse/study_xxqg:latest
+    # 容器名
+    container_name: xuexi-auto
+    environment:
+    # 时区
+      - TZ=Asia/Shanghai
+    build:
+      context: .
+      # 内存大小
+      shm_size: '2g'
+    # 配置文件路径
+    volumes:
+      - ./config:/opt/config
+    # 映射端口
+    ports:
+      - 8080:8080
+    restart: unless-stopped
