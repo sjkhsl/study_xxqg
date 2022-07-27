@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/huoxue1/study_xxqg/conf"
 	"github.com/huoxue1/study_xxqg/model"
 )
 
@@ -90,7 +91,7 @@ func (t *Telegram) Init() {
 			update := <-channel
 			if update.Message == nil {
 				update.Message = &tgbotapi.Message{Text: update.CallbackQuery.Data}
-				t.bot.Send(tgbotapi.NewDeleteMessage(config.TG.ChatID, update.CallbackQuery.Message.MessageID))
+				t.bot.Send(tgbotapi.NewDeleteMessage(conf.GetConfig().TG.ChatID, update.CallbackQuery.Message.MessageID))
 				log.Infoln(update.CallbackQuery.Data)
 			}
 			log.Infoln("收到tg消息  ", update)
@@ -149,7 +150,7 @@ func (t *Telegram) SendMsg(message string) int {
 }
 
 func login(bot *Telegram, args []string) {
-	config := GetConfig()
+	config := conf.GetConfig()
 	go func() {
 		defer func() {
 			err := recover()
@@ -202,7 +203,7 @@ func getAllUser(bot *Telegram, args []string) {
 }
 
 func studyAll(bot *Telegram, args []string) {
-	config := GetConfig()
+	config := conf.GetConfig()
 	users, err := model.Query()
 	if err != nil {
 		bot.SendMsg(err.Error())
@@ -272,7 +273,7 @@ func studyAll(bot *Telegram, args []string) {
 }
 
 func study(bot *Telegram, args []string) {
-	config := GetConfig()
+	config := conf.GetConfig()
 	users, err := model.Query()
 	if err != nil {
 		bot.SendMsg(err.Error())

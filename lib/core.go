@@ -26,6 +26,7 @@ import (
 	goqrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/image/bmp"
 
+	"github.com/huoxue1/study_xxqg/conf"
 	"github.com/huoxue1/study_xxqg/model"
 )
 
@@ -158,14 +159,14 @@ func (c *Core) GenerateCode() (string, string, error) {
 	} else {
 		log.Infoln("二维码已生成到目录下的qrcode.png")
 	}
-	if GetConfig().QrCOde {
+	if conf.GetConfig().QrCOde {
 		data, _ := os.ReadFile("qrcode.png")
 		c.Push("image", base64.StdEncoding.EncodeToString(data))
 	}
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
-	c.Push("flush", "登录链接：\r\n"+config.Scheme+url.QueryEscape(codeURL))
+	c.Push("flush", "登录链接：\r\n"+conf.GetConfig().Scheme+url.QueryEscape(codeURL))
 	return codeURL, g.Result, err
 }
 
@@ -256,7 +257,7 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 		return nil, errors.New("time out")
 	} else {
 		// 等待几分钟后重新执行
-		time.Sleep(time.Duration(GetConfig().Retry.Intervals) * time.Minute)
+		time.Sleep(time.Duration(conf.GetConfig().Retry.Intervals) * time.Minute)
 		c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
 		return c.L(retryTimes - 1)
 	}
@@ -279,7 +280,7 @@ func (c *Core) initWindows() {
 		return
 	}
 	c.pw = pwt
-	path := GetConfig().EdgePath
+	path := conf.GetConfig().EdgePath
 	if path == "" {
 		path = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
 	}

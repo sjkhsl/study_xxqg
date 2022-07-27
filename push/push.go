@@ -3,10 +3,10 @@ package push
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/huoxue1/study_xxqg/lib"
+	"github.com/huoxue1/study_xxqg/conf"
 )
 
-func GetPush(config lib.Config) func(kind string, message string) {
+func GetPush(config conf.Config) func(kind string, message string) {
 	if config.Push.Ding.Enable {
 		ding := &Ding{
 			Secret: config.Push.Ding.Secret,

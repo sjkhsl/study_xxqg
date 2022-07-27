@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 
+	"github.com/huoxue1/study_xxqg/conf"
 	//"github.com/huoxue1/study_xxqg/gui"
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
@@ -34,7 +35,7 @@ func init() {
 	flag.BoolVar(&i, "init", false, "init the app")
 	flag.Parse()
 
-	config = lib.GetConfig()
+	config = conf.GetConfig()
 	logFormatter := &easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 		LogFormat:       "[%time%] [%lvl%]: %msg% \n",
@@ -64,7 +65,7 @@ func init() {
 }
 
 var (
-	config lib.Config
+	config conf.Config
 )
 
 func init() {

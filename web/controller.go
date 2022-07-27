@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/huoxue1/study_xxqg/conf"
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
 	"github.com/huoxue1/study_xxqg/push"
@@ -25,7 +26,7 @@ var (
 func CheckToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Param("token")
-		config := lib.GetConfig()
+		config := conf.GetConfig()
 		md5 := utils.StrMd5(config.Web.Account + config.Web.Password)
 		if md5 == token {
 			ctx.JSON(200, Resp{
@@ -55,7 +56,7 @@ func Login() gin.HandlerFunc {
 		}
 		u := new(user)
 		_ = ctx.BindJSON(u)
-		config := lib.GetConfig()
+		config := conf.GetConfig()
 		if u.Account == config.Web.Account && u.Password == config.Web.Password {
 			ctx.JSON(200, Resp{
 				Code:    200,
@@ -220,7 +221,7 @@ func study() gin.HandlerFunc {
 		}
 		core.Init()
 		state.Store(uid, core)
-		config := lib.GetConfig()
+		config := conf.GetConfig()
 		go func() {
 			core.LearnArticle(user)
 			core.LearnVideo(user)

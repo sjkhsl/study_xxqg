@@ -6,11 +6,11 @@ import (
 
 	"github.com/imroc/req/v3"
 
-	"github.com/huoxue1/study_xxqg/lib"
+	"github.com/huoxue1/study_xxqg/conf"
 )
 
 func PushMessage(title, content, message, pushID string) error {
-	if !lib.GetConfig().JiGuangPush.Enable {
+	if !conf.GetConfig().JiGuangPush.Enable {
 		return nil
 	}
 
@@ -26,7 +26,7 @@ func PushMessage(title, content, message, pushID string) error {
 		"message": map[string]string{
 			"msg_content": message,
 		},
-	}).SetHeader("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(lib.GetConfig().JiGuangPush.AppKey+":"+lib.GetConfig().JiGuangPush.Secret))).Post("https://api.jpush.cn/v3/push")
+	}).SetHeader("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(conf.GetConfig().JiGuangPush.AppKey+":"+conf.GetConfig().JiGuangPush.Secret))).Post("https://api.jpush.cn/v3/push")
 	if err != nil {
 		return err
 	}

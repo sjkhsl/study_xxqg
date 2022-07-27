@@ -1,4 +1,4 @@
-package lib
+package conf
 
 import (
 	_ "embed"

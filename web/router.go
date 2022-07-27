@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/huoxue1/study_xxqg/lib"
+	"github.com/huoxue1/study_xxqg/conf"
 	"github.com/huoxue1/study_xxqg/utils"
 )
 
@@ -54,7 +54,7 @@ func RouterInit() *gin.Engine {
 }
 
 func check() gin.HandlerFunc {
-	config := lib.GetConfig()
+	config := conf.GetConfig()
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("xxqg_token")
 		if token == "" || (utils.StrMd5(config.Web.Account+config.Web.Password) != token) {

@@ -4,7 +4,7 @@ COPY ./output/study_xxqg /opt/study_xxqg
 
 RUN mkdir /opt/config/
 
-COPY ./lib/config_default.yml /opt/config/config.yml
+COPY conf/config_default.yml /opt/config/config.yml
 
 RUN apt-get -qq update \
         && apt-get -qq install -y --no-install-recommends ca-certificates curl \
