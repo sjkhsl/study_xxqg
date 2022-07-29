@@ -15,7 +15,7 @@ model: 3
 log_level: "info"
 
 # 是否显示浏览器
-show_browser: true
+show_browser: false
 
 # 跳转学习强国的scheme,默认使用本仓库的action自建scheme,若需自行修改，可直接复制仓库下/docs/scheme.html到任意静态文件服务器
 scheme: "https://johlanse.github.io/study_xxqg/scheme.html?"
@@ -29,7 +29,7 @@ push:
 # 目前仅支持pushplus推送二维码，默认建议使用pushplus推送
 # pushplus使用方法见：http://www.pushplus.plus/
   push_plus:
-    enable: true
+    enable: false
     token: ""
 
 # telegram交互模式配置
