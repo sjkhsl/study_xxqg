@@ -271,7 +271,7 @@ func stopStudy() gin.HandlerFunc {
 
 func getLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.File(fmt.Sprintf("./logs/%v.log", time.Now().Format("2006-01-02")))
+		ctx.File(fmt.Sprintf("./config/logs/%v.log", time.Now().Format("2006-01-02")))
 	}
 }
 
