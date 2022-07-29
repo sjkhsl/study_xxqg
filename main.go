@@ -15,7 +15,7 @@ import (
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 
 	"github.com/huoxue1/study_xxqg/conf"
-	//"github.com/huoxue1/study_xxqg/gui"
+	// "github.com/huoxue1/study_xxqg/gui"
 	"github.com/huoxue1/study_xxqg/lib"
 	"github.com/huoxue1/study_xxqg/model"
 	"github.com/huoxue1/study_xxqg/push"
@@ -159,13 +159,12 @@ func main() {
 		log.Infoln("已采用普通学习模式")
 		do("normal")
 	} else {
-		//gui.InitWindow()
+		// gui.InitWindow()
 		select {}
 	}
 }
 
 func do(m string) {
-
 	defer func() {
 		err := recover()
 		if err != nil {

@@ -148,6 +148,11 @@ func UserCount(uid string) int {
 	return count
 }
 
+// DeleteUser
+/* @Description:
+ * @param uid
+ * @return error
+ */
 func DeleteUser(uid string) error {
 	ping()
 	_, err := db.Exec("delete from user where uid = ?;", uid)

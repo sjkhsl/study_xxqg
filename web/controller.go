@@ -302,3 +302,28 @@ func generate() gin.HandlerFunc {
 		proxy.ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
+
+// 删除用户
+func deleteUser() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		uid := ctx.Query("uid")
+		err := model.DeleteUser(uid)
+		if err != nil {
+			ctx.JSON(200, Resp{
+				Code:    503,
+				Message: "",
+				Data:    "",
+				Success: false,
+				Error:   err.Error(),
+			})
+			return
+		}
+		ctx.JSON(200, Resp{
+			Code:    200,
+			Message: "删除成功",
+			Data:    "",
+			Success: true,
+			Error:   "",
+		})
+	}
+}

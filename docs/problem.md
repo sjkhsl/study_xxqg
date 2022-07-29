@@ -6,6 +6,12 @@
   然后查看报错内容截图并在[github](https://github.com/johlanse/study_xxqg/issues) 提交issue
 ```
 
++ ### windows下出现找不到浏览器的问题
+
+```yaml
+
+自行安装chromium内核的浏览器，包括chrome，edge浏览器之类，然后在配置文件中配置 edge_path 配置项，配置时将路径中的 \ 换成 / 或者 \\ 
+```
 
 
 + ### arm设备报错```could not download driver: could not check if driver is up2date: could not run driver: exit status 127```
@@ -29,12 +35,19 @@
 
  nohup参考命令
  
- nohup ./study_xxqg > xxqg.log 2>&1 & echo $! >pid.pid
+ nohup ./study_xxqg > xxqg.log 2>&1
 
  退出程序可以通过**cat pid.pid**查看程序pid,然后kill对应pid进行退出
 
 
 ```
+
++ ### linux上退出后台正在执行的进程
+
+```yaml
+study_xxqg进程会在运行的时候将pid输出到目录下的pid.pid文件，使用kil -9 命令即可退出后台进程
+```
+
 + ### 刷文章或者视频无法加分
 ```yaml
 偶尔出现视频和文章无法加分的bug,可以进行等待一段时间后重启程序再次测试，目前尚不清楚造成原因

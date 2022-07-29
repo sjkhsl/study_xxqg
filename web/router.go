@@ -39,6 +39,8 @@ func RouterInit() *gin.Engine {
 
 	user.GET("/", getUsers())
 
+	user.DELETE("/", deleteUser())
+
 	router.GET("/score", getScore())
 
 	router.POST("/study", study())
