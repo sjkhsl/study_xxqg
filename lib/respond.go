@@ -44,20 +44,32 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		return
 	}
 
-	page, err := (*c.context).NewPage()
+	context, err := c.browser.NewContext()
+	_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
+		Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
+	if err != nil {
+		log.Errorln("创建实例对象错误" + err.Error())
+		return
+	}
+	defer func(context playwright.BrowserContext) {
+		err := context.Close()
+		if err != nil {
+			log.Errorln("错误的关闭了实例对象" + err.Error())
+		}
+	}(context)
+
+	page, err := context.NewPage()
 	if err != nil {
 		log.Errorln("创建页面失败" + err.Error())
-
 		return
 	}
 	defer func() {
 		page.Close()
 	}()
-	log.Infoln(user.ToBrowserCookies())
-	err = (*c.context).AddCookies(user.ToBrowserCookies()...)
+
+	err = context.AddCookies(user.ToBrowserCookies()...)
 	if err != nil {
-		log.Errorln(err.Error())
-		log.Errorln("添加cookie信息失败，已退出答题")
+		log.Errorln("添加cookie失败" + err.Error())
 		return
 	}
 	_, _ = page.Goto("https://pc.xuexi.cn/points/my-points.html")

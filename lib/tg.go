@@ -161,7 +161,6 @@ func login(bot *Telegram, args []string) {
 		core := Core{
 			pw:          nil,
 			browser:     nil,
-			context:     nil,
 			ShowBrowser: config.ShowBrowser,
 			Push: func(kind string, message string) {
 				switch {
@@ -219,7 +218,6 @@ func studyAll(bot *Telegram, args []string) {
 			core := Core{
 				pw:          nil,
 				browser:     nil,
-				context:     nil,
 				ShowBrowser: config.ShowBrowser,
 				Push: func(kind string, message string) {
 					switch {
@@ -313,7 +311,6 @@ func study(bot *Telegram, args []string) {
 	core := Core{
 		pw:          nil,
 		browser:     nil,
-		context:     nil,
 		ShowBrowser: config.ShowBrowser,
 		Push: func(kind string, message string) {
 			switch {

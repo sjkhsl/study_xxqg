@@ -94,7 +94,7 @@ func getScore() gin.HandlerFunc {
 		ctx.JSON(200, Resp{
 			Code:    200,
 			Message: "获取成功",
-			Data:    lib.PrintScore(score),
+			Data:    lib.FormatScore(score),
 			Success: true,
 			Error:   "",
 		})
@@ -215,7 +215,7 @@ func study() gin.HandlerFunc {
 		uid := ctx.Query("uid")
 		user := model.Find(uid)
 		core := &lib.Core{
-			ShowBrowser: false,
+			ShowBrowser: conf.GetConfig().ShowBrowser,
 			Push: func(kind, message string) {
 			},
 		}

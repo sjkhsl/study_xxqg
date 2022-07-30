@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path"
 	"strconv"
@@ -95,7 +96,10 @@ func main() {
 	if config.Web.Enable {
 		engine := web.RouterInit()
 		go func() {
-			err := engine.Run(fmt.Sprintf("%s:%d", config.Web.Host, config.Web.Port))
+			h := http.NewServeMux()
+			h.Handle("/", engine)
+			//h.HandleFunc("/wx", web.HandleWechat)
+			err := http.ListenAndServe(fmt.Sprintf("%s:%d", config.Web.Host, config.Web.Port), h)
 			if err != nil {
 				return
 			}
@@ -186,9 +190,17 @@ func do(m string) {
 	var user *model.User
 	users, _ := model.Query()
 	study := func(core2 *lib.Core, u *model.User) {
-		go core2.LearnArticle(u)
-		go core2.LearnVideo(u)
-		lib.WaitStudy(u, "")
+
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Errorln("学习过程异常")
+				log.Errorln(err)
+			}
+		}()
+
+		core2.LearnArticle(u)
+		core2.LearnVideo(u)
 		if config.Model == 2 {
 			core2.RespondDaily(u, "daily")
 		} else if config.Model == 3 {
@@ -205,7 +217,7 @@ func do(m string) {
 		message := u.Nick + " 学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
 		score, _ = lib.GetUserScore(user.ToCookies())
 		content := lib.FormatScore(score)
-		err = push.PushMessage(user.Nick+"学习情况", content, "score", user.PushId)
+		err = push.PushMessage(user.Nick+"学习情况", user.Nick+"学习情况"+content, "score", user.PushId)
 		if err != nil {
 			log.Errorln(err.Error())
 			err = nil

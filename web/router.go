@@ -20,6 +20,10 @@ func RouterInit() *gin.Engine {
 	router := gin.Default()
 	router.Use(Cors())
 
+	router.Group("/wx", func(context *gin.Context) {
+
+	})
+
 	router.StaticFS("/static", http.FS(static))
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.Redirect(301, "/static/xxqg/build/home.html")

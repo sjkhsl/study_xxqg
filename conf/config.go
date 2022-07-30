@@ -54,6 +54,12 @@ type Config struct {
 		// 重试时间
 		Intervals int `json:"intervals" yaml:"intervals"`
 	} `json:"retry" yaml:"retry"`
+
+	Wechat struct {
+		Token  string `json:"token" yaml:"token"`
+		Secret string `json:"secret" yaml:"secret"`
+		AppID  string `json:"app_id" yaml:"app_id"`
+	} `json:"wechat" yaml:"wechat"`
 	// 专项答题可接受的最小值
 	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
 

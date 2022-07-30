@@ -114,7 +114,22 @@ func (c *Core) LearnArticle(user *model.User) {
 	links, _ := getLinks("article")
 	if score.Content["article"].CurrentScore < score.Content["article"].MaxScore {
 		log.Infoln("开始加载文章学习模块")
-		page, err := (*c.context).NewPage()
+
+		context, err := c.browser.NewContext()
+		_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
+			Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
+		if err != nil {
+			log.Errorln("创建实例对象错误" + err.Error())
+			return
+		}
+		defer func(context playwright.BrowserContext) {
+			err := context.Close()
+			if err != nil {
+				log.Errorln("错误的关闭了实例对象" + err.Error())
+			}
+		}(context)
+
+		page, err := context.NewPage()
 		if err != nil {
 			return
 		}
@@ -122,7 +137,7 @@ func (c *Core) LearnArticle(user *model.User) {
 			page.Close()
 		}()
 
-		err = (*c.context).AddCookies(user.ToBrowserCookies()...)
+		err = context.AddCookies(user.ToBrowserCookies()...)
 		if err != nil {
 			log.Errorln("添加cookie失败" + err.Error())
 			return
@@ -209,27 +224,29 @@ func (c *Core) LearnVideo(user *model.User) {
 		// core := Core{}
 		// core.Init()
 
-		page, err := (*c.context).NewPage()
+		context, err := c.browser.NewContext()
+		_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
+			Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
+		if err != nil {
+			log.Errorln("创建实例对象错误" + err.Error())
+			return
+		}
+		defer func(context playwright.BrowserContext) {
+			err := context.Close()
+			if err != nil {
+				log.Errorln("错误的关闭了实例对象" + err.Error())
+			}
+		}(context)
+
+		page, err := context.NewPage()
 		if err != nil {
 			return
 		}
 		defer func() {
 			page.Close()
 		}()
-		var resp string
-		err = gout.GET("http://1.15.144.22/stealth.min.js").BindBody(&resp).Do()
-		if err != nil {
-			return
-		}
-		err = page.AddInitScript(playwright.PageAddInitScriptOptions{
-			Script: playwright.String(resp),
-			Path:   nil,
-		})
-		if err != nil {
-			return
-		}
 
-		err = (*c.context).AddCookies(user.ToBrowserCookies()...)
+		err = context.AddCookies(user.ToBrowserCookies()...)
 		if err != nil {
 			log.Errorln("添加cookie失败" + err.Error())
 			return

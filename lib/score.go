@@ -39,7 +39,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	if !gjson.GetBytes(resp, "ok").Bool() {
 		return Score{}, errors.New("token check failed")
 	}
-	log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
+	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TotalScore = int(gjson.GetBytes(resp, "data.score").Int())
 
 	// 获取用户今日得分
@@ -51,7 +51,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 
 		return Score{}, err
 	}
-	log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
+	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TodayScore = int(gjson.GetBytes(resp, "data.score").Int())
 
 	err = gout.GET(user_rateScore_url).SetCookies(cookies...).SetHeader(gout.H{
@@ -61,7 +61,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 		log.Errorln("获取用户积分出现错误" + err.Error())
 		return Score{}, err
 	}
-	log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
+	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	datas := gjson.GetBytes(resp, "data.taskProgress").Array()
 	m := make(map[string]Data, 7)
 	m["article"] = Data{

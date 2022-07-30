@@ -36,7 +36,6 @@ import (
 type Core struct {
 	pw          *playwright.Playwright
 	browser     playwright.Browser
-	context     *playwright.BrowserContext
 	ShowBrowser bool
 	Push        func(kind string, message string)
 }
@@ -255,12 +254,11 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 	}
 	if retryTimes == 0 {
 		return nil, errors.New("time out")
-	} else {
-		// 等待几分钟后重新执行
-		time.Sleep(time.Duration(conf.GetConfig().Retry.Intervals) * time.Minute)
-		c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
-		return c.L(retryTimes - 1)
 	}
+	// 等待几分钟后重新执行
+	time.Sleep(time.Duration(conf.GetConfig().Retry.Intervals) * time.Minute)
+	c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
+	return c.L(retryTimes - 1)
 }
 
 func (c *Core) initWindows() {
@@ -319,14 +317,6 @@ func (c *Core) initWindows() {
 	}
 
 	c.browser = browser
-
-	context, err := c.browser.NewContext()
-	_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
-		Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
-	if err != nil {
-		return
-	}
-	c.context = &context
 }
 
 func (c *Core) initNotWindows() {
@@ -389,21 +379,10 @@ func (c *Core) initNotWindows() {
 		return
 	}
 	c.browser = browser
-	context, err := c.browser.NewContext()
-	_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
-		Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
-	if err != nil {
-		return
-	}
-	c.context = &context
 }
 
 func (c *Core) Quit() {
-	err := (*c.context).Close()
-	if err != nil {
-		return
-	}
-	err = c.browser.Close()
+	err := c.browser.Close()
 	if err != nil {
 		return
 	}
