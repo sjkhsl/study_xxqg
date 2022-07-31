@@ -1,9 +1,6 @@
 name: docker build
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: [push, pull_request]
 
 env:
   BINARY_PREFIX: "study_xxqg_"
@@ -36,6 +33,6 @@ jobs:
           docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_PASSWORD}}
           ls -R
           pwd
-          docker build -t jolanse/study_xxqg:${{github.ref}} ./
-          docker push jolanse/study_xxqg:${{github.ref}}
+          docker build -t jolanse/study_xxqg ./
+          docker push jolanse/study_xxqg
 
