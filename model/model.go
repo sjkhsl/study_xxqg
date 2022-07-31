@@ -19,6 +19,7 @@ func init() {
 		log.Errorln("用户数据库打开失败，请检查config目录权限")
 		log.Panicln(err.Error())
 	}
+
 	_, _ = db.Exec(`create table user
 (
     nick       TEXT,

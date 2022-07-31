@@ -56,9 +56,13 @@ type Config struct {
 	} `json:"retry" yaml:"retry"`
 
 	Wechat struct {
-		Token  string `json:"token" yaml:"token"`
-		Secret string `json:"secret" yaml:"secret"`
-		AppID  string `json:"app_id" yaml:"app_id"`
+		Enable        bool   `json:"enable" yaml:"enable"`
+		Token         string `json:"token" yaml:"token"`
+		Secret        string `json:"secret" yaml:"secret"`
+		AppID         string `json:"app_id" yaml:"app_id"`
+		LoginTempID   string `json:"login_temp_id" yaml:"login_temp_id"`
+		NormalTempID  string `json:"normal_temp_id" yaml:"normal_temp_id"`
+		PushLoginWarn bool   `json:"push_login_warn" yaml:"push_login_warn"`
 	} `json:"wechat" yaml:"wechat"`
 	// 专项答题可接受的最小值
 	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`

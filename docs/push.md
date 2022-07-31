@@ -1,5 +1,34 @@
 ## 推送配置
 
+### 微信公众号推送
+配置config.yml的如下部分
+```yaml
+# 微信公众号测试号配置
+wechat:
+  # 是否启用
+  enable: false
+  # 开发者平台设置的token
+  token: ""
+  # 开发者平台的secret
+  secret: ""
+  # 开发者平台的appId
+  app_id: ""
+  # 发送登录消息需要使用的消息模板
+  # 模板标题，随意  模板内容：  点我登录，然后在浏览器中打开！！
+  login_temp_id: ""
+  # 发送普通消息需要使用的消息模板
+  # 模板标题：随意 模板内容： {{data.DATA}}
+  normal_temp_id: ""
+  # xxqg会每隔两小时左右检查所有用户的ck有效性，若开启该选项，会在检查失败时推送提醒消息
+  push_login_warn: false
+```
+
++ 前往微信[公众号开发者平台](http://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login)，手机微信扫码登录
++ 配置url为**http:ip:port/wx**,ip和端口在web项配置中配置
++ 设置token
++ 分别添加登录模板消息和普通模板消息，添加要求查看配置项注释
++ 在配置文件中配置所有内容，启动程序
+
 ### web推送
 > 适用于部署在服务器上或者家里有公网IP的设备上
 

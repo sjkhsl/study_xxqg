@@ -178,7 +178,7 @@ func login(bot *Telegram, args []string) {
 		}
 		core.Init()
 		defer core.Quit()
-		_, err := core.L(config.Retry.Times)
+		_, err := core.L(config.Retry.Times, "")
 		if err != nil {
 			bot.SendMsg(err.Error())
 			return

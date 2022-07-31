@@ -169,7 +169,7 @@ func (c *Core) GenerateCode() (string, string, error) {
 	return codeURL, g.Result, err
 }
 
-func (c *Core) CheckQrCode(code string) (*model.User, bool, error) {
+func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
 	client := req.C()
 	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
 		return nil
@@ -218,6 +218,7 @@ func (c *Core) CheckQrCode(code string) (*model.User, bool, error) {
 			UID:       uid,
 			Token:     response.Cookies()[0].Value,
 			LoginTime: time.Now().Unix(),
+			PushId:    pushID,
 		}
 		err = model.AddUser(user)
 		if err != nil {
@@ -235,7 +236,7 @@ func (c *Core) CheckQrCode(code string) (*model.User, bool, error) {
  * @return *model.User
  * @return error
  */
-func (c *Core) L(retryTimes int) (*model.User, error) {
+func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	_, codeData, err := c.GenerateCode()
 	if err != nil {
 		return nil, err
@@ -247,7 +248,7 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
 
 	for i := 0; i < 150; i++ {
-		user, b, err := c.CheckQrCode(codeData)
+		user, b, err := c.CheckQrCode(codeData, pushID)
 		if b && err == nil {
 			return user, err
 		}
@@ -258,10 +259,20 @@ func (c *Core) L(retryTimes int) (*model.User, error) {
 	// 等待几分钟后重新执行
 	time.Sleep(time.Duration(conf.GetConfig().Retry.Intervals) * time.Minute)
 	c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
-	return c.L(retryTimes - 1)
+	return c.L(retryTimes-1, pushID)
 }
 
 func (c *Core) initWindows() {
+	_, err := os.Stat("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe")
+	if err != nil {
+		if os.IsNotExist(err) && conf.GetConfig().EdgePath == "" {
+			log.Warningln("检测到edge浏览器不存在并且未配置edge_path，将再次运行时自动下载chrome浏览器")
+			c.initNotWindows()
+			return
+		}
+		err = nil
+	}
+
 	dir, err := os.Getwd()
 	if err != nil {
 		return

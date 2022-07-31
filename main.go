@@ -93,18 +93,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	if config.Web.Enable {
-		engine := web.RouterInit()
-		go func() {
-			h := http.NewServeMux()
+	engine := web.RouterInit()
+	go func() {
+		h := http.NewServeMux()
+		if config.Web.Enable {
 			h.Handle("/", engine)
-			//h.HandleFunc("/wx", web.HandleWechat)
+		}
+		if config.Wechat.Enable {
+			h.HandleFunc("/wx", web.HandleWechat)
+		}
+		if config.Web.Enable || config.Wechat.Enable {
 			err := http.ListenAndServe(fmt.Sprintf("%s:%d", config.Web.Host, config.Web.Port), h)
 			if err != nil {
 				return
 			}
-		}()
-	}
+		}
+	}()
 
 	if config.StartWait > 0 {
 		log.Infoln(fmt.Sprintf("将等待%d秒后启动程序", config.StartWait))
@@ -159,7 +163,7 @@ func main() {
 		}()
 	}
 
-	if !config.TG.Enable && config.Cron == "" {
+	if !config.TG.Enable && config.Cron == "" && !config.Wechat.Enable {
 		log.Infoln("已采用普通学习模式")
 		do("normal")
 	} else {
@@ -190,7 +194,6 @@ func do(m string) {
 	var user *model.User
 	users, _ := model.Query()
 	study := func(core2 *lib.Core, u *model.User) {
-
 		defer func() {
 			err := recover()
 			if err != nil {
@@ -229,7 +232,7 @@ func do(m string) {
 	// 用户小于1时自动登录
 	if len(users) < 1 {
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
-		u, err := core.L(config.Retry.Times)
+		u, err := core.L(config.Retry.Times, "")
 		if err != nil {
 			log.Errorln(err.Error())
 			return
@@ -242,7 +245,7 @@ func do(m string) {
 				study(core, u)
 			}
 			if len(users) < 1 {
-				user, err := core.L(config.Retry.Times)
+				user, err := core.L(config.Retry.Times, "")
 				if err != nil {
 					core.Push("msg", "登录超时")
 					return
@@ -278,7 +281,7 @@ func do(m string) {
 		}
 
 		if i == 0 {
-			u, err := core.L(config.Retry.Times)
+			u, err := core.L(config.Retry.Times, "")
 			if err != nil {
 				log.Errorln(err.Error())
 				return

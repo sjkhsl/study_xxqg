@@ -4,6 +4,7 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -14,11 +15,20 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/huoxue1/study_xxqg/conf"
 	"github.com/huoxue1/study_xxqg/push"
 )
 
 func init() {
 	go check()
+}
+
+var (
+	wechatPush func(id, message string)
+)
+
+func SetPush(push func(id, message string)) {
+	wechatPush = push
 }
 
 // User
@@ -42,7 +52,7 @@ type User struct {
 func Query() ([]*User, error) {
 	var users []*User
 	ping()
-	var results, err = db.Query("select * from user")
+	results, err := db.Query("select * from user")
 	if err != nil {
 		return nil, err
 	}
@@ -58,17 +68,50 @@ func Query() ([]*User, error) {
 		if err != nil {
 			return nil, err
 		}
-		// login := time.Unix(u.LoginTime, 0)
-		// sub := time.Now().Sub(login)
 		if CheckUserCookie(u) {
-			// if lib.GetConfig().ForceExpiration != 0 && sub.Hours() > float64(lib.GetConfig().ForceExpiration) {
-			//	log.Infoln("用户" + u.Nick + "cookie已强制失效")
-			//	continue
-			// }
 			users = append(users, u)
 		} else {
 			log.Infoln("用户" + u.Nick + "cookie已失效")
-			push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
+			_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
+			if conf.GetConfig().Wechat.PushLoginWarn {
+				wechatPush(u.PushId, fmt.Sprintf("用户%v已失效！！", u.Nick))
+			}
+			_ = DeleteUser(u.UID)
+		}
+	}
+	return users, err
+}
+
+// QueryByPushID
+/**
+ * @Description:
+ * @return []*User
+ * @return error
+ */
+func QueryByPushID(pushID string) ([]*User, error) {
+	var users []*User
+	ping()
+	results, err := db.Query("select * from user where push_id = ?", pushID)
+	if err != nil {
+		return users, err
+	}
+	defer func(results *sql.Rows) {
+		err := results.Close()
+		if err != nil {
+			log.Errorln("关闭results失败" + err.Error())
+		}
+	}(results)
+	for results.Next() {
+		u := new(User)
+		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId)
+		if err != nil {
+			return users, err
+		}
+		if CheckUserCookie(u) {
+			users = append(users, u)
+		} else {
+			log.Infoln("用户" + u.Nick + "cookie已失效")
+			_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
 			_ = DeleteUser(u.UID)
 		}
 	}
