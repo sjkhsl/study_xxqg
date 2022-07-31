@@ -36,6 +36,6 @@ jobs:
           docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_PASSWORD}}
           ls -R
           pwd
-          docker build -t jolanse/study_xxqg ./
+          docker build -t jolanse/study_xxqg:${{github.ref}} ./
           docker push jolanse/study_xxqg:${{github.ref}}
 
