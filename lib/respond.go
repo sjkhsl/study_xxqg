@@ -1,13 +1,20 @@
 package lib
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
 	rand2 "math/rand"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/imroc/req/v3"
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 
 	"github.com/huoxue1/study_xxqg/model"
 )
@@ -23,6 +30,12 @@ div:nth-child(7) > div.my-points-card-footer > div.buttonbox > div`
 div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-points-card-footer > div.buttonbox > div`
 )
 
+// RespondDaily
+/* @Description:
+ * @receiver c
+ * @param user
+ * @param model
+ */
 func (c *Core) RespondDaily(user *model.User, model string) {
 	defer func() {
 		err := recover()
@@ -110,9 +123,22 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 				return
 			}
-			err = page.Click(WEEKEND)
+			// err = page.Click(WEEKEND)
+			// if err != nil {
+			//	log.Errorln("跳转到积分页面错误")
+			//	return
+			//}
+			id, err := getweekID(user.ToCookies())
 			if err != nil {
-				log.Errorln("跳转到积分页面错误")
+				return
+			}
+			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-weekly-detail.html?id=%d", id), playwright.PageGotoOptions{
+				Referer:   playwright.String(MyPointsUri),
+				Timeout:   playwright.Float(10000),
+				WaitUntil: playwright.WaitUntilStateDomcontentloaded,
+			})
+			if err != nil {
+				log.Errorln("跳转到答题页面错误" + err.Error())
 				return
 			}
 			c.Push("text", "已加载每周答题模块")
@@ -125,10 +151,23 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 				return
 			}
-			err = page.Click(SPECIALBUTTON)
+			// err = page.Click(SPECIALBUTTON)
+			// if err != nil {
+			//	log.Errorln("跳转到积分页面错误")
+			//
+			//	return
+			//}
+			id, err := getSpecialID(user.ToCookies())
 			if err != nil {
-				log.Errorln("跳转到积分页面错误")
-
+				return
+			}
+			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-paper-detail.html?id=%d", id), playwright.PageGotoOptions{
+				Referer:   playwright.String(MyPointsUri),
+				Timeout:   playwright.Float(10000),
+				WaitUntil: playwright.WaitUntilStateDomcontentloaded,
+			})
+			if err != nil {
+				log.Errorln("跳转到答题页面错误" + err.Error())
 				return
 			}
 			c.Push("text", "已加载专项答题模块")
@@ -136,9 +175,9 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 	}
 	time.Sleep(5 * time.Second)
 	// 跳转到答题页面，若返回true则说明已答完
-	if getAnswerPage(page, model) {
-		return
-	}
+	// if getAnswerPage(page, model) {
+	//	return
+	//}
 
 	tryCount := 0
 	for true {
@@ -594,4 +633,76 @@ func RemoveRepByLoop(slc []string) []string {
 		}
 	}
 	return result
+}
+
+func getSpecialID(cookies []*http.Cookie) (int, error) {
+	c := req.C()
+	c.SetCommonCookies(cookies...)
+	repo, err := c.R().SetQueryParams(map[string]string{"pageSize": "1000", "pageNo": "1"}).Get(querySpecialList)
+	if err != nil {
+		log.Errorln("获取专项答题列表错误" + err.Error())
+		return 0, err
+	}
+	dataB64, err := repo.ToString()
+	if err != nil {
+		log.Errorln("获取专项答题列表获取string错误" + err.Error())
+		return 0, err
+	}
+	data, err := base64.StdEncoding.DecodeString(gjson.Get(dataB64, "data_str").String())
+	if err != nil {
+		log.Errorln("获取专项答题列表转换b64错误" + err.Error())
+		return 0, err
+	}
+	list := new(SpecialList)
+	err = json.Unmarshal(data, list)
+	if err != nil {
+		log.Errorln("获取专项答题列表转换json错误" + err.Error())
+		return 0, err
+	}
+	log.Infoln(fmt.Sprintf("共获取到专项答题%d个", list.TotalCount))
+	for _, s := range list.List {
+		if s.TipScore == 0 {
+			log.Infoln(fmt.Sprintf("获取到未答专项答题: %v，id: %v", s.Name, s.Id))
+			return s.Id, nil
+		}
+	}
+	log.Warningln("你已不存在未答的专项答题了")
+	return 0, errors.New("未找到专项答题")
+}
+
+func getweekID(cookies []*http.Cookie) (int, error) {
+	c := req.C()
+	c.SetCommonCookies(cookies...)
+	repo, err := c.R().SetQueryParams(map[string]string{"pageSize": "500", "pageNo": "1"}).Get(queryWeekList)
+	if err != nil {
+		log.Errorln("获取每周答题列表错误" + err.Error())
+		return 0, err
+	}
+	dataB64, err := repo.ToString()
+	if err != nil {
+		log.Errorln("获取每周答题列表获取string错误" + err.Error())
+		return 0, err
+	}
+	data, err := base64.StdEncoding.DecodeString(gjson.Get(dataB64, "data_str").String())
+	if err != nil {
+		log.Errorln("获取每周答题列表转换b64错误" + err.Error())
+		return 0, err
+	}
+	list := new(WeekList)
+	err = json.Unmarshal(data, list)
+	if err != nil {
+		log.Errorln("获取每周答题列表转换json错误" + err.Error())
+		return 0, err
+	}
+	log.Infoln(fmt.Sprintf("共获取到每周答题%d个", list.TotalCount))
+	for _, s := range list.List {
+		for _, practice := range s.Practices {
+			if practice.TipScore == 0 {
+				log.Infoln(fmt.Sprintf("获取到未答每周答题: %v，id: %v", practice.Name, practice.Id))
+				return practice.Id, nil
+			}
+		}
+	}
+	log.Warningln("你已不存在未答的每周答题了")
+	return 0, errors.New("未找到每周答题")
 }

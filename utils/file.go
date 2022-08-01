@@ -1,3 +1,5 @@
+// Package utils
+// @Description:
 package utils
 
 import (
@@ -6,6 +8,11 @@ import (
 	"os"
 )
 
+// FileIsExist
+/* @Description:
+ * @param path
+ * @return bool
+ */
 func FileIsExist(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -17,6 +24,11 @@ func FileIsExist(path string) bool {
 	return false
 }
 
+// StrMd5
+/* @Description:
+ * @param str
+ * @return retMd5
+ */
 func StrMd5(str string) (retMd5 string) {
 	h := md5.New()
 	h.Write([]byte(str))

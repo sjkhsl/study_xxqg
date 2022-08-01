@@ -26,7 +26,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	var score Score
 	var resp []byte
 	// 获取用户总分
-	err := gout.GET(user_totalScore_url).SetCookies(cookies...).SetHeader(gout.H{
+	err := gout.GET(userTotalscoreUrl).SetCookies(cookies...).SetHeader(gout.H{
 		"Cache-Control": "no-cache",
 	}).BindBody(&resp).Do()
 	if err != nil {
@@ -43,7 +43,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	score.TotalScore = int(gjson.GetBytes(resp, "data.score").Int())
 
 	// 获取用户今日得分
-	err = gout.GET(user_todayTotalScore_url).SetCookies(cookies...).SetHeader(gout.H{
+	err = gout.GET(userTodaytotalscoreUrl).SetCookies(cookies...).SetHeader(gout.H{
 		"Cache-Control": "no-cache",
 	}).BindBody(&resp).Do()
 	if err != nil {
@@ -54,7 +54,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TodayScore = int(gjson.GetBytes(resp, "data.score").Int())
 
-	err = gout.GET(user_rateScore_url).SetCookies(cookies...).SetHeader(gout.H{
+	err = gout.GET(userRatescoreUrl).SetCookies(cookies...).SetHeader(gout.H{
 		"Cache-Control": "no-cache",
 	}).BindBody(&resp).Do()
 	if err != nil {

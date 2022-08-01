@@ -20,7 +20,7 @@ import (
  */
 func GetUserInfo(cookies []*http.Cookie) (string, string, error) {
 	var resp []byte
-	err := gout.GET(user_Info_url).
+	err := gout.GET(userInfoUrl).
 		SetCookies(cookies...).
 		SetHeader(gout.H{
 			"Cache-Control": "no-cache",

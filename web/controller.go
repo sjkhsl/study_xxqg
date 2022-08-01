@@ -1,3 +1,5 @@
+// Package web
+// @Description:
 package web
 
 import (
@@ -23,7 +25,11 @@ var (
 	state = sync.Map{}
 )
 
-func CheckToken() gin.HandlerFunc {
+// checkToken
+/* @Description:
+ * @return gin.HandlerFunc
+ */
+func checkToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.Param("token")
 		config := conf.GetConfig()
@@ -48,7 +54,7 @@ func CheckToken() gin.HandlerFunc {
 	}
 }
 
-func Login() gin.HandlerFunc {
+func userLogin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		type user struct {
 			Account  string `json:"account"`
@@ -176,7 +182,7 @@ func getUsers() gin.HandlerFunc {
 	}
 }
 
-func Cors() gin.HandlerFunc {
+func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
 		origin := c.Request.Header.Get("Origin") // 请求头部
