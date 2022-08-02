@@ -36,8 +36,8 @@ jobs:
       - name: push to docker
         run: |
           docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_PASSWORD}}
-          ls -R
           pwd
+          echo ${{env.RELEASE_VERSION}}
           docker build -t jolanse/study_xxqg ./
           docker tag jolanse/study_xxqg jolanse/study_xxqg:${{env.RELEASE_VERSION}}
           docker push jolanse/study_xxqg:${{env.RELEASE_VERSION}}
