@@ -1,6 +1,9 @@
 name: docker build
 
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - 'v*'
 
 env:
   BINARY_PREFIX: "study_xxqg_"
@@ -34,5 +37,6 @@ jobs:
           ls -R
           pwd
           docker build -t jolanse/study_xxqg ./
-          docker push jolanse/study_xxqg
+          docker tag jolanse/study_xxqg jolanse/study_xxqg:${{github.ref}}
+          docker push jolanse/study_xxqg:${{github.ref}}
 
