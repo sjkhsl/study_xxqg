@@ -21,6 +21,8 @@ jobs:
         uses: actions/setup-go@v2.1.3
         with:
           go-version: 1.17
+      - name: Set env
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
       - name: Build binary file
         run: |
           export LD_FLAGS="-w -s -X main.VERSION=${COMMIT_ID::7}"
@@ -37,6 +39,6 @@ jobs:
           ls -R
           pwd
           docker build -t jolanse/study_xxqg ./
-          docker tag jolanse/study_xxqg jolanse/study_xxqg:${{github.ref}}
-          docker push jolanse/study_xxqg:${{github.ref}}
+          docker tag jolanse/study_xxqg jolanse/study_xxqg:${{env.RELEASE_VERSION}}
+          docker push jolanse/study_xxqg:${{env.RELEASE_VERSION}}
 
