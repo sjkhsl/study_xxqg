@@ -20,8 +20,10 @@ jobs:
           go-version: 1.17
       - name: Set env
         run: |
-          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+          if [ ${GITHUB_REF:10} == "/main" ]; then echo "RELEASE_VERSION=latest" >> $GITHUB_ENV; else then echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV; fi
+          
           echo ${GITHUB_REF:10}
+
       - name: Build binary file
         run: |
           export LD_FLAGS="-w -s -X main.VERSION=${COMMIT_ID::7}"
