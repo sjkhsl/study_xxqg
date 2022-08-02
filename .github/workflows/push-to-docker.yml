@@ -1,9 +1,6 @@
 name: docker build
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: [push, pull_request]
 
 env:
   BINARY_PREFIX: "study_xxqg_"
@@ -22,7 +19,9 @@ jobs:
         with:
           go-version: 1.17
       - name: Set env
-        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+          echo ${GITHUB_REF:10}
       - name: Build binary file
         run: |
           export LD_FLAGS="-w -s -X main.VERSION=${COMMIT_ID::7}"
