@@ -16,6 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/huoxue1/study_xxqg/conf"
 	"github.com/huoxue1/study_xxqg/model"
 )
 
@@ -37,15 +38,16 @@ div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-
  * @param model
  */
 func (c *Core) RespondDaily(user *model.User, model string) {
+	// 捕获所有异常，防止程序崩溃
 	defer func() {
 		err := recover()
 		if err != nil {
 			log.Errorln("答题模块异常结束或答题已完成")
 			c.Push("text", "答题模块异常退出或答题已完成")
-			time.Sleep(5 * time.Second)
 			log.Errorln(err)
 		}
 	}()
+	// 判断浏览器是否被退出
 	if c.IsQuit() {
 		return
 	}
@@ -56,39 +58,39 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 		return
 	}
-
+	// 创建浏览器上下文对象
 	context, err := c.browser.NewContext()
+	// 添加一个script,防止被检测
 	_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
 		Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
 	if err != nil {
 		log.Errorln("创建实例对象错误" + err.Error())
 		return
 	}
+	// 在退出方法时关闭对象
 	defer func(context playwright.BrowserContext) {
 		err := context.Close()
 		if err != nil {
 			log.Errorln("错误的关闭了实例对象" + err.Error())
 		}
 	}(context)
-
+	// 创建一个页面
 	page, err := context.NewPage()
 	if err != nil {
 		log.Errorln("创建页面失败" + err.Error())
 		return
 	}
+	// 退出时关闭页面
 	defer func() {
 		page.Close()
 	}()
-
+	// 添加用户的cookie
 	err = context.AddCookies(user.ToBrowserCookies()...)
 	if err != nil {
 		log.Errorln("添加cookie失败" + err.Error())
 		return
 	}
-	_, _ = page.Goto("https://pc.xuexi.cn/points/my-points.html")
-
-	log.Infoln("已加载答题模块")
-
+	// 跳转到积分页面
 	_, err = page.Goto(MyPointsUri, playwright.PageGotoOptions{
 		Referer:   playwright.String(MyPointsUri),
 		Timeout:   playwright.Float(10000),
@@ -98,6 +100,8 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		log.Errorln("跳转页面失败" + err.Error())
 		return
 	}
+	log.Infoln("已加载答题模块")
+	// 判断答题类型，然后相应处理
 	switch model {
 	case "daily":
 		{
@@ -107,6 +111,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 				return
 			}
+			// 点击每日答题的按钮
 			err = page.Click(DailyBUTTON)
 			if err != nil {
 				log.Errorln("跳转到积分页面错误")
@@ -128,10 +133,13 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			//	log.Errorln("跳转到积分页面错误")
 			//	return
 			//}
+
+			// 获取每周答题的ID
 			id, err := getweekID(user.ToCookies())
 			if err != nil {
 				return
 			}
+			// 跳转到每周答题界面
 			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-weekly-detail.html?id=%d", id), playwright.PageGotoOptions{
 				Referer:   playwright.String(MyPointsUri),
 				Timeout:   playwright.Float(10000),
@@ -157,10 +165,13 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			//
 			//	return
 			//}
+
+			// 获取专项答题ID
 			id, err := getSpecialID(user.ToCookies())
 			if err != nil {
 				return
 			}
+			// 跳转到专项答题界面
 			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-paper-detail.html?id=%d", id), playwright.PageGotoOptions{
 				Referer:   playwright.String(MyPointsUri),
 				Timeout:   playwright.Float(10000),
@@ -207,6 +218,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				log.Errorln("提交答案失败")
 			}
 		}
+		// 该元素存在则说明出现了滑块
 		handle, _ := page.QuerySelector("#nc_mask > div")
 		if handle != nil {
 			log.Infoln(handle)
@@ -283,7 +295,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 			return
 		}
-
+		// 获取题目类型
 		categoryText, err := category.TextContent()
 		if err != nil {
 			log.Errorln("获取题目元素失败" + err.Error())
@@ -292,6 +304,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		}
 		log.Infoln("## 题目类型：" + categoryText)
 
+		// 获取题目的问题
 		questionText, err := question.TextContent()
 		if err != nil {
 			log.Errorln("获取题目问题失败" + err.Error())
@@ -308,12 +321,14 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			goto label
 		}
 		log.Debugln("开始尝试获取打开提示信息按钮")
+		// 点击提示的按钮
 		err = openTips.Click()
 		if err != nil {
 			log.Errorln("点击打开提示信息按钮失败" + err.Error())
 			goto label
 		}
 		log.Debugln("已打开提示信息")
+		// 获取页面内容
 		content, err := page.Content()
 		if err != nil {
 			log.Errorln("获取网页全体内容失败" + err.Error())
@@ -321,6 +336,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		}
 		time.Sleep(time.Second * time.Duration(rand2.Intn(3)))
 		log.Debugln("以获取网页内容")
+		// 关闭提示信息
 		err = openTips.Click()
 		if err != nil {
 			log.Errorln("点击打开提示信息按钮失败" + err.Error())
@@ -328,7 +344,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			goto label
 		}
 		log.Debugln("已关闭提示信息")
-
+		// 从整个页面内容获取提示信息
 		tips := getTips(content)
 		log.Infoln("[提示信息]：", tips)
 		// 填空题
@@ -337,6 +353,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			if len(tips) < 1 {
 				tips = append(tips, "不知道")
 			}
+			// 填充填空题
 			err := FillBlank(page, tips)
 			if err != nil {
 				log.Errorln("填空题答题失败" + err.Error())
@@ -367,6 +384,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				log.Infoln("无法判断答案，自动选择ABCD")
 			}
 			log.Infoln("根据提示分别选择了", RemoveRepByLoop(answer))
+			// 多选题选择
 			err = radioCheck(page, answer)
 			if err != nil {
 				return
@@ -638,6 +656,7 @@ func RemoveRepByLoop(slc []string) []string {
 func getSpecialID(cookies []*http.Cookie) (int, error) {
 	c := req.C()
 	c.SetCommonCookies(cookies...)
+	// 获取专项答题列表
 	repo, err := c.R().SetQueryParams(map[string]string{"pageSize": "1000", "pageNo": "1"}).Get(querySpecialList)
 	if err != nil {
 		log.Errorln("获取专项答题列表错误" + err.Error())
@@ -648,22 +667,36 @@ func getSpecialID(cookies []*http.Cookie) (int, error) {
 		log.Errorln("获取专项答题列表获取string错误" + err.Error())
 		return 0, err
 	}
+	// 因为返回内容使用base64编码，所以需要对内容进行转码
 	data, err := base64.StdEncoding.DecodeString(gjson.Get(dataB64, "data_str").String())
 	if err != nil {
 		log.Errorln("获取专项答题列表转换b64错误" + err.Error())
 		return 0, err
 	}
+	// 创建实例对象
 	list := new(SpecialList)
+	// json序列号
 	err = json.Unmarshal(data, list)
 	if err != nil {
 		log.Errorln("获取专项答题列表转换json错误" + err.Error())
 		return 0, err
 	}
 	log.Infoln(fmt.Sprintf("共获取到专项答题%d个", list.TotalCount))
-	for _, s := range list.List {
-		if s.TipScore == 0 {
-			log.Infoln(fmt.Sprintf("获取到未答专项答题: %v，id: %v", s.Name, s.Id))
-			return s.Id, nil
+
+	// 判断是否配置选题顺序，若ReverseOrder为true则从后面选题
+	if conf.GetConfig().ReverseOrder {
+		for i := len(list.List) - 1; i >= 0; i-- {
+			if list.List[i].TipScore == 0 {
+				log.Infoln(fmt.Sprintf("获取到未答专项答题: %v，id: %v", list.List[i].Name, list.List[i].Id))
+				return list.List[i].Id, nil
+			}
+		}
+	} else {
+		for _, s := range list.List {
+			if s.TipScore == 0 {
+				log.Infoln(fmt.Sprintf("获取到未答专项答题: %v，id: %v", s.Name, s.Id))
+				return s.Id, nil
+			}
 		}
 	}
 	log.Warningln("你已不存在未答的专项答题了")
@@ -695,11 +728,23 @@ func getweekID(cookies []*http.Cookie) (int, error) {
 		return 0, err
 	}
 	log.Infoln(fmt.Sprintf("共获取到每周答题%d个", list.TotalCount))
-	for _, s := range list.List {
-		for _, practice := range s.Practices {
-			if practice.TipScore == 0 {
-				log.Infoln(fmt.Sprintf("获取到未答每周答题: %v，id: %v", practice.Name, practice.Id))
-				return practice.Id, nil
+
+	if conf.GetConfig().ReverseOrder {
+		for i := len(list.List) - 1; i >= 0; i-- {
+			for _, practice := range list.List[i].Practices {
+				if practice.TipScore == 0 {
+					log.Infoln(fmt.Sprintf("获取到未答每周答题: %v，id: %v", practice.Name, practice.Id))
+					return practice.Id, nil
+				}
+			}
+		}
+	} else {
+		for _, s := range list.List {
+			for _, practice := range s.Practices {
+				if practice.TipScore == 0 {
+					log.Infoln(fmt.Sprintf("获取到未答每周答题: %v，id: %v", practice.Name, practice.Id))
+					return practice.Id, nil
+				}
 			}
 		}
 	}

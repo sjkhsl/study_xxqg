@@ -17,8 +17,8 @@ type SpecialList struct {
 	TotalPageCount int `json:"totalPageCount"`
 	TotalCount     int `json:"totalCount"`
 	List           []struct {
-		TipScore    int    `json:"tipScore"`
-		EndDate     string `json:"endDate"`
+		TipScore    float64 `json:"tipScore"`
+		EndDate     string  `json:"endDate"`
 		Achievement struct {
 			Score   int `json:"score"`
 			Total   int `json:"total"`
@@ -52,10 +52,10 @@ type WeekList struct {
 	List           []struct {
 		Month     string `json:"month"`
 		Practices []struct {
-			SeeSolution bool `json:"seeSolution"`
-			TipScore    int  `json:"tipScore"`
-			ExamScoreId int  `json:"examScoreId"`
-			Overdue     bool `json:"overdue"`
+			SeeSolution bool    `json:"seeSolution"`
+			TipScore    float64 `json:"tipScore"`
+			ExamScoreId int     `json:"examScoreId"`
+			Overdue     bool    `json:"overdue"`
 			Achievement struct {
 				Total   int `json:"total"`
 				Correct int `json:"correct"`

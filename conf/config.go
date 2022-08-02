@@ -67,6 +67,8 @@ type Config struct {
 	// 专项答题可接受的最小值
 	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
 
+	ReverseOrder bool `json:"reverse_order" yaml:"reverse_order"`
+
 	JiGuangPush struct {
 		Enable bool   `json:"enable" yaml:"enable"`
 		Secret string `json:"secret" yaml:"secret"`
