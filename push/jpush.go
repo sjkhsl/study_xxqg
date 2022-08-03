@@ -6,7 +6,7 @@ import (
 
 	"github.com/imroc/req/v3"
 
-	"github.com/huoxue1/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/conf"
 )
 
 func PushMessage(title, content, message, pushID string) error {

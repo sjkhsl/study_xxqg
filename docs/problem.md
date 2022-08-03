@@ -1,4 +1,4 @@
-## 常见问题
+## 常见问题<!-- {docsify-ignore} -->
 
 + ### windows打开**study_xxqg.exe**出现直接闪退
 ```yaml
@@ -83,7 +83,12 @@ study_xxqg进程会在运行的时候将pid输出到目录下的pid.pid文件，
 
 ```
 
-在debian11的系统上解决方式为：
-```
-sudo apt-get install -y libx11-xcb1 && apt-get install -y libgtk-3-0 && apt-get install -y libxt6 && apt-get install -y libdbus-glib-1.2
-```
+~~在debian11的系统上解决方式为：~~
+
+使用docker可以快速解决
+
+[//]: # (```)
+
+[//]: # (sudo apt-get install -y libx11-xcb1 && apt-get install -y libgtk-3-0 && apt-get install -y libxt6 && apt-get install -y libdbus-glib-1.2)
+
+[//]: # (```)

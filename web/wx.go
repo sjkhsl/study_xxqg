@@ -12,9 +12,9 @@ import (
 	"github.com/johlanse/wechat/mp/request"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/huoxue1/study_xxqg/conf"
-	"github.com/huoxue1/study_xxqg/lib"
-	"github.com/huoxue1/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/lib"
+	"github.com/johlanse/study_xxqg/model"
 )
 
 func init() {

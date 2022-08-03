@@ -12,7 +12,7 @@ import (
 	"github.com/mxschmitt/playwright-go"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/huoxue1/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/model"
 )
 
 var (

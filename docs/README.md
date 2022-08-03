@@ -2,7 +2,7 @@
 + [推送参考](./push.md)
 + [常见问题](./problem.md)
 
-## 使用
+## 使用<!-- {docsify-ignore} -->
 
 + [Windows使用](./windows/index.md)
 + [Linux使用](./linux/index.md)

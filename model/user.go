@@ -15,8 +15,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
-	"github.com/huoxue1/study_xxqg/conf"
-	"github.com/huoxue1/study_xxqg/push"
+	"github.com/johlanse/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/push"
 )
 
 func init() {

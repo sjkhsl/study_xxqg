@@ -10,11 +10,7 @@
 + 再任意终端输入一下命令
 ```yaml
 cd study_xxqg
-
 go mod tidy
-
 go build ./
-
 ./study_xxqg
-
 ```

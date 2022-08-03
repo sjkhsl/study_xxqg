@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/huoxue1/study_xxqg/conf"
-	"github.com/huoxue1/study_xxqg/utils"
+	"github.com/johlanse/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 // 将静态文件嵌入到可执行程序中来
