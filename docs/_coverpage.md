@@ -11,4 +11,4 @@
 - 支持多种推送方式
 
 [GitHub](https://github.com/johlanse/study_xxqg)
-[Get Started](/README)
+[Get Started](./start.md)

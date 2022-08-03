@@ -1,5 +1,5 @@
-* [Study_xxqg](/README)
-* [开始使用](/README)
+* [Study_xxqg](./start.md)
+* [开始使用](./start.md)
   * [Windows运行](./windows/index)
   * [linux运行](./linux/index)
   * [源码运行](./custom/index)
