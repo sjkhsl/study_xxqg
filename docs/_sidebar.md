@@ -6,4 +6,5 @@
 * [推送配置](./push.md)
 * [配置文件](./config.md)
 * [常见问题](./problem.md)
+* [做出贡献](./contribute.md)
 * [加群交流](https://t.me/+VWI88z6d1k45NGJl)
