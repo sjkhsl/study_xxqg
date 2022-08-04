@@ -11,8 +11,14 @@
 ## docker运行
 
 ```
-docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  jolanse/study_xxqg
+docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  jolanse/study_xxqg:latest
 ```
+各个参数的含义：
+
++ **--name study_xxqg** 运行的容器的名称，可以根据自己实际情况进行修改
++ **-p 8080:8080** 将容器内部的8080端口映射到容器外面，前面是宿主机的端口，就是网页上访问的端口，后面是容器内部需要运行的端口，对应配置文件内web配置的端口就好
++ **-v /etc/study_xxqg/:/opt/config/** 将容器内的/opt/config/目录映射到宿主机的/etc/study_xxqg/目录，可根据实际情况修改前面宿主机路径，映射后对应的config.yml配置文件位置就在该目录下
++ **jolanse/study_xxqg:latest**镜像名称和镜像的版本，latest代表开发中的最新版本
 
 ## docker-compose运行
 

@@ -87,8 +87,9 @@ study_xxqg进程会在运行的时候将pid输出到目录下的pid.pid文件，
 
 使用docker可以快速解决
 
-[//]: # (```)
 
-[//]: # (sudo apt-get install -y libx11-xcb1 && apt-get install -y libgtk-3-0 && apt-get install -y libxt6 && apt-get install -y libdbus-glib-1.2)
++ ### 为什么运行了就卡住了
 
-[//]: # (```)
+当开启了cron定时配置，微信公众号测试号配置，telegram配置这三项的任意一项后，
+
+程序就会等待用户的指令从而卡住，所以只需要修改配置文件就可以解决

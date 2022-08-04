@@ -36,11 +36,12 @@ type Config struct {
 	QQ struct {
 	}
 	Web struct {
-		Enable   bool   `json:"enable" yaml:"enable"`
-		Account  string `json:"account" yaml:"account"`
-		Password string `json:"password" yaml:"password"`
-		Host     string `json:"host" yaml:"host"`
-		Port     int    `json:"port" yaml:"port"`
+		Enable       bool   `json:"enable" yaml:"enable"`
+		Account      string `json:"account" yaml:"account"`
+		Password     string `json:"password" yaml:"password"`
+		Host         string `json:"host" yaml:"host"`
+		Port         int    `json:"port" yaml:"port"`
+		Announcement string `json:"announcement" yaml:"announcement"`
 	} `json:"web"`
 	Cron      string `json:"cron" yaml:"cron"`
 	EdgePath  string `json:"edge_path" yaml:"edge_path"`
