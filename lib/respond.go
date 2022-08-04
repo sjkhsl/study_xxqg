@@ -400,6 +400,12 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 			var answer []string
 
+			if len(tips) > 1 {
+				log.Warningln("检测到单选题出现多个提示信息，即将对提示信息进行合并")
+				tip := strings.Join(tips, "")
+				tips = []string{tip}
+			}
+
 			for _, option := range options {
 				for _, tip := range tips {
 					if strings.Contains(option, tip) {
@@ -556,7 +562,10 @@ func getTips(data string) []string {
 	match := compile.FindAllStringSubmatch(data, -1)
 	var tips []string
 	for _, i := range match {
-		tips = append(tips, i[1])
+		// 新增判断提示信息为空的逻辑
+		if i[1] != "" {
+			tips = append(tips, i[1])
+		}
 	}
 	return tips
 }
