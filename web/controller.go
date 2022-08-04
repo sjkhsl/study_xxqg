@@ -155,8 +155,16 @@ func getUsers() gin.HandlerFunc {
 			return
 		}
 		if users == nil {
-			users = []*model.User{}
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "查询成功",
+				Data:    []interface{}{},
+				Success: true,
+				Error:   "",
+			})
+			return
 		}
+
 		var datas []map[string]interface{}
 		for _, user := range users {
 			var isStudy = false
