@@ -5,8 +5,11 @@ package web
 import (
 	"embed"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils"
@@ -15,6 +18,9 @@ import (
 // 将静态文件嵌入到可执行程序中来
 //go:embed xxqg/build
 var static embed.FS
+
+//go:embed app
+var newUI embed.FS
 
 // RouterInit
 // @Description:
@@ -30,6 +36,18 @@ func RouterInit() *gin.Engine {
 		ctx.Redirect(301, "/static/xxqg/build/home.html")
 	})
 
+	router.GET("/new/*file", func(ctx *gin.Context) {
+		if strings.HasSuffix(ctx.Request.URL.Path, "js") {
+			ctx.Header("Content-Type", "application/javascript; charset=utf-8")
+		}
+		f, err := newUI.ReadFile(strings.TrimLeft(ctx.Param("file"), "/"))
+		if err != nil {
+			log.Errorln(err.Error())
+			f, _ = newUI.ReadFile("app/home.html")
+		}
+		ctx.Writer.Write(f)
+		ctx.Status(200)
+	})
 	// 对权限的管理组
 	auth := router.Group("/auth")
 	// 用户登录的接口
@@ -37,9 +55,15 @@ func RouterInit() *gin.Engine {
 	// 检查登录状态的token是否正确
 	auth.POST("/check/:token", checkToken())
 
+	dir, _ := os.Getwd()
 	// 对于用户可自定义挂载文件的目录
 	if utils.FileIsExist("dist") {
-		router.StaticFS("/dist", gin.Dir("./dist/", true))
+		router.GET("/dist/*file", func(ctx *gin.Context) {
+			if strings.HasSuffix(ctx.Request.URL.Path, "js") {
+				ctx.Header("Content-Type", "application/javascript; charset=utf-8")
+			}
+			ctx.File(dir + ctx.Request.URL.Path)
+		})
 	}
 
 	// 对用户管理的组
@@ -47,9 +71,9 @@ func RouterInit() *gin.Engine {
 	// 添加用户
 	user.POST("", addUser())
 	// 获取所以已登陆的用户
-	user.GET("/", getUsers())
+	user.GET("", getUsers())
 	// 删除用户
-	user.DELETE("/", deleteUser())
+	user.DELETE("", deleteUser())
 
 	// 获取用户成绩
 	router.GET("/score", getScore())
