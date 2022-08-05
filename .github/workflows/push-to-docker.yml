@@ -32,7 +32,7 @@ jobs:
       - name: Build binary file
         run: |
         
-          export LD_FLAGS="-w -s -X main.VERSION=$env.RELEASE_VERSION"
+          export LD_FLAGS="-w -s -X main.VERSION=${GITHUB_REF:10}"
           go mod tidy
           go build -o "output/study_xxqg" -trimpath -ldflags "$LD_FLAGS" ./
 
