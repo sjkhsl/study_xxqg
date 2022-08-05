@@ -15,6 +15,8 @@ import (
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/lib"
 	"github.com/johlanse/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/utils"
+	"github.com/johlanse/study_xxqg/utils/update"
 )
 
 func init() {
@@ -32,6 +34,10 @@ const (
 	StartStudy = "start_study"
 	getUser    = "stop_study"
 	SCORE      = "score"
+
+	checkUpdate = "check_update"
+	updateBtn   = "updateBtn"
+	restart     = "restart"
 )
 
 func initWechat() {
@@ -83,6 +89,39 @@ func initWechat() {
 				},
 			},
 		},
+		{
+			Name:    "关于",
+			Type:    "click",
+			Key:     "",
+			Url:     "",
+			MediaId: "",
+			SubButtons: []mp.MenuButton{
+				{
+					Name:       "检查更新",
+					Type:       "click",
+					Key:        checkUpdate,
+					Url:        "",
+					MediaId:    "",
+					SubButtons: nil,
+				},
+				{
+					Name:       "重启程序",
+					Type:       "click",
+					Key:        restart,
+					Url:        "",
+					MediaId:    "",
+					SubButtons: nil,
+				},
+				{
+					Name:       "更新程序",
+					Type:       "click",
+					Key:        updateBtn,
+					Url:        "",
+					MediaId:    "",
+					SubButtons: nil,
+				},
+			},
+		},
 	}})
 	if err != nil {
 		log.Errorln("设置自定义菜单出现异常" + err.Error())
@@ -105,8 +144,30 @@ func initWechat() {
 			go handleGetUser(r.FromUserName)
 		case SCORE:
 			go handleScore(r.FromUserName)
+		case checkUpdate:
+			handleCheckUpdate(r.FromUserName)
+		case updateBtn:
+			handleUpdate(r.FromUserName)
+		case restart:
+			handleRestart(r.FromUserName)
 		}
 	})
+}
+
+func handleCheckUpdate(id string) {
+	about := utils.GetAbout()
+	sendMsg(id, about)
+}
+
+func handleUpdate(id string) {
+	update.SelfUpdate("", conf.GetVersion())
+	sendMsg(id, "检查更新已完成，即将重启程序")
+	utils.Restart()
+}
+
+func handleRestart(id string) {
+	sendMsg(id, "即将重启程序")
+	utils.Restart()
 }
 
 func sendMsg(id, message string) {

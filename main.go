@@ -78,6 +78,8 @@ func init() {
 }
 
 func main() {
+	conf.SetVersion(VERSION)
+	log.Infoln("当前程序运行版本： " + VERSION)
 	if i {
 		core := &lib.Core{}
 		core.Init()

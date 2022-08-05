@@ -20,32 +20,33 @@ import (
 )
 
 // CheckUpdate 检查更新
-func CheckUpdate(version string) {
+func CheckUpdate(version string) string {
 	log.Infof("正在检查更新.")
 	if version == "(devel)" {
 		log.Warnf("检查更新失败: 使用的 Actions 测试版或自编译版本.")
-		return
+		return ""
 	}
 	if version == "unknown" {
 		log.Warnf("检查更新失败: 使用的未知版本.")
-		return
+		return ""
 	}
 
 	if !strings.HasPrefix(version, "v") {
 		log.Warnf("版本格式错误")
-		return
+		return ""
 	}
 	latest, err := lastVersion()
 	if err != nil {
 		log.Warnf("检查更新失败: %v", err)
-		return
+		return ""
 	}
 	if versionCompare(version, latest) {
 		log.Infof("当前有更新的 study_xxqg 可供更新, 请前往 https://github.com/johlanse/study_xxqg/releases 下载.")
 		log.Infof("当前版本: %v 最新版本: %v", version, latest)
-		return
+		return "检测到可用更新，版本号：" + latest
 	}
 	log.Infof("检查更新完成. 当前已运行最新版本.")
+	return ""
 }
 
 func readLine() (str string) {
