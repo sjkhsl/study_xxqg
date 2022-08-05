@@ -11,7 +11,7 @@ import (
 
 	"github.com/guonaihong/gout"
 	"github.com/imroc/req/v3"
-	"github.com/mxschmitt/playwright-go"
+	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
@@ -239,18 +239,18 @@ func TokenToCookies(token string) []*http.Cookie {
 	return []*http.Cookie{cookie}
 }
 
-func (u *User) ToBrowserCookies() []playwright.SetNetworkCookieParam {
-	cookie := playwright.SetNetworkCookieParam{
-		Name:     "token",
-		Value:    u.Token,
+func (u *User) ToBrowserCookies() []playwright.BrowserContextAddCookiesOptionsCookies {
+	cookie := playwright.BrowserContextAddCookiesOptionsCookies{
+		Name:     playwright.String("token"),
+		Value:    playwright.String(u.Token),
 		Path:     playwright.String("/"),
 		Domain:   playwright.String(".xuexi.cn"),
-		Expires:  playwright.Int(int(time.Now().Add(time.Hour * 12).UnixNano())),
+		Expires:  playwright.Float(float64(time.Now().Add(time.Hour * 12).Unix())),
 		Secure:   playwright.Bool(false),
 		HttpOnly: playwright.Bool(false),
-		SameSite: playwright.String("Strict"),
+		SameSite: playwright.SameSiteAttributeStrict,
 	}
-	return []playwright.SetNetworkCookieParam{cookie}
+	return []playwright.BrowserContextAddCookiesOptionsCookies{cookie}
 }
 
 // CheckUserCookie

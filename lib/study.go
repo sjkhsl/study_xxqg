@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/guonaihong/gout"
-	"github.com/mxschmitt/playwright-go"
+	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/johlanse/study_xxqg/model"

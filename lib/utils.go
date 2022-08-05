@@ -3,7 +3,7 @@ package lib
 import (
 	"net/http"
 
-	"github.com/mxschmitt/playwright-go"
+	"github.com/playwright-community/playwright-go"
 )
 
 func cookieToJar(cookies []Cookie) []*http.Cookie {
@@ -28,9 +28,9 @@ func cookieToJar(cookies []Cookie) []*http.Cookie {
 	return cooks
 }
 
-func cookieToParam(cookies []Cookie) []playwright.SetNetworkCookieParam {
+func cookieToParam(cookies []Cookie) []playwright.BrowserContextAddCookiesOptionsCookies {
 	var (
-		cooks []playwright.SetNetworkCookieParam
+		cooks []playwright.BrowserContextAddCookiesOptionsCookies
 	)
 
 	for _, c := range cookies {
@@ -38,15 +38,15 @@ func cookieToParam(cookies []Cookie) []playwright.SetNetworkCookieParam {
 		if c.Name == "acw_tc" || c.Name == "aliyungf_tc" {
 			domain = "iflow-api.xuexi.cn\t"
 		}
-		cooks = append(cooks, playwright.SetNetworkCookieParam{
-			Name:     c.Name,
-			Value:    c.Value,
+		cooks = append(cooks, playwright.BrowserContextAddCookiesOptionsCookies{
+			Name:     playwright.String(c.Name),
+			Value:    playwright.String(c.Value),
 			Domain:   playwright.String(domain),
 			Path:     playwright.String(c.Path),
-			Expires:  playwright.Int(c.Expires),
+			Expires:  playwright.Float(float64(c.Expires)),
 			HttpOnly: playwright.Bool(c.HTTPOnly),
 			Secure:   playwright.Bool(c.Secure),
-			SameSite: playwright.String(c.SameSite),
+			SameSite: playwright.SameSiteAttributeStrict,
 		})
 	}
 	return cooks

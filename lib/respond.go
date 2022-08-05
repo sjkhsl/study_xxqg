@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/imroc/req/v3"
-	"github.com/mxschmitt/playwright-go"
+	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
@@ -191,7 +191,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 	//}
 
 	tryCount := 0
-	for true {
+	for {
 	label:
 		tryCount++
 		if tryCount >= 30 {
