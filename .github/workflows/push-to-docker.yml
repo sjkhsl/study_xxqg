@@ -31,7 +31,7 @@ jobs:
 
       - name: Build binary file
         run: |
-          echo ${env.RELEASE_VERSION}
+          echo "${env.RELEASE_VERSION}"
           export LD_FLAGS="-w -s -X main.VERSION=${env.RELEASE_VERSION}"
           go mod tidy
           go build -o "output/study_xxqg" -trimpath -ldflags "$LD_FLAGS" ./
