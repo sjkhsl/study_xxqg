@@ -41,12 +41,17 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v2
       -
+        name: Check snapshot
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        id: snapshot
+        run: echo '::set-output name=ARG::--snapshot'
+      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist
+          args: build --rm-dist ${{ steps.snapshot.outputs.ARG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
