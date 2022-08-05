@@ -1,6 +1,8 @@
 FROM debian:bullseye-slim
 
-COPY ./output/study_xxqg /opt/study_xxqg
+ARG TARGETARCH
+
+COPY ./dist/nowin_linux_$TARGETARCH*/study_xxqg /opt/study_xxqg
 
 RUN mkdir /opt/config/
 

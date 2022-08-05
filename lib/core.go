@@ -20,8 +20,8 @@ import (
 	"github.com/imroc/req/v3"
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
-	"github.com/mxschmitt/playwright-go"
 	"github.com/nfnt/resize"
+	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 	goqrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/image/bmp"
@@ -32,7 +32,6 @@ import (
 
 // Core
 // @Description:
-//
 type Core struct {
 	pw          *playwright.Playwright
 	browser     playwright.Browser
@@ -42,7 +41,6 @@ type Core struct {
 
 // Cookie
 // @Description:
-//
 type Cookie struct {
 	Name     string `json:"name" yaml:"name"`
 	Value    string `json:"value" yaml:"value"`
@@ -277,11 +275,22 @@ func (c *Core) initWindows() {
 	if err != nil {
 		return
 	}
-	pwt, err := playwright.Run(&playwright.RunOptions{
+
+	pwo := &playwright.RunOptions{
 		DriverDirectory:     dir + "/tools/driver/",
 		SkipInstallBrowsers: true,
 		Browsers:            []string{"msedge"},
-	})
+	}
+
+	err = playwright.Install(pwo)
+	if err != nil {
+		log.Errorln("[core]", "安装playwright失败")
+		log.Errorln("[core] ", err.Error())
+
+		return
+	}
+
+	pwt, err := playwright.Run(pwo)
 	if err != nil {
 		log.Errorln("[core]", "初始化playwright失败")
 		log.Errorln("[core] ", err.Error())
@@ -344,11 +353,21 @@ func (c *Core) initNotWindows() {
 		}
 	}
 
-	pwt, err := playwright.Run(&playwright.RunOptions{
+	pwo := &playwright.RunOptions{
 		DriverDirectory:     dir + "/tools/driver/",
 		SkipInstallBrowsers: false,
 		Browsers:            []string{"chromium"},
-	})
+	}
+
+	err = playwright.Install(pwo)
+	if err != nil {
+		log.Errorln("[core]", "安装playwright失败")
+		log.Errorln("[core] ", err.Error())
+
+		return
+	}
+
+	pwt, err := playwright.Run(pwo)
 	if err != nil {
 		log.Errorln("[core]", "初始化playwright失败")
 		log.Errorln("[core] ", err.Error())
@@ -538,7 +557,7 @@ func removeNode(page playwright.Page) {
 // *  图片裁剪
 // * 入参:图片输入、输出、缩略图宽、缩略图高、Rectangle{Pt(x0, y0), Pt(x1, y1)}，精度
 // * 规则:如果精度为0则精度保持不变
-//*
+// *
 // * 返回:error
 // */
 func Clip(in io.Reader, out io.Writer, wi, hi, x0, y0, x1, y1, quality int) (err error) {
