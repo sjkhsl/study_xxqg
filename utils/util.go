@@ -3,6 +3,9 @@ package utils
 import (
 	"os"
 	"os/exec"
+
+	"github.com/johlanse/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/utils/update"
 )
 
 // Restart
@@ -15,4 +18,11 @@ func Restart() {
 		os.Exit(3)
 	}()
 
+}
+
+func GetAbout() string {
+	msg := "study_xxqg\n程序版本："
+	msg += conf.GetVersion()
+	msg += "\n" + update.CheckUpdate(conf.GetVersion())
+	return msg
 }

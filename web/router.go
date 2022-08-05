@@ -36,6 +36,10 @@ func RouterInit() *gin.Engine {
 		ctx.Redirect(301, "/static/xxqg/build/home.html")
 	})
 
+	router.GET("/about", func(context *gin.Context) {
+		context.JSON(200, utils.GetAbout())
+	})
+
 	router.GET("/new/*file", func(ctx *gin.Context) {
 		if strings.HasSuffix(ctx.Request.URL.Path, "js") {
 			ctx.Header("Content-Type", "application/javascript; charset=utf-8")

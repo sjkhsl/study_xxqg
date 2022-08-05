@@ -75,6 +75,8 @@ type Config struct {
 		Secret string `json:"secret" yaml:"secret"`
 		AppKey string `json:"app_key" yaml:"app_key"`
 	} `json:"ji_guang_push" yaml:"ji_guang_push"`
+
+	version string
 }
 
 var (
@@ -85,6 +87,14 @@ var (
 
 //go:embed config_default.yml
 var defaultConfig []byte
+
+func SetVersion(string2 string) {
+	config.version = string2
+}
+
+func GetVersion() string {
+	return config.version
+}
 
 // GetConfig
 /**
