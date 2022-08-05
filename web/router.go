@@ -45,7 +45,7 @@ func RouterInit() *gin.Engine {
 			log.Errorln(err.Error())
 			f, _ = newUI.ReadFile("app/home.html")
 		}
-		ctx.Writer.Write(f)
+		_, _ = ctx.Writer.Write(f)
 		ctx.Status(200)
 	})
 	// 对权限的管理组
