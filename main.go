@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	rotates "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/robfig/cron/v3"
 	log "github.com/sirupsen/logrus"
@@ -46,6 +47,7 @@ func init() {
 		log.Errorf("rotates init err: %v", err)
 		panic(err)
 	}
+	gin.DefaultWriter = io.MultiWriter(w, os.Stdout)
 	log.SetOutput(io.MultiWriter(w, os.Stdout))
 	log.SetFormatter(logFormatter)
 	level, err := log.ParseLevel(config.LogLevel)

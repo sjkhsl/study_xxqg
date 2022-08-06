@@ -134,7 +134,11 @@ func (c *Core) LearnArticle(user *model.User) {
 			return
 		}
 		defer func() {
-			page.Close()
+			err := page.Close()
+			if err != nil {
+				log.Errorln("关闭页面失败")
+				return
+			}
 		}()
 
 		err = context.AddCookies(user.ToBrowserCookies()...)
