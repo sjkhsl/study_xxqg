@@ -5,5 +5,5 @@ import (
 )
 
 func TestName1(t *testing.T) {
-	CheckUserCookie(User{})
+
 }

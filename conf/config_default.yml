@@ -84,6 +84,9 @@ retry:
 # "* 10 * * *” 每天早上十点执行一次
 cron: "0 0 * * *"
 
+# 定时任务随机等待时间，单位：分钟
+cron_random_wait: 0
+
 #windows环境自定义浏览器路径，仅支持chromium系列
 edge_path: ""
 

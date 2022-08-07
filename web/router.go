@@ -5,7 +5,6 @@ package web
 import (
 	"embed"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -27,6 +26,7 @@ var newUI embed.FS
 // @return *gin.Engine
 func RouterInit() *gin.Engine {
 	router := gin.Default()
+	router.RemoveExtraSlash = true
 	router.Use(cors())
 
 	// 挂载静态文件
@@ -47,7 +47,7 @@ func RouterInit() *gin.Engine {
 		f, err := newUI.ReadFile(strings.TrimLeft(ctx.Param("file"), "/"))
 		if err != nil {
 			log.Errorln(err.Error())
-			f, _ = newUI.ReadFile("app/home.html")
+			f, _ = newUI.ReadFile("app/index.html")
 		}
 		_, _ = ctx.Writer.Write(f)
 		ctx.Status(200)
@@ -59,15 +59,9 @@ func RouterInit() *gin.Engine {
 	// 检查登录状态的token是否正确
 	auth.POST("/check/:token", checkToken())
 
-	dir, _ := os.Getwd()
 	// 对于用户可自定义挂载文件的目录
-	if utils.FileIsExist("dist") {
-		router.GET("/dist/*file", func(ctx *gin.Context) {
-			if strings.HasSuffix(ctx.Request.URL.Path, "js") {
-				ctx.Header("Content-Type", "application/javascript; charset=utf-8")
-			}
-			ctx.File(dir + ctx.Request.URL.Path)
-		})
+	if utils.FileIsExist("./config/dist/") {
+		router.StaticFS("/dist", http.Dir("./config/dist/"))
 	}
 
 	// 对用户管理的组
@@ -89,7 +83,7 @@ func RouterInit() *gin.Engine {
 	router.GET("/log", check(), getLog())
 
 	// 登录xxqg的三个接口
-	router.GET("/sign/*proxyPath", check(), sign())
+	router.GET("/sign/", check(), sign())
 	router.GET("/login/*proxyPath", check(), generate())
 	router.POST("/login/*proxyPath", check(), generate())
 	return router

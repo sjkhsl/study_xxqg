@@ -171,7 +171,11 @@ func login(bot *Telegram, args []string) {
 					newMessage := tgbotapi.NewMessage(bot.ChatId, message)
 					newMessage.ParseMode = tgbotapi.ModeMarkdownV2
 					bot.bot.Send(newMessage)
-				default:
+				case kind == "text":
+					if log.GetLevel() == log.DebugLevel {
+						bot.SendMsg(message)
+					}
+				case kind == "flush":
 					bot.SendMsg(message)
 				}
 			},
@@ -229,7 +233,11 @@ func studyAll(bot *Telegram, args []string) {
 						newMessage.ParseMode = tgbotapi.ModeMarkdownV2
 						_, _ = bot.bot.Send(newMessage)
 
-					default:
+					case kind == "text":
+						if log.GetLevel() == log.DebugLevel {
+							bot.SendMsg(message)
+						}
+					case kind == "flush":
 						bot.SendMsg(message)
 					}
 				},
@@ -322,7 +330,11 @@ func study(bot *Telegram, args []string) {
 				newMessage.ParseMode = tgbotapi.ModeMarkdownV2
 				_, _ = bot.bot.Send(newMessage)
 
-			default:
+			case kind == "text":
+				if log.GetLevel() == log.DebugLevel {
+					bot.SendMsg(message)
+				}
+			case kind == "flush":
 				bot.SendMsg(message)
 			}
 		},

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -101,9 +102,11 @@ func main() {
 	go func() {
 		h := http.NewServeMux()
 		if config.Web.Enable {
+			log.Infoln(fmt.Sprintf("已开启web配置，web监听地址 ==> %v:%v", config.Web.Host, config.Web.Port))
 			h.Handle("/", engine)
 		}
 		if config.Wechat.Enable {
+			log.Infoln(fmt.Sprintf("已开启wechat公众号配置,监听地址： ==》 %v:%v", config.Web.Host, config.Web.Port))
 			h.HandleFunc("/wx", web.HandleWechat)
 		}
 		if config.Web.Enable || config.Wechat.Enable {
@@ -129,7 +132,10 @@ func main() {
 				}
 			}()
 			log.Infoln("已采用定时执行模式")
-			c := cron.New()
+			c := cron.New(func(c *cron.Cron) {
+
+			})
+
 			_, err := c.AddFunc(config.Cron, func() {
 				defer func() {
 					i := recover()
@@ -138,6 +144,13 @@ func main() {
 						log.Errorln("执行定时任务出现异常")
 					}
 				}()
+				log.Infoln("即将开始执行定时任务")
+				// 检测是否开启了随机等待
+				if config.CronRandomWait > 0 {
+					rand.Seed(time.Now().UnixNano())
+					r := rand.Intn(config.CronRandomWait)
+					time.Sleep(time.Duration(r) * time.Minute)
+				}
 				do("cron")
 			})
 			if err != nil {

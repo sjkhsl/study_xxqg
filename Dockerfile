@@ -8,7 +8,8 @@ RUN mkdir /opt/config/
 
 COPY conf/config_default.yml /opt/config/config.yml
 
-RUN apt-get -qq update \
+RUN  ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+     echo 'Asia/Shanghai' >/etc/timezone && apt-get -qq update \
         && apt-get -qq install -y --no-install-recommends ca-certificates curl \
     && apt-get update && apt-get install -y libx11-6 libgbm1 libasound2 libcairo2 libxshmfence1 libatspi2.0-0 libpango-1.0-0 libnss3  \
     libatk1.0-0 libatk-bridge2.0-0 libcups2 libxrandr2 libxfixes3 libxdamage1 libxcomposite1 libxkbcommon0 \

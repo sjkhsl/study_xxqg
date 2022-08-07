@@ -43,10 +43,11 @@ type Config struct {
 		Port         int    `json:"port" yaml:"port"`
 		Announcement string `json:"announcement" yaml:"announcement"`
 	} `json:"web"`
-	Cron      string `json:"cron" yaml:"cron"`
-	EdgePath  string `json:"edge_path" yaml:"edge_path"`
-	QrCOde    bool   `json:"qr_code" yaml:"qr_code"`
-	StartWait int    `json:"start_wait" yaml:"start_wait"`
+	Cron           string `json:"cron" yaml:"cron"`
+	CronRandomWait int    `json:"cron_random_wait" yaml:"cron_random_wait"`
+	EdgePath       string `json:"edge_path" yaml:"edge_path"`
+	QrCOde         bool   `json:"qr_code" yaml:"qr_code"`
+	StartWait      int    `json:"start_wait" yaml:"start_wait"`
 	// cookie强制过期时间，单位为h
 	ForceExpiration int `json:"force_expiration" yaml:"force_expiration"`
 	Retry           struct {
