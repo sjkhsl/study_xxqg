@@ -47,6 +47,20 @@ builds:
       - -trimpath
     ldflags:
       - -s -w -X main.VERSION=v{{.Version}}
+  - id: docker
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.VERSION=v{{.Version}}
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
@@ -87,3 +101,6 @@ nfpms:
       - deb
       - rpm
     maintainer: johlanse
+    builds:
+      - nowin
+      - win
