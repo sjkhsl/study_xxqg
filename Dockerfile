@@ -8,6 +8,7 @@ RUN  ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
      apt-get -qq install -y --no-install-recommends ca-certificates curl && \
      apt-get install -y libx11-6 libgbm1 libasound2 libcairo2 libxshmfence1 libatspi2.0-0 libpango-1.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxrandr2 libxfixes3 libxdamage1 libxcomposite1 libxkbcommon0 && \
      apt-get clean && \
+     rm -rf /var/lib/apt/lists/* && \
      mkdir /opt/config/
 
 COPY ./dist/docker_linux_$TARGETARCH*/study_xxqg /opt/study_xxqg
