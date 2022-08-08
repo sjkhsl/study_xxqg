@@ -7,10 +7,6 @@ services:
     environment:
     # 时区
       - TZ=Asia/Shanghai
-    build:
-      context: .
-      # 内存大小
-      shm_size: '2g'
     # 配置文件路径
     volumes:
       - ./config:/opt/config
