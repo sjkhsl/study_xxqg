@@ -620,7 +620,7 @@ func checkNextBotton(page playwright.Page) {
 		return
 	}
 	if len(btns) <= 1 {
-		err := btns[0].Check()
+		err := btns[0].Click()
 		if err != nil {
 			log.Errorln("点击下一题按钮失败")
 
