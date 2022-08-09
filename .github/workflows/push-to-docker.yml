@@ -87,3 +87,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           shm-size: 2g
+          ulimit: core=0:0
