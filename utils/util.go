@@ -13,6 +13,9 @@ import (
  */
 func Restart() {
 	cmd := exec.Command("./study_xxqg")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
 	go func() {
 		cmd.Start()
 		os.Exit(3)

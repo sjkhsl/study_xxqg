@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"net/http"
@@ -68,15 +69,22 @@ func (t *Telegram) Init() {
 	newPlugin("/get_scores", getScores)
 	newPlugin("/quit", quit)
 	newPlugin("/study_all", studyAll)
-
-	uri, err := url.Parse(t.Proxy)
-	if err != nil {
-		log.Errorln("代理解析失败" + err.Error())
-		err = nil
+	var err error
+	var uri *url.URL
+	if t.Proxy != "" {
+		uri, err = url.Parse(t.Proxy)
+		if err != nil {
+			log.Errorln("代理解析失败" + err.Error())
+			err = nil
+		}
 	}
-	t.bot, err = tgbotapi.NewBotAPIWithClient(t.Token, tgbotapi.APIEndpoint, &http.Client{Transport: &http.Transport{
+
+	t.bot, err = tgbotapi.NewBotAPIWithClient(t.Token, conf.GetConfig().TG.CustomApi+"/bot%s/%s", &http.Client{Transport: &http.Transport{
 		// 设置代理
-		Proxy: http.ProxyURL(uri),
+		Proxy: func(r *http.Request) (*url.URL, error) {
+			return uri, nil
+		},
+		TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
 	}})
 
 	if err != nil {

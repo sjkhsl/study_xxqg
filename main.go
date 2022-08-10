@@ -132,9 +132,7 @@ func main() {
 				}
 			}()
 			log.Infoln("已采用定时执行模式")
-			c := cron.New(func(c *cron.Cron) {
-
-			})
+			c := cron.New()
 
 			_, err := c.AddFunc(config.Cron, func() {
 				defer func() {
@@ -149,6 +147,7 @@ func main() {
 				if config.CronRandomWait > 0 {
 					rand.Seed(time.Now().UnixNano())
 					r := rand.Intn(config.CronRandomWait)
+					log.Infoln(fmt.Sprintf("随机延迟%d分钟", r))
 					time.Sleep(time.Duration(r) * time.Minute)
 				}
 				do("cron")

@@ -38,6 +38,8 @@ tg:
   chat_id: 0
   token: ""
   proxy: ""
+  # 自定义tg的api,可通过cloudflare搭建，需自备域名
+  custom_api: "https://api.telegram.org"
 
 # 网页端配置
 web:
