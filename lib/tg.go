@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"net/http"
@@ -78,13 +77,16 @@ func (t *Telegram) Init() {
 			err = nil
 		}
 	}
-
 	t.bot, err = tgbotapi.NewBotAPIWithClient(t.Token, conf.GetConfig().TG.CustomApi+"/bot%s/%s", &http.Client{Transport: &http.Transport{
 		// 设置代理
 		Proxy: func(r *http.Request) (*url.URL, error) {
-			return uri, nil
+			if uri != nil {
+				return uri, nil
+			} else {
+				return http.ProxyFromEnvironment(r)
+			}
 		},
-		TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+		//TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
 	}})
 
 	if err != nil {
