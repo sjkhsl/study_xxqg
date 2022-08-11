@@ -206,16 +206,17 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			log.Infoln("获取提交按钮失败，本次答题结束" + err.Error())
 			return
 		}
-
-		enabled, err := btn.IsEnabled()
-		if err != nil {
-			log.Errorln(err.Error())
-			continue
-		}
-		if enabled {
-			err := btn.Click()
+		if btn != nil {
+			enabled, err := btn.IsEnabled()
 			if err != nil {
-				log.Errorln("提交答案失败")
+				log.Errorln(err.Error())
+				continue
+			}
+			if enabled {
+				err := btn.Click()
+				if err != nil {
+					log.Errorln("提交答案失败")
+				}
 			}
 		}
 		// 该元素存在则说明出现了滑块
