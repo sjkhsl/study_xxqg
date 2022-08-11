@@ -127,5 +127,8 @@ func GetConfig() Config {
 	if config.SpecialMinScore == 0 {
 		config.SpecialMinScore = 10
 	}
+	if config.TG.CustomApi == "" {
+		config.TG.CustomApi = "https://api.telegram.org"
+	}
 	return config
 }
