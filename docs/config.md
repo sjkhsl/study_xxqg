@@ -46,7 +46,9 @@ tg:
   proxy: ""
   # 自定义tg的api,可通过cloudflare搭建，需自备域名
   custom_api: "https://api.telegram.org"
-
+  # 白名单id,包括群id或者用户id,若为空，则允许所有群所有用户使用，若仅用于单人，直接配置上面的chat_id就可以
+  white_list:
+    - 123
 # 网页端配置
 web:
   # 是否启用网页

@@ -28,11 +28,12 @@ type Config struct {
 		} `json:"push_plus" yaml:"push_plus"`
 	} `json:"push" yaml:"push"`
 	TG struct {
-		Enable    bool   `json:"enable" yaml:"enable"`
-		Token     string `json:"token" yaml:"token"`
-		ChatID    int64  `json:"chat_id" yaml:"chat_id"`
-		Proxy     string `json:"proxy" yaml:"proxy"`
-		CustomApi string `json:"custom_api" yaml:"custom_api"`
+		Enable    bool    `json:"enable" yaml:"enable"`
+		Token     string  `json:"token" yaml:"token"`
+		ChatID    int64   `json:"chat_id" yaml:"chat_id"`
+		Proxy     string  `json:"proxy" yaml:"proxy"`
+		CustomApi string  `json:"custom_api" yaml:"custom_api"`
+		WhiteList []int64 `json:"white_list" yaml:"white_list"`
 	} `json:"tg" yaml:"tg"`
 	QQ struct {
 	}
