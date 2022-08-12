@@ -90,28 +90,39 @@ var (
 //go:embed config_default.yml
 var defaultConfig []byte
 
+// SetVersion
+/* @Description: 设置应用程序版本号
+ * @param string2
+ */
 func SetVersion(string2 string) {
 	config.version = string2
 }
 
+// GetVersion
+/* @Description: 获取应用程序版本号
+ * @return string
+ */
 func GetVersion() string {
 	return config.version
 }
 
-// GetConfig
-/**
- * @Description:
- * @return Config
+// InitConfig
+/* @Description: 初始化配置文件
+ * @param path
  */
-func GetConfig() Config {
-	file, err := os.ReadFile("./config/config.yml")
+func InitConfig(path string) {
+	if path == "" {
+		path = "./config/config.yml"
+	}
+	log.Infoln("配置文件路径 ==》 " + path)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		log.Warningln("检测到配置文件可能不存在")
-		err := os.WriteFile("./config/config.yml", defaultConfig, 0666)
+		err := os.WriteFile(path, defaultConfig, 0666)
 		if err != nil {
 			log.Errorln("写入到配置文件出现错误")
 			log.Errorln(err.Error())
-			return Config{}
+			return
 		}
 		log.Infoln("成功写入到配置文件,请重启应用")
 		os.Exit(3)
@@ -119,7 +130,7 @@ func GetConfig() Config {
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
 		log.Errorln(err.Error())
-		return Config{}
+		log.Panicln("配置文件解析失败，请检查配置文件")
 	}
 	if config.Scheme == "" {
 		config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"
@@ -130,5 +141,13 @@ func GetConfig() Config {
 	if config.TG.CustomApi == "" {
 		config.TG.CustomApi = "https://api.telegram.org"
 	}
+}
+
+// GetConfig
+/**
+ * @Description: 获取配置信息
+ * @return Config
+ */
+func GetConfig() Config {
 	return config
 }

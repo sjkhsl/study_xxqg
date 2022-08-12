@@ -27,17 +27,20 @@ import (
 )
 
 var (
-	u bool
-	i bool
+	u          bool
+	i          bool
+	configPath = ""
 )
 
 var VERSION = "unknown"
 
 func init() {
-	flag.BoolVar(&u, "u", false, "update the study_xxqg")
+	flag.BoolVar(&u, "u", false, "更新应用")
 	flag.BoolVar(&i, "init", false, "init the app")
+	flag.StringVar(&configPath, "config", "./config/config.yml", "设置配置文件路径")
 	flag.Parse()
-
+	// 初始化配置文件
+	conf.InitConfig(configPath)
 	config = conf.GetConfig()
 	logFormatter := &easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
@@ -233,7 +236,7 @@ func do(m string) {
 			log.Debugln(err.Error())
 			return
 		}
-		message := u.Nick + " 学习完成：今日得分:" + strconv.Itoa(score.TodayScore)
+
 		score, _ = lib.GetUserScore(user.ToCookies())
 		content := lib.FormatScore(score)
 		err = push.PushMessage(user.Nick+"学习情况", user.Nick+"学习情况"+content, "score", user.PushId)
@@ -241,8 +244,8 @@ func do(m string) {
 			log.Errorln(err.Error())
 			err = nil
 		}
-		core2.Push("markdown", message)
-		core2.Push("flush", "")
+		message := u.Nick + " 学习完成：今日得分:" + lib.PrintScore(score)
+		core2.Push("flush", message)
 	}
 
 	// 用户小于1时自动登录

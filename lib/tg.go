@@ -273,7 +273,7 @@ func studyAll(bot *Telegram, args []string) {
 			select {
 			case <-timer:
 				{
-					bot.SendMsg("学习超时，请重新登录或检查日志")
+					bot.SendMsg("学习超时，请重新学习或检查日志")
 					log.Errorln("学习超时，已自动退出")
 					core.Quit()
 				}
@@ -282,7 +282,7 @@ func studyAll(bot *Telegram, args []string) {
 				}
 			}
 			score, _ := GetUserScore(user.ToCookies())
-			bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
+			bot.SendMsg(fmt.Sprintf("%v已学习完成\n%v", user.Nick, PrintScore(score)))
 		}
 		s()
 	}
@@ -379,7 +379,7 @@ func study(bot *Telegram, args []string) {
 		}
 	}
 	score, _ := GetUserScore(user.ToCookies())
-	bot.SendMsg(fmt.Sprintf("当前学习总积分：%v,今日得分：%v", score.TotalScore, score.TodayScore))
+	bot.SendMsg(fmt.Sprintf("%v已学习完成\n%v", user.Nick, PrintScore(score)))
 }
 
 func getScores(bot *Telegram, args []string) {
