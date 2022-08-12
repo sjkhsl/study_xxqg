@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/guonaihong/gout"
+	log "github.com/sirupsen/logrus"
 )
 
 type Ding struct {
@@ -18,7 +19,7 @@ type Ding struct {
 func (d *Ding) Send() func(kind string, message string) {
 	s := TypeSecret{Secret: d.Secret, Webhook: d.Token}
 	return func(kind string, message string) {
-		if kind == "markdown" {
+		if kind == "flush" {
 			err := s.SendMessage(map[string]interface{}{
 				"msgtype": "markdown",
 				"markdown": map[string]string{
@@ -30,9 +31,11 @@ func (d *Ding) Send() func(kind string, message string) {
 				return
 			}
 		} else {
-			err := s.SendMessage(Text(message))
-			if err != nil {
-				return
+			if log.GetLevel() == log.DebugLevel {
+				err := s.SendMessage(Text(message))
+				if err != nil {
+					return
+				}
 			}
 		}
 	}

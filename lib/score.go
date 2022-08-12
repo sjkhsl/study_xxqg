@@ -130,3 +130,18 @@ func FormatScore(score Score) string {
 	)
 	return result
 }
+
+func FormatScoreShort(score Score) string {
+	result := ""
+	result += fmt.Sprintf("当前学习总积分：%d </br> 今日得分：%d</br>", score.TotalScore, score.TodayScore)
+	result += fmt.Sprintf("登录：%v/%v</br>  文章学习：%v/%v</br>  视频学习：%v/%v</br>  视频时长：%v/%v</br>每日答题：%v/%v</br>  每周答题：%v/%v</br>   专项答题：%v/%v",
+		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
+		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
+		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
+		score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
+		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
+		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
+		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
+	)
+	return result
+}

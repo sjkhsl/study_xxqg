@@ -92,6 +92,8 @@ func main() {
 		core.Quit()
 		return
 	}
+	getPush := push.GetPush(config)
+	getPush("flush", "学习强国助手已上线")
 
 	go update.CheckUpdate(VERSION)
 
@@ -207,6 +209,7 @@ func do(m string) {
 	log.Infoln("检测到模式", config.Model)
 
 	getPush := push.GetPush(config)
+	getPush("flush", "学习强国助手已上线")
 	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()
@@ -220,7 +223,7 @@ func do(m string) {
 				log.Errorln(err)
 			}
 		}()
-
+		startTime := time.Now()
 		core2.LearnArticle(u)
 		core2.LearnVideo(u)
 		if config.Model == 2 {
@@ -230,6 +233,7 @@ func do(m string) {
 			core2.RespondDaily(u, "weekly")
 			core2.RespondDaily(u, "special")
 		}
+		endTime := time.Now()
 		score, err := lib.GetUserScore(u.ToCookies())
 		if err != nil {
 			log.Errorln("获取成绩失败")
@@ -237,14 +241,14 @@ func do(m string) {
 			return
 		}
 
-		score, _ = lib.GetUserScore(user.ToCookies())
+		score, _ = lib.GetUserScore(u.ToCookies())
 		content := lib.FormatScore(score)
-		err = push.PushMessage(user.Nick+"学习情况", user.Nick+"学习情况"+content, "score", user.PushId)
+		err = push.PushMessage(u.Nick+"学习情况", u.Nick+"学习情况"+content, "score", u.PushId)
 		if err != nil {
 			log.Errorln(err.Error())
 			err = nil
 		}
-		message := u.Nick + " 学习完成：今日得分:" + lib.PrintScore(score)
+		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟</br>%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
 		core2.Push("flush", message)
 	}
 
