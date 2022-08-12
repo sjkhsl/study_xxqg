@@ -32,7 +32,7 @@ var (
 const (
 	login      = "login"
 	StartStudy = "start_study"
-	getUser    = "stop_study"
+	getUser    = "get_user"
 	SCORE      = "score"
 
 	checkUpdate = "check_update"
@@ -40,12 +40,31 @@ const (
 	restart     = "restart"
 )
 
+type WechatHandler func(id string)
+
+var (
+	handlers sync.Map
+)
+
+func RegisterHandler(key string, action WechatHandler) {
+	handlers.Store(key, action)
+}
+
 func initWechat() {
 	config := conf.GetConfig()
 	if !config.Wechat.Enable {
 		return
 	}
-	log.Infoln(config.Wechat)
+
+	// 注册插件
+	RegisterHandler(login, handleLogin)
+	RegisterHandler(StartStudy, handleStartStudy)
+	RegisterHandler(getUser, handleGetUser)
+	RegisterHandler(SCORE, handleScore)
+	RegisterHandler(checkUpdate, handleCheckUpdate)
+	RegisterHandler(updateBtn, handleUpdate)
+	RegisterHandler(restart, handleRestart)
+
 	wx = mp.New(config.Wechat.Token, config.Wechat.AppID, config.Wechat.Secret, "123", "123")
 	err := wx.CreateMenu(&mp.Menu{Buttons: []mp.MenuButton{
 		{
@@ -64,61 +83,40 @@ func initWechat() {
 			MediaId: "",
 			SubButtons: []mp.MenuButton{
 				{
-					Name:       "开始学习",
-					Type:       "click",
-					Key:        StartStudy,
-					Url:        "",
-					MediaId:    "",
-					SubButtons: nil,
+					Name: "开始学习",
+					Type: "click",
+					Key:  StartStudy,
 				},
 				{
-					Name:       "获取用户",
-					Type:       "click",
-					Key:        getUser,
-					Url:        "",
-					MediaId:    "",
-					SubButtons: nil,
+					Name: "获取用户",
+					Type: "click",
+					Key:  getUser,
 				},
 				{
-					Name:       "积分查询",
-					Type:       "click",
-					Key:        SCORE,
-					Url:        "",
-					MediaId:    "",
-					SubButtons: nil,
+					Name: "积分查询",
+					Type: "click",
+					Key:  SCORE,
 				},
 			},
 		},
 		{
-			Name:    "关于",
-			Type:    "click",
-			Key:     "",
-			Url:     "",
-			MediaId: "",
+			Name: "关于",
+			Type: "click",
 			SubButtons: []mp.MenuButton{
 				{
-					Name:       "检查更新",
-					Type:       "click",
-					Key:        checkUpdate,
-					Url:        "",
-					MediaId:    "",
-					SubButtons: nil,
+					Name: "检查更新",
+					Type: "click",
+					Key:  checkUpdate,
 				},
 				{
-					Name:       "重启程序",
-					Type:       "click",
-					Key:        restart,
-					Url:        "",
-					MediaId:    "",
-					SubButtons: nil,
+					Name: "重启程序",
+					Type: "click",
+					Key:  restart,
 				},
 				{
-					Name:       "更新程序",
-					Type:       "click",
-					Key:        updateBtn,
-					Url:        "",
-					MediaId:    "",
-					SubButtons: nil,
+					Name: "更新程序",
+					Type: "click",
+					Key:  updateBtn,
 				},
 			},
 		},
@@ -135,22 +133,21 @@ func initWechat() {
 			return
 		}
 		lastNonce = nonce
-		switch r.EventKey {
-		case login:
-			go handleLogin(r.FromUserName)
-		case StartStudy:
-			go handleStartStudy(r.FromUserName)
-		case getUser:
-			go handleGetUser(r.FromUserName)
-		case SCORE:
-			go handleScore(r.FromUserName)
-		case checkUpdate:
-			handleCheckUpdate(r.FromUserName)
-		case updateBtn:
-			handleUpdate(r.FromUserName)
-		case restart:
-			handleRestart(r.FromUserName)
+		value, ok := handlers.Load(r.EventKey)
+		if !ok {
+			log.Warningln("未注册key为" + r.EventKey + "的调用方法")
+			return
 		}
+		go func() {
+			defer func() {
+				err := recover()
+				if err != nil {
+					log.Errorln("处理微信事件错误")
+					log.Errorln(err)
+				}
+			}()
+			(value.(WechatHandler))(r.FromUserName)
+		}()
 	})
 }
 
@@ -199,13 +196,6 @@ func HandleWechat(rep http.ResponseWriter, req *http.Request) {
 }
 
 func handleLogin(id string) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("处理微信事件错误")
-			log.Errorln(err)
-		}
-	}()
 	core := &lib.Core{Push: func(kind, message string) {
 		if kind == "flush" && strings.HasPrefix(message, "登录链接") {
 			l := strings.ReplaceAll(message, "登录链接：\r\n", "")
@@ -230,13 +220,6 @@ func handleLogin(id string) {
 }
 
 func handleStartStudy(id string) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("处理微信事件错误")
-			log.Errorln(err)
-		}
-	}()
 	users, err := model.QueryByPushID(id)
 	if err != nil {
 		return
@@ -271,13 +254,6 @@ func handleStartStudy(id string) {
 }
 
 func handleGetUser(id string) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("处理微信事件错误")
-			log.Errorln(err)
-		}
-	}()
 	users, err := model.Query()
 	if err != nil {
 		return
@@ -298,21 +274,6 @@ func handleGetUser(id string) {
 }
 
 func handleScore(id string) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("处理微信事件错误")
-			log.Errorln(err)
-		}
-	}()
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("处理微信事件错误")
-			log.Errorln(err)
-		}
-	}()
 	users, err := model.Query()
 	if err != nil {
 		return
