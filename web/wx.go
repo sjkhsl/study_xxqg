@@ -19,10 +19,6 @@ import (
 	"github.com/johlanse/study_xxqg/utils/update"
 )
 
-func init() {
-	initWechat()
-}
-
 var (
 	wx        *mp.WeiXin
 	lastNonce = ""
@@ -192,6 +188,9 @@ func sendMsg(id, message string) {
  * @param req
  */
 func HandleWechat(rep http.ResponseWriter, req *http.Request) {
+	if wx == nil {
+		initWechat()
+	}
 	wx.ServeHTTP(rep, req)
 }
 
