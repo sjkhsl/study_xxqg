@@ -26,8 +26,8 @@ push:
     enable: false
     access_token: ""
     secret: ""
-# 目前仅支持pushplus推送二维码，默认建议使用pushplus推送
-# pushplus使用方法见：http://www.pushplus.plus/
+# 目前仅支持push-plus推送二维码，默认建议使用push-plus推送
+# push-plus使用方法见：http://www.pushplus.plus/
   push_plus:
     enable: false
     token: ""
@@ -37,6 +37,7 @@ tg:
   enable: false
   chat_id: 0
   token: ""
+  # telegram的代理，不配置默认走系统代理
   proxy: ""
   # 自定义tg的api,可通过cloudflare搭建，需自备域名
   custom_api: "https://api.telegram.org"
@@ -68,7 +69,7 @@ wechat:
   login_temp_id: ""
   # 发送普通消息需要使用的消息模板
   # 模板标题：随意 模板内容： {{data.DATA}}
-  normal_temp_id: "-6Q"
+  normal_temp_id: ""
   # xxqg会每隔两小时左右检查所有用户的ck有效性，若开启该选项，会在检查失败时推送提醒消息
   push_login_warn: false
 
