@@ -285,144 +285,146 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 			return
 		}
-		_ = category.WaitForElementState(`visible`)
-		time.Sleep(1 * time.Second)
+		if category != nil {
+			_ = category.WaitForElementState(`visible`)
+			time.Sleep(1 * time.Second)
 
-		// 获取题目
-		question, err := page.QuerySelector(
-			`#app > div > div.layout-body > div > div.detail-body > div.question > div.q-body > div`)
-		if err != nil {
-			log.Errorln("未找到题目问题元素")
-
-			return
-		}
-		// 获取题目类型
-		categoryText, err := category.TextContent()
-		if err != nil {
-			log.Errorln("获取题目元素失败" + err.Error())
-
-			return
-		}
-		log.Infoln("## 题目类型：" + categoryText)
-
-		// 获取题目的问题
-		questionText, err := question.TextContent()
-		if err != nil {
-			log.Errorln("获取题目问题失败" + err.Error())
-			return
-		}
-		log.Infoln("## 题目：" + questionText)
-
-		// 获取答题帮助
-		openTips, err := page.QuerySelector(
-			`#app > div > div.layout-body > div > div.detail-body > div.question > div.q-footer > span`)
-		if err != nil || openTips == nil {
-			log.Errorln("未获取到题目提示信息")
-
-			goto label
-		}
-		log.Debugln("开始尝试获取打开提示信息按钮")
-		// 点击提示的按钮
-		err = openTips.Click()
-		if err != nil {
-			log.Errorln("点击打开提示信息按钮失败" + err.Error())
-			goto label
-		}
-		log.Debugln("已打开提示信息")
-		// 获取页面内容
-		content, err := page.Content()
-		if err != nil {
-			log.Errorln("获取网页全体内容失败" + err.Error())
-			goto label
-		}
-		time.Sleep(time.Second * time.Duration(rand2.Intn(3)))
-		log.Debugln("以获取网页内容")
-		// 关闭提示信息
-		err = openTips.Click()
-		if err != nil {
-			log.Errorln("点击打开提示信息按钮失败" + err.Error())
-
-			goto label
-		}
-		log.Debugln("已关闭提示信息")
-		// 从整个页面内容获取提示信息
-		tips := getTips(content)
-		log.Infoln("[提示信息]：", tips)
-		// 填空题
-		switch {
-		case strings.Contains(categoryText, "填空题"):
-			if len(tips) < 1 {
-				tips = append(tips, "不知道")
-			}
-			// 填充填空题
-			err := FillBlank(page, tips)
+			// 获取题目
+			question, err := page.QuerySelector(
+				`#app > div > div.layout-body > div > div.detail-body > div.question > div.q-body > div`)
 			if err != nil {
-				log.Errorln("填空题答题失败" + err.Error())
+				log.Errorln("未找到题目问题元素")
 
 				return
 			}
-		case strings.Contains(categoryText, "多选题"):
-			log.Infoln("读取到多选题")
-			options, err := getOptions(page)
+			// 获取题目类型
+			categoryText, err := category.TextContent()
 			if err != nil {
-				log.Errorln("获取选项失败" + err.Error())
+				log.Errorln("获取题目元素失败" + err.Error())
+
 				return
 			}
-			log.Infoln("获取到选项答案：", options)
-			log.Infoln("[多选题选项]：", options)
-			var answer []string
+			log.Infoln("## 题目类型：" + categoryText)
 
-			for _, option := range options {
-				for _, tip := range tips {
-					if strings.Contains(option, tip) {
-						answer = append(answer, option)
+			// 获取题目的问题
+			questionText, err := question.TextContent()
+			if err != nil {
+				log.Errorln("获取题目问题失败" + err.Error())
+				return
+			}
+			log.Infoln("## 题目：" + questionText)
+
+			// 获取答题帮助
+			openTips, err := page.QuerySelector(
+				`#app > div > div.layout-body > div > div.detail-body > div.question > div.q-footer > span`)
+			if err != nil || openTips == nil {
+				log.Errorln("未获取到题目提示信息")
+
+				goto label
+			}
+			log.Debugln("开始尝试获取打开提示信息按钮")
+			// 点击提示的按钮
+			err = openTips.Click()
+			if err != nil {
+				log.Errorln("点击打开提示信息按钮失败" + err.Error())
+				goto label
+			}
+			log.Debugln("已打开提示信息")
+			// 获取页面内容
+			content, err := page.Content()
+			if err != nil {
+				log.Errorln("获取网页全体内容失败" + err.Error())
+				goto label
+			}
+			time.Sleep(time.Second * time.Duration(rand2.Intn(3)))
+			log.Debugln("以获取网页内容")
+			// 关闭提示信息
+			err = openTips.Click()
+			if err != nil {
+				log.Errorln("点击打开提示信息按钮失败" + err.Error())
+
+				goto label
+			}
+			log.Debugln("已关闭提示信息")
+			// 从整个页面内容获取提示信息
+			tips := getTips(content)
+			log.Infoln("[提示信息]：", tips)
+			// 填空题
+			switch {
+			case strings.Contains(categoryText, "填空题"):
+				if len(tips) < 1 {
+					tips = append(tips, "不知道")
+				}
+				// 填充填空题
+				err := FillBlank(page, tips)
+				if err != nil {
+					log.Errorln("填空题答题失败" + err.Error())
+
+					return
+				}
+			case strings.Contains(categoryText, "多选题"):
+				log.Infoln("读取到多选题")
+				options, err := getOptions(page)
+				if err != nil {
+					log.Errorln("获取选项失败" + err.Error())
+					return
+				}
+				log.Infoln("获取到选项答案：", options)
+				log.Infoln("[多选题选项]：", options)
+				var answer []string
+
+				for _, option := range options {
+					for _, tip := range tips {
+						if strings.Contains(option, tip) {
+							answer = append(answer, option)
+						}
 					}
 				}
-			}
 
-			if len(answer) < 1 {
-				answer = append(answer, options...)
-				log.Infoln("无法判断答案，自动选择ABCD")
-			}
-			log.Infoln("根据提示分别选择了", RemoveRepByLoop(answer))
-			// 多选题选择
-			err = radioCheck(page, answer)
-			if err != nil {
-				return
-			}
-		case strings.Contains(categoryText, "单选题"):
-			log.Infoln("读取到单选题")
-			options, err := getOptions(page)
-			if err != nil {
-				log.Errorln("获取选项失败" + err.Error())
-				return
-			}
-			log.Infoln("获取到选项答案：", options)
+				if len(answer) < 1 {
+					answer = append(answer, options...)
+					log.Infoln("无法判断答案，自动选择ABCD")
+				}
+				log.Infoln("根据提示分别选择了", RemoveRepByLoop(answer))
+				// 多选题选择
+				err = radioCheck(page, answer)
+				if err != nil {
+					return
+				}
+			case strings.Contains(categoryText, "单选题"):
+				log.Infoln("读取到单选题")
+				options, err := getOptions(page)
+				if err != nil {
+					log.Errorln("获取选项失败" + err.Error())
+					return
+				}
+				log.Infoln("获取到选项答案：", options)
 
-			var answer []string
+				var answer []string
 
-			if len(tips) > 1 {
-				log.Warningln("检测到单选题出现多个提示信息，即将对提示信息进行合并")
-				tip := strings.Join(tips, "")
-				tips = []string{tip}
-			}
+				if len(tips) > 1 {
+					log.Warningln("检测到单选题出现多个提示信息，即将对提示信息进行合并")
+					tip := strings.Join(tips, "")
+					tips = []string{tip}
+				}
 
-			for _, option := range options {
-				for _, tip := range tips {
-					if strings.Contains(option, tip) {
-						answer = append(answer, option)
+				for _, option := range options {
+					for _, tip := range tips {
+						if strings.Contains(option, tip) {
+							answer = append(answer, option)
+						}
 					}
 				}
-			}
-			if len(answer) < 1 {
-				answer = append(answer, options[0])
-				log.Infoln("无法判断答案，自动选择A")
-			}
+				if len(answer) < 1 {
+					answer = append(answer, options[0])
+					log.Infoln("无法判断答案，自动选择A")
+				}
 
-			log.Infoln("根据提示分别选择了", answer)
-			err = radioCheck(page, answer)
-			if err != nil {
-				return
+				log.Infoln("根据提示分别选择了", answer)
+				err = radioCheck(page, answer)
+				if err != nil {
+					return
+				}
 			}
 		}
 		score, _ = GetUserScore(user.ToCookies())
