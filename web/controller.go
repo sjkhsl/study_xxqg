@@ -295,7 +295,6 @@ func sign() gin.HandlerFunc {
 		if err != nil {
 			return
 		}
-
 		ctx.Writer.WriteHeader(200)
 		data, _ := io.ReadAll(response.Body)
 		ctx.Writer.Write(data)
