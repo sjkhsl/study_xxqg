@@ -1,19 +1,21 @@
-FROM debian:bullseye-slim
+FROM ubuntu:jammy
 
+ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
+ARG TZ="Asia/Shanghai"
 
-RUN  ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-     echo 'Asia/Shanghai' >/etc/timezone && \
+RUN  ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && \
+     echo ${TZ} > /etc/timezone && \
      apt-get -qq update && \
-     apt-get -qq install -y --no-install-recommends ca-certificates curl && \
-     apt-get install -y libx11-6 libgbm1 libasound2 libcairo2 libxshmfence1 libatspi2.0-0 libpango-1.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxrandr2 libxfixes3 libxdamage1 libxcomposite1 libxkbcommon0 && \
-     apt-get clean && \
+     apt-get -qq install -y --no-install-recommends ca-certificates libglib2.0-0 libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+         libdbus-1-3 libexpat1 libxcb1 libxkbcommon0 libx11-6 libxcomposite1 libxdamage1 libxext6 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 \
+         libcairo2 libasound2 libatspi2.0-0 && \
      rm -rf /var/lib/apt/lists/* && \
      mkdir /opt/config/
 
-COPY ./dist/docker_linux_$TARGETARCH*/study_xxqg /opt/study_xxqg
-
 COPY conf/config_default.yml /opt/config/config.yml
+
+COPY ./dist/docker_linux_$TARGETARCH*/study_xxqg /opt/study_xxqg
 
 RUN  chmod -R 777 /opt/study_xxqg && \
      cd /opt/ && \
