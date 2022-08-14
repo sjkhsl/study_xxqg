@@ -4,7 +4,6 @@ package web
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -302,8 +301,9 @@ func sign() gin.HandlerFunc {
 			})
 			return
 		}
+		data := response.Bytes()
+		log.Debugln("访问sign结果返回内容为 ==》 " + string(data))
 		ctx.Writer.WriteHeader(200)
-		data, _ := io.ReadAll(response.Body)
 		ctx.Writer.Write(data)
 	}
 }
