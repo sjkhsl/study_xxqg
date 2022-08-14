@@ -1,14 +1,14 @@
 package lib
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 type Score struct {
@@ -25,42 +25,64 @@ type Data struct {
 func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	var score Score
 	var resp []byte
-	// 获取用户总分
-	err := gout.GET(userTotalscoreUrl).SetCookies(cookies...).SetHeader(gout.H{
+
+	header := map[string]string{
 		"Cache-Control": "no-cache",
-	}).BindBody(&resp).Do()
+	}
+
+	client := utils.GetClient()
+	response, err := client.R().SetCookies(cookies...).SetHeaders(header).Get(userTotalscoreUrl)
 	if err != nil {
 		log.Errorln("获取用户总分错误" + err.Error())
-
 		return Score{}, err
 	}
-	data := string(resp)
-	log.Infoln(data)
-	if !gjson.GetBytes(resp, "ok").Bool() {
-		return Score{}, errors.New("token check failed")
-	}
+	resp = response.Bytes()
+	// 获取用户总分
+	// err := gout.GET(userTotalscoreUrl).SetCookies(cookies...).SetHeader(gout.H{}).BindBody(&resp).Do()
+	// if err != nil {
+	// 	log.Errorln("获取用户总分错误" + err.Error())
+
+	// 	return Score{}, err
+	// }
+	// data := string(resp)
+	// log.Infoln(data)
+	// if !gjson.GetBytes(resp, "ok").Bool() {
+	// 	return Score{}, errors.New("token check failed")
+	// }
 	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TotalScore = int(gjson.GetBytes(resp, "data.score").Int())
 
 	// 获取用户今日得分
-	err = gout.GET(userTodaytotalscoreUrl).SetCookies(cookies...).SetHeader(gout.H{
-		"Cache-Control": "no-cache",
-	}).BindBody(&resp).Do()
-	if err != nil {
-		log.Errorln("获取用户每日总分错误" + err.Error())
+	// err = gout.GET(userTodaytotalscoreUrl).SetCookies(cookies...).SetHeader(gout.H{
+	// 	"Cache-Control": "no-cache",
+	// }).BindBody(&resp).Do()
+	// if err != nil {
+	// 	log.Errorln("获取用户每日总分错误" + err.Error())
 
+	// 	return Score{}, err
+	// }
+	response, err = client.R().SetCookies(cookies...).SetHeaders(header).Get(userTodaytotalscoreUrl)
+	if err != nil {
+		log.Errorln("获取用户总分错误" + err.Error())
 		return Score{}, err
 	}
+	resp = response.Bytes()
 	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	score.TodayScore = int(gjson.GetBytes(resp, "data.score").Int())
 
-	err = gout.GET(userRatescoreUrl).SetCookies(cookies...).SetHeader(gout.H{
-		"Cache-Control": "no-cache",
-	}).BindBody(&resp).Do()
+	// err = gout.GET(userRatescoreUrl).SetCookies(cookies...).SetHeader(gout.H{
+	// 	"Cache-Control": "no-cache",
+	// }).BindBody(&resp).Do()
+	// if err != nil {
+	// 	log.Errorln("获取用户积分出现错误" + err.Error())
+	// 	return Score{}, err
+	// }
+	response, err = client.R().SetCookies(cookies...).SetHeaders(header).Get(userRatescoreUrl)
 	if err != nil {
-		log.Errorln("获取用户积分出现错误" + err.Error())
+		log.Errorln("获取用户总分错误" + err.Error())
 		return Score{}, err
 	}
+	resp = response.Bytes()
 	// log.Debugln(gjson.GetBytes(resp, "@this|@pretty"))
 	datas := gjson.GetBytes(resp, "data.taskProgress").Array()
 	m := make(map[string]Data, 7)

@@ -17,7 +17,6 @@ import (
 
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
 	"github.com/google/uuid"
-	"github.com/imroc/req/v3"
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/nfnt/resize"
@@ -28,6 +27,7 @@ import (
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 // Core
@@ -89,8 +89,7 @@ func (c *Core) Init() {
 }
 
 func GetToken(code, sign, pushId string) (bool, error) {
-	client := req.C()
-	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
+	client := utils.GetClient()
 	response, err := client.R().SetQueryParams(map[string]string{
 		"code":  code,
 		"state": sign + uuid.New().String(),
@@ -134,12 +133,7 @@ func GetToken(code, sign, pushId string) (bool, error) {
  * @return error
  */
 func (c *Core) GenerateCode() (string, string, error) {
-	client := req.C()
-	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
-		return nil
-	})
-	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-
+	client := utils.GetClient()
 	g := new(gennerateResp)
 	_, err := client.R().SetResult(g).Get("https://login.xuexi.cn/user/qrcode/generate")
 	if err != nil {
@@ -168,12 +162,7 @@ func (c *Core) GenerateCode() (string, string, error) {
 }
 
 func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
-	client := req.C()
-	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
-		return nil
-	})
-	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-
+	client := utils.GetClient()
 	checkQrCode := func() (bool, string) {
 		res := new(checkQrCodeResp)
 		_, err := client.R().SetResult(res).SetFormData(map[string]string{
@@ -239,12 +228,6 @@ func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := req.C()
-	client.OnAfterResponse(func(client *req.Client, response *req.Response) error {
-		return nil
-	})
-	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-
 	for i := 0; i < 150; i++ {
 		user, b, err := c.CheckQrCode(codeData, pushID)
 		if b && err == nil {

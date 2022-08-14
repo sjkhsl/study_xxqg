@@ -83,8 +83,8 @@ func RouterInit() *gin.Engine {
 	router.GET("/log", check(), getLog())
 
 	// 登录xxqg的三个接口
-	router.GET("/sign/", check(), sign())
-	router.GET("/login/*proxyPath", check(), generate())
+	router.GET("/sign/", sign())
+	router.GET("/login/*proxyPath", generate())
 	router.POST("/login/*proxyPath", check(), generate())
 	return router
 }

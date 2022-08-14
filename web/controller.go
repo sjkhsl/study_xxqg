@@ -291,8 +291,15 @@ func getLog() gin.HandlerFunc {
 
 func sign() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		response, err := http.Get("https://pc-api.xuexi.cn/open/api/sns/sign") //nolint:bodyclose
+		response, err := utils.GetClient().R().Get("https://pc-api.xuexi.cn/open/api/sns/sign")
 		if err != nil {
+			ctx.JSON(403, Resp{
+				Code:    403,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   err.Error(),
+			})
 			return
 		}
 		ctx.Writer.WriteHeader(200)

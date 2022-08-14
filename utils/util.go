@@ -20,7 +20,6 @@ func Restart() {
 		cmd.Start()
 		os.Exit(3)
 	}()
-
 }
 
 func GetAbout() string {
