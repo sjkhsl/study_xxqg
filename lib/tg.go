@@ -102,13 +102,12 @@ func (t *Telegram) Init() {
 			update := <-channel
 			if update.Message == nil {
 				if update.CallbackQuery != nil {
-					update.Message = &tgbotapi.Message{Text: update.CallbackQuery.Data}
-					t.bot.Send(tgbotapi.NewDeleteMessage(conf.GetConfig().TG.ChatID, update.CallbackQuery.Message.MessageID))
-					log.Infoln(update.CallbackQuery.Data)
+					update.Message = update.CallbackQuery.Message
+					update.Message.Text = update.CallbackQuery.Data
+					t.bot.Send(tgbotapi.NewDeleteMessage(update.Message.Chat.ID, update.CallbackQuery.Message.MessageID))
 				} else {
 					data, _ := json.Marshal(update)
 					log.Infoln(string(data))
-					return
 				}
 			}
 
@@ -344,7 +343,7 @@ func study(bot *Telegram, from int64, args []string) {
 				markup.InlineKeyboard = append(markup.InlineKeyboard, append([]tgbotapi.InlineKeyboardButton{}, tgbotapi.NewInlineKeyboardButtonData(user.Nick, "/study "+strconv.Itoa(i))))
 			}
 
-			replyMarkup := tgbotapi.NewEditMessageReplyMarkup(config.TG.ChatID, msgID, markup)
+			replyMarkup := tgbotapi.NewEditMessageReplyMarkup(from, msgID, markup)
 			_, err := bot.bot.Send(replyMarkup)
 			if err != nil {
 				return
