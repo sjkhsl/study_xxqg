@@ -11,7 +11,7 @@ type PushPlus struct {
 	Token string
 }
 
-func (p *PushPlus) Init() func(kind, message string) {
+func (p *PushPlus) Init() func(id string, kind, message string) {
 	send := func(data string) {
 		err := gout.POST("http://www.pushplus.plus/send").SetJSON(gout.H{
 			"token":    p.Token,
@@ -26,7 +26,7 @@ func (p *PushPlus) Init() func(kind, message string) {
 		}
 	}
 
-	return func(kind, message string) {
+	return func(id string, kind, message string) {
 		switch {
 		case kind == "image":
 			message = fmt.Sprintf("![](%v)", "data:image/png;base64,"+message)

@@ -5,10 +5,8 @@ package web
 import (
 	"embed"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils"
@@ -17,9 +15,6 @@ import (
 // 将静态文件嵌入到可执行程序中来
 //go:embed xxqg/build
 var static embed.FS
-
-//go:embed app
-var newUI embed.FS
 
 // RouterInit
 // @Description:
@@ -40,18 +35,9 @@ func RouterInit() *gin.Engine {
 		context.JSON(200, utils.GetAbout())
 	})
 
-	router.GET("/new/*file", func(ctx *gin.Context) {
-		if strings.HasSuffix(ctx.Request.URL.Path, "js") {
-			ctx.Header("Content-Type", "application/javascript; charset=utf-8")
-		}
-		f, err := newUI.ReadFile(strings.TrimLeft(ctx.Param("file"), "/"))
-		if err != nil {
-			log.Errorln(err.Error())
-			f, _ = newUI.ReadFile("app/index.html")
-		}
-		_, _ = ctx.Writer.Write(f)
-		ctx.Status(200)
-	})
+	if utils.FileIsExist("./config/flutter_xxqg/") {
+		router.StaticFS("/flutter_xxqg", http.Dir("./config/flutter_xxqg/"))
+	}
 	// 对权限的管理组
 	auth := router.Group("/auth")
 	// 用户登录的接口

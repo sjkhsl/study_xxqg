@@ -16,9 +16,9 @@ type Ding struct {
 	Token  string `json:"token"`
 }
 
-func (d *Ding) Send() func(kind string, message string) {
+func (d *Ding) Send() func(id string, kind string, message string) {
 	s := TypeSecret{Secret: d.Secret, Webhook: d.Token}
-	return func(kind string, message string) {
+	return func(id string, kind string, message string) {
 		if kind == "flush" {
 			err := s.SendMessage(map[string]interface{}{
 				"msgtype": "markdown",

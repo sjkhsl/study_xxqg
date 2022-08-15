@@ -92,8 +92,6 @@ func main() {
 		core.Quit()
 		return
 	}
-	getPush := push.GetPush(config)
-	getPush("flush", "学习强国助手已上线")
 
 	go update.CheckUpdate(VERSION)
 
@@ -112,7 +110,7 @@ func main() {
 		}
 		if config.Wechat.Enable {
 			log.Infoln(fmt.Sprintf("已开启wechat公众号配置,监听地址： ==》 %v:%v", config.Web.Host, config.Web.Port))
-			h.HandleFunc("/wx", web.HandleWechat)
+			h.HandleFunc("/wx", push.HandleWechat)
 		}
 		if config.Web.Enable || config.Wechat.Enable {
 			err := http.ListenAndServe(fmt.Sprintf("%s:%d", config.Web.Host, config.Web.Port), h)
@@ -166,24 +164,10 @@ func main() {
 	}
 
 	if config.TG.Enable {
-		go func() {
-			defer func() {
-				err := recover()
-				if err != nil {
-					log.Errorln("TG模式执行出现问题")
-					log.Errorln(err)
-				}
-			}()
-			log.Infoln("已采用tg交互模式")
-			telegram := lib.Telegram{
-				Token:  config.TG.Token,
-				ChatId: config.TG.ChatID,
-				Proxy:  config.TG.Proxy,
-			}
-			telegram.Init()
-		}()
+		push.TgInit()
 	}
-
+	getPush := push.GetPush(config)
+	getPush("", "flush", "学习强国助手已上线")
 	if !config.TG.Enable && config.Cron == "" && !config.Wechat.Enable {
 		log.Infoln("已采用普通学习模式")
 		do("normal")
@@ -209,7 +193,7 @@ func do(m string) {
 	log.Infoln("检测到模式", config.Model)
 
 	getPush := push.GetPush(config)
-	getPush("flush", "学习强国助手已上线")
+	getPush("", "flush", "学习强国助手已上线")
 	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()
@@ -249,7 +233,7 @@ func do(m string) {
 			err = nil
 		}
 		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟</br>%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
-		core2.Push("flush", message)
+		core2.Push(u.PushId, "flush", message)
 	}
 
 	// 用户小于1时自动登录
@@ -270,7 +254,7 @@ func do(m string) {
 			if len(users) < 1 {
 				user, err := core.L(config.Retry.Times, "")
 				if err != nil {
-					core.Push("msg", "登录超时")
+					core.Push(user.PushId, "msg", "登录超时")
 					return
 				}
 				study(core, user)
@@ -317,5 +301,5 @@ func do(m string) {
 	}
 
 	study(core, user)
-	core.Push("flush", "")
+	core.Push(user.PushId, "flush", "")
 }

@@ -16,7 +16,6 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/push"
 )
 
 func init() {
@@ -72,7 +71,7 @@ func Query() ([]*User, error) {
 			users = append(users, u)
 		} else {
 			log.Infoln("用户" + u.Nick + "cookie已失效")
-			_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
+			//_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
 			if conf.GetConfig().Wechat.PushLoginWarn {
 				wechatPush(u.PushId, fmt.Sprintf("用户%v已失效！！", u.Nick))
 			}
@@ -111,7 +110,7 @@ func QueryByPushID(pushID string) ([]*User, error) {
 			users = append(users, u)
 		} else {
 			log.Infoln("用户" + u.Nick + "cookie已失效")
-			_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
+			//_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
 			_ = DeleteUser(u.UID)
 		}
 	}

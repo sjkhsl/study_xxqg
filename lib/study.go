@@ -162,7 +162,7 @@ func (c *Core) LearnArticle(user *model.User) {
 					log.Errorln("页面跳转失败")
 				}
 				log.Infoln("正在学习文章：" + links[n].Title)
-				c.Push("text", "正在学习文章："+links[n].Title)
+				c.Push(user.PushId, "text", "正在学习文章："+links[n].Title)
 				log.Infoln("文章发布时间：" + links[n].PublishTime)
 				log.Infoln("文章学习链接：" + links[n].Url)
 				learnTime := 60 + rand.Intn(15) + 3
@@ -269,7 +269,7 @@ func (c *Core) LearnVideo(user *model.User) {
 					log.Errorln("页面跳转失败")
 				}
 				log.Infoln("正在观看视频：" + links[n].Title)
-				c.Push("text", "正在观看视频："+links[n].Title)
+				c.Push(user.PushId, "text", "正在观看视频："+links[n].Title)
 				log.Infoln("视频发布时间：" + links[n].PublishTime)
 				log.Infoln("视频学习链接：" + links[n].Url)
 				learnTime := 60 + rand.Intn(10) + 5

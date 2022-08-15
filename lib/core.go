@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"image"
@@ -36,7 +35,7 @@ type Core struct {
 	pw          *playwright.Playwright
 	browser     playwright.Browser
 	ShowBrowser bool
-	Push        func(kind string, message string)
+	Push        func(id string, kind string, message string)
 }
 
 // Cookie
@@ -132,7 +131,7 @@ func GetToken(code, sign, pushId string) (bool, error) {
  * @return string 二维码回调查询的code
  * @return error
  */
-func (c *Core) GenerateCode() (string, string, error) {
+func (c *Core) GenerateCode(pushID string) (string, string, error) {
 	client := utils.GetClient()
 	g := new(gennerateResp)
 	_, err := client.R().SetResult(g).Get("https://login.xuexi.cn/user/qrcode/generate")
@@ -150,14 +149,10 @@ func (c *Core) GenerateCode() (string, string, error) {
 	} else {
 		log.Infoln("二维码已生成到目录下的qrcode.png")
 	}
-	if conf.GetConfig().QrCOde {
-		data, _ := os.ReadFile("qrcode.png")
-		c.Push("image", base64.StdEncoding.EncodeToString(data))
-	}
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
-	c.Push("flush", "登录链接：\r\n"+conf.GetConfig().Scheme+url.QueryEscape(codeURL))
+	c.Push(pushID, "flush", "登录链接：\r\n"+conf.GetConfig().Scheme+url.QueryEscape(codeURL))
 	return codeURL, g.Result, err
 }
 
@@ -211,7 +206,7 @@ func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
 		if err != nil {
 			return nil, false, err
 		}
-		c.Push("text", "登录成功，用户名："+nick)
+		c.Push(pushID, "text", "登录成功，用户名："+nick)
 		return user, true, err
 	}
 }
@@ -224,7 +219,7 @@ func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
  * @return error
  */
 func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
-	_, codeData, err := c.GenerateCode()
+	_, codeData, err := c.GenerateCode(pushID)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +234,7 @@ func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	}
 	// 等待几分钟后重新执行
 	time.Sleep(time.Duration(conf.GetConfig().Retry.Intervals) * time.Minute)
-	c.Push("text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
+	c.Push(pushID, "text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
 	return c.L(retryTimes-1, pushID)
 }
 

@@ -43,7 +43,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		err := recover()
 		if err != nil {
 			log.Errorln("答题模块异常结束或答题已完成")
-			c.Push("text", "答题模块异常退出或答题已完成")
+			c.Push(user.PushId, "text", "答题模块异常退出或答题已完成")
 			log.Errorln(err)
 		}
 	}()
@@ -118,7 +118,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 				return
 			}
-			c.Push("text", "已加载每日答题模块")
+			c.Push(user.PushId, "text", "已加载每日答题模块")
 		}
 	case "weekly":
 		{
@@ -149,7 +149,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				log.Errorln("跳转到答题页面错误" + err.Error())
 				return
 			}
-			c.Push("text", "已加载每周答题模块")
+			c.Push(user.PushId, "text", "已加载每周答题模块")
 		}
 	case "special":
 		{
@@ -181,7 +181,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				log.Errorln("跳转到答题页面错误" + err.Error())
 				return
 			}
-			c.Push("text", "已加载专项答题模块")
+			c.Push(user.PushId, "text", "已加载专项答题模块")
 		}
 	}
 	time.Sleep(5 * time.Second)
@@ -236,7 +236,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				page.Mouse().Up()
 				time.Sleep(10 * time.Second)
 				log.Infoln("可能存在滑块")
-				c.Push("text", "答题过程出现滑块，正在尝试滑动")
+				c.Push(user.PushId, "text", "答题过程出现滑块，正在尝试滑动")
 				en, err = handle.IsVisible()
 				if err != nil {
 					return
