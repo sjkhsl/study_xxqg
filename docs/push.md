@@ -79,7 +79,7 @@ web:
   # 监听的端口号 0-65535可选
   port: 8081
   # web端登录得账号
-  account： admin
+  account：admin
   # web端登录的密码
   password: admin
 ```
@@ -153,4 +153,16 @@ tg:
 `/study_all` 按顺序对cookie有效的所有用户进行学习
 
 
+### PushDeer推送配置
 
+pishDeer也仅支持单向推送
+
+配置：
+```yaml
+push_deer:
+  enable: true
+  api: "https://api2.pushdeer.com"
+  token: ""
+```
+
+自行注册pushDeer后获取token,配置token到配置文件即可，api默认为官方api,若为自建，则配置对应接口即可

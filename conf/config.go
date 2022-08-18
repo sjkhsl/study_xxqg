@@ -72,6 +72,12 @@ type Config struct {
 	// 专项答题可接受的最小值
 	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
 
+	PushDeer struct {
+		Enable bool   `json:"enable" yaml:"enable"`
+		Api    string `json:"api" yaml:"api"`
+		Token  string `json:"token" yaml:"token"`
+	} `json:"push_deer" yaml:"push_deer"`
+
 	ReverseOrder bool `json:"reverse_order" yaml:"reverse_order"`
 
 	JiGuangPush struct {

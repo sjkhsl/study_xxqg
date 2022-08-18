@@ -77,6 +77,13 @@ wechat:
   # 微信管理员的openid,可点击关于按钮获得，配置后请重启程序
   super_open_id: ""
 
+
+# pushDeer推送配置,详情参考psuhDeer官网：http://www.pushdeer.com/official.html
+push_deer:
+  enable: false
+  api: "https://api2.pushdeer.com"
+  token: ""
+
 # 登录重试配置
 retry:
   # 重试次数

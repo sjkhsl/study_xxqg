@@ -45,6 +45,10 @@ func GetPush(config conf.Config) func(id string, kind string, message string) {
 		log.Infoln("已配置tg推送")
 		pushs = append(pushs, tgPush)
 	}
+	if config.PushDeer.Enable {
+		log.Infoln("已配置pushDeer推送")
+		pushs = append(pushs, InitPushDeer())
+	}
 	if config.JiGuangPush.Enable {
 		pushs = append(pushs, func(id, kind, message string) {
 			_ = PushMessage("", message, message, id)
