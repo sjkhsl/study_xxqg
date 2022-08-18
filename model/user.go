@@ -296,6 +296,6 @@ func check() {
 				_ = UpdateUser(user)
 			}
 		}
-		time.Sleep(time.Hour * time.Duration(rand.Intn(2)))
+		time.Sleep(time.Hour * time.Duration(rand.Intn(2)+1))
 	}
 }
