@@ -74,6 +74,8 @@ wechat:
   normal_temp_id: ""
   # xxqg会每隔两小时左右检查所有用户的ck有效性，若开启该选项，会在检查失败时推送提醒消息
   push_login_warn: false
+  # 微信管理员的openid,可点击关于按钮获得，配置后请重启程序
+  super_open_id: ""
 
 # 登录重试配置
 retry:

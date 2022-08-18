@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"image"
@@ -148,6 +149,10 @@ func (c *Core) GenerateCode(pushID string) (string, string, error) {
 		err = nil
 	} else {
 		log.Infoln("二维码已生成到目录下的qrcode.png")
+	}
+	if conf.GetConfig().QrCOde {
+		data, _ := os.ReadFile("qrcode.png")
+		c.Push(pushID, "image", base64.StdEncoding.EncodeToString(data))
 	}
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)

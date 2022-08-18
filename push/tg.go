@@ -51,6 +51,9 @@ func TgInit() {
 		}
 		if kind == "flush" {
 			telegram.SendMsg(chatId, strings.ReplaceAll(message, "</br>", "\n"))
+		} else if kind == "image" {
+			bytes, _ := base64.StdEncoding.DecodeString(message)
+			telegram.SendPhoto(chatId, bytes)
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				telegram.SendMsg(chatId, message)

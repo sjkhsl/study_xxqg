@@ -168,6 +168,7 @@ func main() {
 	}
 	getPush := push.GetPush(config)
 	getPush("", "flush", "学习强国助手已上线")
+	model.SetPush(getPush)
 	if !config.TG.Enable && config.Cron == "" && !config.Wechat.Enable {
 		log.Infoln("已采用普通学习模式")
 		do("normal")
@@ -194,6 +195,10 @@ func do(m string) {
 
 	getPush := push.GetPush(config)
 	getPush("", "flush", "学习强国助手已上线")
+	failUser, _ := model.QueryFailUser()
+	for _, user := range failUser {
+		getPush(user.PushId, "flush", user.Nick+"的cookie已过期")
+	}
 	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()

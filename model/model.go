@@ -31,6 +31,9 @@ func init() {
     push_id TEXT
 );
 `)
+	_, _ = db.Exec(`alter table user
+    add status integer default 1;
+`)
 }
 
 func ping() {

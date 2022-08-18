@@ -1,8 +1,13 @@
 package utils
 
 import (
+	"net/http"
 	"os"
 	"os/exec"
+
+	"github.com/imroc/req/v3"
+	"github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils/update"
@@ -27,4 +32,23 @@ func GetAbout() string {
 	msg += conf.GetVersion()
 	msg += "\n" + update.CheckUpdate(conf.GetVersion())
 	return msg
+}
+
+// CheckUserCookie
+/**
+ * @Description: 获取用户成绩
+ * @param user
+ * @return bool
+ */
+func CheckUserCookie(cookies []*http.Cookie) bool {
+	client := req.C().DevMode()
+	response, err := client.R().SetCookies(cookies...).Get("https://pc-api.xuexi.cn/open/api/score/get")
+	if err != nil {
+		logrus.Errorln("获取用户总分错误" + err.Error())
+		return false
+	}
+	if !gjson.GetBytes(response.Bytes(), "ok").Bool() {
+		return false
+	}
+	return true
 }

@@ -30,6 +30,7 @@ require (
 )
 
 require (
+	github.com/Luoxin/go-pushdeer-sdk v0.0.0-20220308071956-e50d1ec38c98 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect

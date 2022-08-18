@@ -352,9 +352,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			// 填空题
 			switch {
 			case strings.Contains(categoryText, "填空题"):
-				if len(tips) < 1 {
-					tips = append(tips, "不知道")
-				}
+
 				// 填充填空题
 				err := FillBlank(page, tips)
 				if err != nil {
@@ -576,10 +574,9 @@ func getTips(data string) []string {
 func FillBlank(page playwright.Page, tips []string) error {
 	video := false
 	var answer []string
-	for _, tip := range tips {
-		if tip == "请观看视频" {
-			video = true
-		}
+	if len(tips) < 1 {
+		log.Warningln("检测到未获取到提示信息")
+		video = true
 	}
 	if video {
 		answer = append(answer, "不知道")
@@ -591,7 +588,7 @@ func FillBlank(page playwright.Page, tips []string) error {
 		log.Errorln("获取输入框错误" + err.Error())
 		return err
 	}
-	log.Debugln("获取到", len(inouts), "个填空")
+	log.Infoln("获取到", len(inouts), "个填空")
 	if len(inouts) == 1 && len(tips) > 1 {
 		temp := ""
 		for _, tip := range tips {
@@ -600,16 +597,22 @@ func FillBlank(page playwright.Page, tips []string) error {
 		answer = strings.Split(temp, ",")
 		log.Infoln("答案已合并处理")
 	}
+	var ans string
 	for i := 0; i < len(inouts); i++ {
-		err := inouts[i].Fill(answer[i])
+		if video {
+			ans = "不知道"
+		} else {
+			ans = answer[i]
+		}
+		err := inouts[i].Fill(ans)
 		if err != nil {
 			log.Errorln("填充答案失败" + err.Error())
 			continue
 		}
-		r := rand2.Intn(5)
+		r := rand2.Intn(4) + 1
 		time.Sleep(time.Duration(r) * time.Second)
 	}
-	r := rand2.Intn(2)
+	r := rand2.Intn(1) + 1
 	time.Sleep(time.Duration(r) * time.Second)
 	checkNextBotton(page)
 	return nil

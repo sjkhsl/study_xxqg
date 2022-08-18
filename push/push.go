@@ -45,6 +45,11 @@ func GetPush(config conf.Config) func(id string, kind string, message string) {
 		log.Infoln("一配置tg推送")
 		pushs = append(pushs, tgPush)
 	}
+	if config.JiGuangPush.Enable {
+		pushs = append(pushs, func(id, kind, message string) {
+			_ = PushMessage("", message, message, id)
+		})
+	}
 	pushs = append(pushs, func(id, kind, message string) {
 		log.Debugln(fmt.Sprintf("消息id: %v，消息类型：%v,消息内容：%v", id, kind, message))
 	})

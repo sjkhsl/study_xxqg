@@ -272,7 +272,7 @@ func (c *Core) LearnVideo(user *model.User) {
 				c.Push(user.PushId, "text", "正在观看视频："+links[n].Title)
 				log.Infoln("视频发布时间：" + links[n].PublishTime)
 				log.Infoln("视频学习链接：" + links[n].Url)
-				learnTime := 60 + rand.Intn(10) + 5
+				learnTime := 60 + rand.Intn(10)
 				for i := 0; i < learnTime; i++ {
 					if c.IsQuit() {
 						return

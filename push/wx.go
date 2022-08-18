@@ -35,6 +35,7 @@ const (
 	checkUpdate = "check_update"
 	updateBtn   = "updateBtn"
 	restart     = "restart"
+	getOpenID   = "get_open_id"
 )
 
 type WechatHandler func(id string)
@@ -58,6 +59,10 @@ func initWechat() {
 		return
 	}
 
+	if config.Wechat.SuperOpenID == "" {
+		log.Warningln("你还未配置super_open_id选项")
+	}
+
 	// 注册插件
 	RegisterHandler(loginBtn, handleLogin)
 	RegisterHandler(StartStudy, handleStartStudy)
@@ -66,6 +71,7 @@ func initWechat() {
 	RegisterHandler(checkUpdate, handleCheckUpdate)
 	RegisterHandler(updateBtn, handleUpdate)
 	RegisterHandler(restart, handleRestart)
+	RegisterHandler(getOpenID, handleGetOpenID)
 
 	wx = mp.New(config.Wechat.Token, config.Wechat.AppID, config.Wechat.Secret, "123", "123")
 	err := wx.CreateMenu(&mp.Menu{Buttons: []mp.MenuButton{
@@ -120,15 +126,17 @@ func initWechat() {
 					Type: "click",
 					Key:  updateBtn,
 				},
+				{
+					Name: "获取open_id",
+					Type: "click",
+					Key:  getOpenID,
+				},
 			},
 		},
 	}})
 	if err != nil {
 		log.Errorln("设置自定义菜单出现异常" + err.Error())
 		return
-	}
-	if conf.GetConfig().Wechat.PushLoginWarn {
-		model.SetPush(sendMsg)
 	}
 	wx.HandleFunc("eventCLICK", func(wx *mp.WeiXin, w http.ResponseWriter, r *request.WeiXinRequest, timestamp, nonce string) {
 		if lastNonce == nonce {
@@ -153,22 +161,55 @@ func initWechat() {
 	})
 }
 
+func handleGetOpenID(id string) {
+	sendMsg(id, "你的open_id为"+id)
+}
+
+//
+//  handleCheckUpdate
+//  @Description: 检查更新
+//  @param id
+//
 func handleCheckUpdate(id string) {
 	about := utils.GetAbout()
 	sendMsg(id, about)
 }
 
+//
+//  handleUpdate
+//  @Description: 开始更新
+//  @param id
+//
 func handleUpdate(id string) {
+	if conf.GetConfig().Wechat.SuperOpenID != id {
+		sendMsg(id, "请联系管理员处理！")
+		return
+	}
 	update.SelfUpdate("", conf.GetVersion())
 	sendMsg(id, "检查更新已完成，即将重启程序")
 	utils.Restart()
 }
 
+//
+//  handleRestart
+//  @Description: 重启程序
+//  @param id
+//
 func handleRestart(id string) {
+	if conf.GetConfig().Wechat.SuperOpenID != id {
+		sendMsg(id, "请联系管理员处理！")
+		return
+	}
 	sendMsg(id, "即将重启程序")
 	utils.Restart()
 }
 
+//
+//  sendMsg
+//  @Description: 发送消息
+//  @param id
+//  @param message
+//
 func sendMsg(id, message string) {
 	m := map[string]interface{}{
 		"data": map[string]string{
@@ -192,7 +233,7 @@ func sendMsg(id, message string) {
 }
 
 // HandleWechat
-/* @Description:
+/* @Description:处理wechat的请求接口
  * @param rep
  * @param req
  */
@@ -203,6 +244,11 @@ func HandleWechat(rep http.ResponseWriter, req *http.Request) {
 	wx.ServeHTTP(rep, req)
 }
 
+//
+//  handleLogin
+//  @Description: 用户登录
+//  @param id
+//
 func handleLogin(id string) {
 	core := &lib.Core{Push: func(id1 string, kind, message string) {
 		if kind == "flush" && strings.HasPrefix(message, "登录链接") {
@@ -227,6 +273,11 @@ func handleLogin(id string) {
 	sendMsg(id, "登录成功")
 }
 
+//
+//  handleStartStudy
+//  @Description: 开始学习
+//  @param id
+//
 func handleStartStudy(id string) {
 	users, err := model.QueryByPushID(id)
 	if err != nil {
@@ -272,11 +323,19 @@ func handleGetUser(id string) {
 		return
 	}
 	message := ""
+	config := conf.GetConfig()
 	for _, user := range users {
-		message += fmt.Sprintf("%v ==>  %v", user.Nick, time.Unix(user.LoginTime, 0).Format("2006-01-02 15:04:05"))
-		if user.PushId == id {
-			message += "(已绑定)\n"
+		if config.Wechat.SuperOpenID == id {
+			message += fmt.Sprintf("%v ==>  %v", user.Nick, time.Unix(user.LoginTime, 0).Format("2006-01-02"))
+			if user.PushId == id {
+				message += "(已绑定)\r\n"
+			}
+		} else {
+			if user.PushId == id {
+				message += fmt.Sprintf("%v ==>  %v", user.Nick, time.Unix(user.LoginTime, 0).Format("2006-01-02"))
+			}
 		}
+
 	}
 	sendMsg(id, message)
 }
@@ -291,8 +350,16 @@ func handleScore(id string) {
 		sendMsg(id, "你还没有已登陆的用户，请点击下方登录按钮登录！")
 		return
 	}
+	config := conf.GetConfig()
 	for _, user := range users {
 		score, _ := lib.GetUserScore(user.ToCookies())
-		sendMsg(id, "用户："+user.Nick+"\n"+lib.FormatScore(score))
+		if config.Wechat.SuperOpenID == id {
+			sendMsg(id, "用户："+user.Nick+"\n"+lib.FormatScore(score))
+		} else {
+			if user.PushId == id {
+				sendMsg(id, "用户："+user.Nick+"\n"+lib.FormatScore(score))
+			}
+		}
+
 	}
 }

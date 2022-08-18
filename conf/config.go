@@ -67,6 +67,7 @@ type Config struct {
 		LoginTempID   string `json:"login_temp_id" yaml:"login_temp_id"`
 		NormalTempID  string `json:"normal_temp_id" yaml:"normal_temp_id"`
 		PushLoginWarn bool   `json:"push_login_warn" yaml:"push_login_warn"`
+		SuperOpenID   string `json:"super_open_id" yaml:"super_open_id"`
 	} `json:"wechat" yaml:"wechat"`
 	// 专项答题可接受的最小值
 	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
@@ -78,6 +79,9 @@ type Config struct {
 		Secret string `json:"secret" yaml:"secret"`
 		AppKey string `json:"app_key" yaml:"app_key"`
 	} `json:"ji_guang_push" yaml:"ji_guang_push"`
+
+	SuperUser     string `json:"super_user" yaml:"super_user"`
+	SuperPassword string `json:"super_password" yaml:"super_password"`
 
 	version string
 }
