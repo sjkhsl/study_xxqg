@@ -42,7 +42,7 @@ func GetPush(config conf.Config) func(id string, kind string, message string) {
 		})
 	}
 	if config.TG.Enable {
-		log.Infoln("一配置tg推送")
+		log.Infoln("已配置tg推送")
 		pushs = append(pushs, tgPush)
 	}
 	if config.JiGuangPush.Enable {
