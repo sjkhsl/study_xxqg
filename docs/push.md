@@ -52,6 +52,8 @@ wechat:
   normal_temp_id: ""
   # xxqg会每隔两小时左右检查所有用户的ck有效性，若开启该选项，会在检查失败时推送提醒消息
   push_login_warn: false
+  # 微信管理员的openid,可点击关于按钮获得，配置后请重启程序
+  super_open_id: ""
 ```
 
 + 前往微信[公众号开发者平台](http://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login)，手机微信扫码登录
@@ -64,6 +66,7 @@ wechat:
 + 在配置文件中配置所有内容，启动程序
 + 运行程序后，在浏览器中访问配置的url,页面会返回``No Signature!``,然后提交配置，若成功则关注公众号尝试运行
 + docker运行方式参考[linux运行](./linux/index.md)
++ 配置成功后可点击关于按钮获取open_id，然后填写到配置项的super_open_id中，然后重启容器生效
 
 
 ### web推送

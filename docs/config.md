@@ -79,6 +79,15 @@ wechat:
   normal_temp_id: ""
   # xxqg会每隔两小时左右检查所有用户的ck有效性，若开启该选项，会在检查失败时推送提醒消息
   push_login_warn: false
+  # 微信管理员的openid,可点击关于按钮获得，配置后请重启程序
+  super_open_id: ""
+
+
+# pushDeer推送配置,详情参考psuhDeer官网：http://www.pushdeer.com/official.html
+push_deer:
+  enable: false
+  api: "https://api2.pushdeer.com"
+  token: ""
 
 # 登录重试配置
 retry:
@@ -111,5 +120,6 @@ special_min_score: 10
 
 # 题目搜索的顺序，为true则从2018年最开始搜题，否则从现在最新开始搜题
 reverse_order: false
+
 
 ```
