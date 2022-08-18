@@ -3,20 +3,19 @@
 package model
 
 import (
+	"database/sql"
+	"fmt"
 	"math/rand"
 	"net/http"
-	"sync"
 	"time"
 
+	"github.com/guonaihong/gout"
 	"github.com/imroc/req/v3"
 	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 
-	"github.com/johlanse/study_xxqg/utils"
-)
-
-var (
-	lock sync.RWMutex
+	"github.com/johlanse/study_xxqg/conf"
 )
 
 func init() {
@@ -24,11 +23,11 @@ func init() {
 }
 
 var (
-	pushFunc func(id, kind, message string)
+	wechatPush func(id, message string)
 )
 
-func SetPush(push func(id, kind, message string)) {
-	pushFunc = push
+func SetPush(push func(id, message string)) {
+	wechatPush = push
 }
 
 // User
@@ -41,118 +40,79 @@ type User struct {
 	Token     string `json:"token"`
 	LoginTime int64  `json:"login_time"`
 	PushId    string `json:"push_id"`
-	Status    int    `json:"status"`
 }
 
 // Query
 /**
- * @Description: 查询所有未掉线的用户
+ * @Description:
  * @return []*User
  * @return error
  */
 func Query() ([]*User, error) {
 	var users []*User
 	ping()
-	lock.Lock()
-	defer lock.Unlock()
 	results, err := db.Query("select * from user")
 	if err != nil {
 		return nil, err
 	}
-	var failusers []*User
+	defer func(results *sql.Rows) {
+		err := results.Close()
+		if err != nil {
+			log.Errorln("关闭results失败" + err.Error())
+		}
+	}(results)
 	for results.Next() {
 		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
+		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId)
 		if err != nil {
-			_ = results.Close()
 			return nil, err
 		}
-		if u.Status != 0 {
-			if utils.CheckUserCookie(u.ToCookies()) {
-				users = append(users, u)
-			} else {
-				log.Warningln(u.Nick + "的cookie已失效")
-				failusers = append(failusers, u)
-				if pushFunc != nil {
-					pushFunc(u.PushId, "flush", u.Nick+"的cookie已失效")
-				}
+		if CheckUserCookie(u) {
+			users = append(users, u)
+		} else {
+			log.Infoln("用户" + u.Nick + "cookie已失效")
+			//_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
+			if conf.GetConfig().Wechat.PushLoginWarn {
+				wechatPush(u.PushId, fmt.Sprintf("用户%v已失效！！", u.Nick))
 			}
+			_ = DeleteUser(u.UID)
 		}
 	}
-	_ = results.Close()
-	for _, failuser := range failusers {
-		changeStatus(failuser.UID, 0)
-	}
-	return users, err
-}
-
-func changeStatus(uid string, status int) {
-	ping()
-	_, err := db.Exec("update user set status = ? where uid = ?", status, uid)
-	if err != nil {
-		log.Errorln("改变status失败" + err.Error())
-		return
-	}
-}
-
-func QueryFailUser() ([]*User, error) {
-	var users []*User
-	ping()
-	lock.Lock()
-	defer lock.Unlock()
-	results, err := db.Query("select * from user where status = 0")
-	if err != nil {
-		return nil, err
-	}
-	for results.Next() {
-		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
-		if err != nil {
-			_ = results.Close()
-			return nil, err
-		}
-		users = append(users, u)
-	}
-	_ = results.Close()
 	return users, err
 }
 
 // QueryByPushID
 /**
- * @Description: 根据推送平台的key查询用户
+ * @Description:
  * @return []*User
  * @return error
  */
 func QueryByPushID(pushID string) ([]*User, error) {
-	lock.Lock()
-	defer lock.Unlock()
 	var users []*User
 	ping()
 	results, err := db.Query("select * from user where push_id = ?", pushID)
 	if err != nil {
 		return users, err
 	}
-
-	var failusers []*User
+	defer func(results *sql.Rows) {
+		err := results.Close()
+		if err != nil {
+			log.Errorln("关闭results失败" + err.Error())
+		}
+	}(results)
 	for results.Next() {
 		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
+		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId)
 		if err != nil {
-			_ = results.Close()
 			return users, err
 		}
-		if u.Status != 0 {
-			if utils.CheckUserCookie(u.ToCookies()) {
-				users = append(users, u)
-			} else {
-				log.Warningln(u.Nick + "的cookie已失效")
-				failusers = append(failusers, u)
-			}
+		if CheckUserCookie(u) {
+			users = append(users, u)
+		} else {
+			log.Infoln("用户" + u.Nick + "cookie已失效")
+			//_ = push.PushMessage("", "用户"+u.UID+"已失效，请登录", "login", u.PushId)
+			_ = DeleteUser(u.UID)
 		}
-	}
-	_ = results.Close()
-	for _, failuser := range failusers {
-		changeStatus(failuser.UID, 0)
 	}
 	return users, err
 }
@@ -165,7 +125,7 @@ func QueryByPushID(pushID string) ([]*User, error) {
  */
 func Find(uid string) *User {
 	u := new(User)
-	err := db.QueryRow("select * from user where uid=?;", uid).Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
+	err := db.QueryRow("select * from user where uid=?;", uid).Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId)
 	if err != nil {
 		return nil
 	}
@@ -179,8 +139,6 @@ func Find(uid string) *User {
  * @return error
  */
 func AddUser(user *User) error {
-	lock.Lock()
-	defer lock.Unlock()
 	ping()
 	count := UserCount(user.UID)
 	if count < 1 {
@@ -206,10 +164,8 @@ func AddUser(user *User) error {
  * @return error
  */
 func UpdateUser(user *User) error {
-	lock.Lock()
-	defer lock.Unlock()
 	ping()
-	_, err := db.Exec("update user set token=?,login_time=?,push_id=?,status=1 where uid = ?", user.Token, user.LoginTime, user.PushId, user.UID)
+	_, err := db.Exec("update user set token=?,login_time=?,push_id=? where uid = ?", user.Token, user.LoginTime, user.PushId, user.UID)
 	if err != nil {
 		log.Errorln("更新数据失败")
 		log.Errorln(err.Error())
@@ -294,6 +250,28 @@ func (u *User) ToBrowserCookies() []playwright.BrowserContextAddCookiesOptionsCo
 		SameSite: playwright.SameSiteAttributeStrict,
 	}
 	return []playwright.BrowserContextAddCookiesOptionsCookies{cookie}
+}
+
+// CheckUserCookie
+/**
+ * @Description: 获取用户成绩
+ * @param user
+ * @return bool
+ */
+func CheckUserCookie(user *User) bool {
+	var resp []byte
+	err := gout.GET("https://pc-api.xuexi.cn/open/api/score/get").SetCookies(user.ToCookies()...).SetHeader(gout.H{
+		"Cache-Control": "no-cache",
+	}).BindBody(&resp).Do()
+	if err != nil {
+		log.Errorln("获取用户总分错误" + err.Error())
+
+		return false
+	}
+	if !gjson.GetBytes(resp, "ok").Bool() {
+		return false
+	}
+	return true
 }
 
 func check() {
