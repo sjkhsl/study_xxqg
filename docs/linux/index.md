@@ -11,7 +11,7 @@
 ## docker运行
 
 ```
-docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  jolanse/study_xxqg:latest
+docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  johlanse/study_xxqg:latest
 ```
 各个参数的含义：
 

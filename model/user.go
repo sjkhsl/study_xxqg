@@ -243,6 +243,8 @@ func UserCount(uid string) int {
  * @return error
  */
 func DeleteUser(uid string) error {
+	lock.Lock()
+	defer lock.Unlock()
 	ping()
 	_, err := db.Exec("delete from user where uid = ?;", uid)
 	if err != nil {
