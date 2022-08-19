@@ -180,7 +180,7 @@ func Find(uid string) *User {
  */
 func AddUser(user *User) error {
 	lock.Lock()
-	defer lock.Unlock()
+
 	ping()
 	count := UserCount(user.UID)
 	if count < 1 {
@@ -188,10 +188,13 @@ func AddUser(user *User) error {
 		if err != nil {
 			log.Errorln("数据库插入失败")
 			log.Errorln(err.Error())
+			lock.Unlock()
 			return err
 		}
+		lock.Unlock()
 		return err
 	}
+	lock.Unlock()
 	err := UpdateUser(user)
 	if err != nil {
 		return err
