@@ -176,7 +176,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			if err != nil {
 				return
 			}
-			//id = 81
+			//id = 71
 			// 跳转到专项答题界面
 			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-paper-detail.html?id=%d", id), playwright.PageGotoOptions{
 				Referer:   playwright.String(MyPointsUri),

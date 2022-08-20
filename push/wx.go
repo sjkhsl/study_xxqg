@@ -251,12 +251,11 @@ func HandleWechat(rep http.ResponseWriter, req *http.Request) {
 //
 func handleLogin(id string) {
 	core := &lib.Core{Push: func(id1 string, kind, message string) {
-		if kind == "flush" && strings.HasPrefix(message, "登录链接") {
-			l := strings.ReplaceAll(message, "登录链接：\r\n", "")
+		if kind == "flush" && strings.Contains(message, "login.xuexi.cn") {
 			_, err := wx.SendTemplateMessage(&mp.TemplateMessage{
 				ToUser:      id,
 				TemplateId:  conf.GetConfig().Wechat.LoginTempID,
-				URL:         l,
+				URL:         message,
 				TopColor:    "",
 				RawJSONData: nil,
 			})
