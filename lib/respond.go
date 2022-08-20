@@ -38,6 +38,11 @@ div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-
  * @param model
  */
 func (c *Core) RespondDaily(user *model.User, model string) {
+
+	var title string
+	retryTimes := 0
+	var id int
+
 	// 捕获所有异常，防止程序崩溃
 	defer func() {
 		err := recover()
@@ -135,7 +140,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			//}
 
 			// 获取每周答题的ID
-			id, err := getweekID(user.ToCookies())
+			id, err = getweekID(user.ToCookies())
 			if err != nil {
 				return
 			}
@@ -167,10 +172,11 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			//}
 
 			// 获取专项答题ID
-			id, err := getSpecialID(user.ToCookies())
-			if err != nil {
-				return
-			}
+			//id, err = getSpecialID(user.ToCookies())
+			//if err != nil {
+			//	return
+			//}
+			id = 81
 			// 跳转到专项答题界面
 			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-paper-detail.html?id=%d", id), playwright.PageGotoOptions{
 				Referer:   playwright.String(MyPointsUri),
@@ -312,7 +318,15 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				log.Errorln("获取题目问题失败" + err.Error())
 				return
 			}
+
 			log.Infoln("## 题目：" + questionText)
+			if title == questionText {
+				log.Warningln("可能已经卡住，正在重试，重试次数+1")
+				retryTimes++
+			} else {
+				retryTimes = 0
+			}
+			title = questionText
 
 			// 获取答题帮助
 			openTips, err := page.QuerySelector(
@@ -349,6 +363,15 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			// 从整个页面内容获取提示信息
 			tips := getTips(content)
 			log.Infoln("[提示信息]：", tips)
+
+			if retryTimes > 4 {
+				log.Warningln("重试次数太多，即将退出答题")
+				options, _ := getOptions(page)
+				c.Push(user.PushId, "flush", fmt.Sprintf(
+					"答题过程出现异常！！</br>答题渠道：%v</br>题目ID:%v</br>题目类型：%v</br>题目：%v</br>题目选项：%v</br>提示信息：%v</br>", model, id, categoryText, questionText, strings.Join(options, " "), strings.Join(tips, " ")))
+				return
+			}
+
 			// 填空题
 			switch {
 			case strings.Contains(categoryText, "填空题"):
@@ -579,7 +602,19 @@ func FillBlank(page playwright.Page, tips []string) error {
 		video = true
 	}
 	if video {
-		answer = append(answer, "不知道")
+		data1, err := page.QuerySelector("#app > div > div.layout-body > div > div.detail-body > div.question > div.q-body > div > span:nth-child(1)")
+		if err != nil {
+			log.Errorln("获取题目前半段失败" + err.Error())
+			return err
+		}
+		data1Text, _ := data1.TextContent()
+		log.Infoln("题目前半段：=》" + data1Text)
+		searchAnswer := model.SearchAnswer(data1Text)
+		if searchAnswer != "" {
+			answer = append(answer, searchAnswer)
+		} else {
+			answer = append(answer, "不知道")
+		}
 	} else {
 		answer = tips
 	}
@@ -599,11 +634,12 @@ func FillBlank(page playwright.Page, tips []string) error {
 	}
 	var ans string
 	for i := 0; i < len(inouts); i++ {
-		if video {
+		if len(answer) < i+1 {
 			ans = "不知道"
 		} else {
 			ans = answer[i]
 		}
+
 		err := inouts[i].Fill(ans)
 		if err != nil {
 			log.Errorln("填充答案失败" + err.Error())

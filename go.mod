@@ -6,7 +6,6 @@ replace github.com/willf/bitset v1.2.1 => github.com/bits-and-blooms/bitset v1.2
 
 require (
 	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f
-	github.com/Luoxin/go-pushdeer-sdk v0.0.0-20220308071956-e50d1ec38c98
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
@@ -36,7 +35,6 @@ require (
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
-	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect

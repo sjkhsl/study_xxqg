@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"sync"
 
 	_ "modernc.org/sqlite"
 
@@ -10,6 +11,8 @@ import (
 
 var (
 	db *sql.DB
+
+	db1 *sql.DB
 )
 
 func init() {
@@ -34,6 +37,18 @@ func init() {
 	_, _ = db.Exec(`alter table user
     add status integer default 1;
 `)
+}
+
+func initQuestionDb() {
+	once := sync.Once{}
+	once.Do(func() {
+		var err error
+		db1, err = sql.Open("sqlite", "./config/QuestionBank.db")
+		if err != nil {
+			log.Errorln("题目数据库打开失败，请检查config目录权限")
+			log.Panicln(err.Error())
+		}
+	})
 }
 
 func ping() {
