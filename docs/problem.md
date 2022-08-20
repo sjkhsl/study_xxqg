@@ -6,6 +6,14 @@
   然后查看报错内容截图并在[github](https://github.com/johlanse/study_xxqg/issues) 提交issue
 ```
 
++ ### 浏览器中登录不上怎么办？显示一个白条没反应
+
+```yaml
+浏览器登录是使用的study_xxqg的配置文件中的账号密码，
+是为了防止滥用，不是强国的账号密码，需要更改直接修改
+config.yml文件然后重启就可以
+```
+
 + ### windows下出现找不到浏览器的问题
 
 ```yaml

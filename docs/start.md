@@ -1,8 +1,11 @@
-+ [配置参考](./config.md)
-+ [推送参考](./push.md)
-+ [常见问题](./problem.md)
-
-## 使用<!-- {docsify-ignore} -->
-
-+ [Windows使用](./windows/index.md)
-+ [Linux使用](./linux/index.md)
+* [Study_xxqg](./start.md)
+* [开始使用](./start.md)
+    * [Windows运行](./windows/index)
+    * [linux运行](./linux/index)
+    * [源码运行](./custom/index)
+* [推送配置](./push.md)
+* [配置文件](./config.md)
+* [跳板搭建](./scheme.md)
+* [常见问题](./problem.md)
+* [做出贡献](./contribute.md)
+* [加群交流](./joinGroup.md)
