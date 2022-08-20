@@ -157,7 +157,8 @@ func (c *Core) GenerateCode(pushID string) (string, string, error) {
 
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
-	c.Push(pushID, "flush", "登录链接：\r\n"+conf.GetConfig().Scheme+url.QueryEscape(codeURL))
+	c.Push(pushID, "flush", conf.GetConfig().Scheme+url.QueryEscape(codeURL))
+	c.Push(pushID, "flush", "请点击链接登录")
 	return codeURL, g.Result, err
 }
 
