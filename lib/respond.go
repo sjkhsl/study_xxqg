@@ -171,12 +171,12 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			//	return
 			//}
 
-			// 获取专项答题ID
-			//id, err = getSpecialID(user.ToCookies())
-			//if err != nil {
-			//	return
-			//}
-			id = 81
+			//获取专项答题ID
+			id, err = getSpecialID(user.ToCookies())
+			if err != nil {
+				return
+			}
+			//id = 81
 			// 跳转到专项答题界面
 			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-paper-detail.html?id=%d", id), playwright.PageGotoOptions{
 				Referer:   playwright.String(MyPointsUri),
