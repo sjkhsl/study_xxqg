@@ -176,7 +176,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 			if err != nil {
 				return
 			}
-			//id = 71
+			// id = 77
 			// 跳转到专项答题界面
 			_, err = page.Goto(fmt.Sprintf("https://pc.xuexi.cn/points/exam-paper-detail.html?id=%d", id), playwright.PageGotoOptions{
 				Referer:   playwright.String(MyPointsUri),
@@ -402,11 +402,13 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 					}
 				}
 
+				answer = RemoveRepByLoop(answer)
+
 				if len(answer) < 1 {
 					answer = append(answer, options...)
 					log.Infoln("无法判断答案，自动选择ABCD")
 				}
-				log.Infoln("根据提示分别选择了", RemoveRepByLoop(answer))
+				log.Infoln("根据提示分别选择了", answer)
 				// 多选题选择
 				err = radioCheck(page, answer)
 				if err != nil {
