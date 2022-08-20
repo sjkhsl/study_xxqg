@@ -18,6 +18,8 @@ import (
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/lib"
 	"github.com/johlanse/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/utils"
+	"github.com/johlanse/study_xxqg/utils/update"
 )
 
 var (
@@ -110,6 +112,11 @@ func (t *Telegram) Init() {
 	newPlugin("/get_scores", getScores)
 	newPlugin("/quit", quit)
 	newPlugin("/study_all", studyAll)
+	newPlugin("/delete", deleteUser)
+	newPlugin("/version", checkVersion)
+	newPlugin("/update", botUpdate)
+	newPlugin("/restart", botRestart)
+	newPlugin("/get_fail_users", getFailUser)
 	var err error
 	var uri *url.URL
 	if t.Proxy != "" {
@@ -196,10 +203,15 @@ func (t *Telegram) Init() {
 	_, err = t.bot.Request(tgbotapi.NewSetMyCommands(
 		tgbotapi.BotCommand{Command: "login", Description: "登录一个账号"},
 		tgbotapi.BotCommand{Command: "get_users", Description: "获取所有cookie有效的用户"},
+		tgbotapi.BotCommand{Command: "get_fail_users", Description: "获取所有cookie失效的用户"},
 		tgbotapi.BotCommand{Command: "study", Description: "对一个账户进行学习"},
 		tgbotapi.BotCommand{Command: "get_scores", Description: "获取用户成绩"},
 		tgbotapi.BotCommand{Command: "quit", Description: "退出所有正在学习的实例,或者跟上实例ID退出对应实例"},
 		tgbotapi.BotCommand{Command: "study_all", Description: "对当前所有用户进行按顺序学习"},
+		tgbotapi.BotCommand{Command: "delete", Description: "删除选中的用户"},
+		tgbotapi.BotCommand{Command: "version", Description: "获取程序当前的版本"},
+		tgbotapi.BotCommand{Command: "restart", Description: "重启程序！"},
+		tgbotapi.BotCommand{Command: "update", Description: "更新程序"},
 	))
 	if err != nil {
 		return
@@ -229,6 +241,65 @@ func (t *Telegram) SendMsg(id int64, message string) int {
 		return 0
 	}
 	return messa.MessageID
+}
+
+func getFailUser(bot *Telegram, from int64, args []string) {
+	user, err := model.QueryFailUser()
+	if err != nil {
+		bot.SendMsg(from, err.Error())
+		return
+	}
+	msg := "当前过期用户:\n"
+	for _, u := range user {
+		msg += u.Nick + "\n"
+	}
+	bot.SendMsg(from, "当前过期用户:\n"+msg)
+}
+
+//
+//  checkVersion
+//  @Description: 检查版本信息
+//  @param bot
+//  @param from
+//  @param args
+//
+func checkVersion(bot *Telegram, from int64, args []string) {
+	about := utils.GetAbout()
+	bot.SendMsg(from, about)
+}
+
+//
+//  botRestart
+//  @Description: 重启程序
+//  @param bot
+//  @param from
+//  @param args
+//
+func botRestart(bot *Telegram, from int64, args []string) {
+	if from != conf.GetConfig().TG.ChatID {
+		bot.SendMsg(from, "请联系管理员解决！！")
+		return
+	}
+	bot.SendMsg(from, "即将重启程序！！！")
+	utils.Restart()
+}
+
+//
+//  botUpdate
+//  @Description: 更新程序
+//  @param bot
+//  @param from
+//  @param args
+//
+func botUpdate(bot *Telegram, from int64, args []string) {
+	if from != conf.GetConfig().TG.ChatID {
+		bot.SendMsg(from, "请联系管理员解决！！")
+		return
+	}
+	bot.SendMsg(from, "即将更新程序！！")
+	update.SelfUpdate("", conf.GetVersion())
+	bot.SendMsg(from, "更新完成，即将重启程序！")
+	utils.Restart()
 }
 
 func login(bot *Telegram, from int64, args []string) {
@@ -353,6 +424,60 @@ func studyAll(bot *Telegram, from int64, args []string) {
 			bot.SendMsg(from, fmt.Sprintf("%v已学习完成\n%v", user.Nick, lib.PrintScore(score)))
 		}
 		s()
+	}
+}
+
+func deleteUser(bot *Telegram, from int64, args []string) {
+	config := conf.GetConfig()
+	if from != config.TG.ChatID {
+		bot.SendMsg(from, "请联系管理员删除！")
+		return
+	}
+	users, err := model.Query()
+	if err != nil {
+		bot.SendMsg(from, err.Error())
+		return
+	}
+	failUser, err := model.QueryFailUser()
+	if err != nil {
+		bot.SendMsg(from, err.Error())
+		return
+	}
+	if len(args) < 1 {
+		msgID := bot.SendMsg(from, "请选择删除的用户")
+		markup := tgbotapi.InlineKeyboardMarkup{}
+		for i, user := range users {
+			markup.InlineKeyboard = append(markup.InlineKeyboard, append([]tgbotapi.InlineKeyboardButton{}, tgbotapi.NewInlineKeyboardButtonData(user.Nick, "/delete "+strconv.Itoa(i))))
+		}
+
+		for i, user := range failUser {
+			markup.InlineKeyboard = append(markup.InlineKeyboard, append([]tgbotapi.InlineKeyboardButton{}, tgbotapi.NewInlineKeyboardButtonData(user.Nick+"  (已失效)", "/delete "+strconv.Itoa(len(users)+i))))
+
+		}
+
+		replyMarkup := tgbotapi.NewEditMessageReplyMarkup(from, msgID, markup)
+		_, err := bot.bot.Send(replyMarkup)
+		if err != nil {
+			return
+		}
+		return
+	} else {
+		users = append(users, failUser...)
+		i, err := strconv.Atoi(args[0])
+		if err != nil {
+			bot.SendMsg(from, err.Error())
+			return
+		}
+		if i >= len(users) {
+			bot.SendMsg(from, "错误的序号")
+			return
+		}
+		err = model.DeleteUser(users[i].UID)
+		if err != nil {
+			bot.SendMsg(from, err.Error())
+			return
+		}
+		bot.SendMsg(from, "删除用户"+users[i].Nick+"成功")
 	}
 }
 
