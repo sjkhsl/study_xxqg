@@ -3,12 +3,10 @@
 package model
 
 import (
-	"math/rand"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/imroc/req/v3"
 	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 
@@ -209,8 +207,6 @@ func AddUser(user *User) error {
  * @return error
  */
 func UpdateUser(user *User) error {
-	lock.Lock()
-	defer lock.Unlock()
 	ping()
 	_, err := db.Exec("update user set token=?,login_time=?,push_id=?,status=1 where uid = ?", user.Token, user.LoginTime, user.PushId, user.UID)
 	if err != nil {
@@ -311,7 +307,7 @@ func check() {
 	for {
 		users, _ := Query()
 		for _, user := range users {
-			response, _ := req.R().SetCookies(user.ToCookies()...).Get("https://pc-api.xuexi.cn/open/api/auth/check")
+			response, _ := utils.GetClient().R().SetCookies(user.ToCookies()...).Get("https://pc-api.xuexi.cn/open/api/auth/check")
 			token := ""
 			for _, cookie := range response.Cookies() {
 				if cookie.Name == "token" {
@@ -321,8 +317,9 @@ func check() {
 			if token != "" {
 				user.Token = token
 				_ = UpdateUser(user)
+				log.Infoln("用户" + user.Nick + "的ck已成功保活cookie")
 			}
 		}
-		time.Sleep(time.Hour * time.Duration(rand.Intn(2)+1))
+		time.Sleep(time.Hour * time.Duration(2))
 	}
 }

@@ -87,6 +87,13 @@ func versionCompare(nowVersion, lastVersion string) bool {
 	if nowMainIntVersion < lastMainIntVersion {
 		return true
 	}
+	if strings.Contains(nowVersion, "SNAPSHOT") {
+		if nowMainIntVersion == lastMainIntVersion {
+			return false
+		} else {
+			return true
+		}
+	}
 	// 如果最新版本是beta
 	if LastBeta {
 		// 如果当前版本也是beta
