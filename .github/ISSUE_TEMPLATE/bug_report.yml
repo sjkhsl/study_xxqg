@@ -119,6 +119,12 @@ body:
     validations:
       required: true
 
+  # Optional | CMD
+  - type: textarea
+    id: cmd
+    attributes:
+      label: docker运行命令或者docker-compose的内容
+      render: golang
 
   # Optional | Logging
   - type: textarea
