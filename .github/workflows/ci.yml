@@ -5,6 +5,7 @@ on: [push, pull_request]
 env:
   BINARY_PREFIX: "study_xxqg_"
   BINARY_SUFFIX: ""
+  COMMIT_ID: "${{ github.sha }}"
   PR_PROMPT: "::warning:: Build artifact will not be uploaded due to the workflow is trigged by pull request."
   LD_FLAGS: "-w -s"
 
@@ -40,6 +41,7 @@ jobs:
           IS_PR: ${{ !!github.head_ref }}
           CGO_ENABLED: 0
         run: |
+          echo $COMMIT_ID
           if [ $GOOS = "windows" ]; then export BINARY_SUFFIX="$BINARY_SUFFIX.exe"; fi
           if $IS_PR ; then echo $PR_PROMPT; fi
           export BINARY_NAME="$BINARY_PREFIX$GOOS_$GOARCH$BINARY_SUFFIX"
