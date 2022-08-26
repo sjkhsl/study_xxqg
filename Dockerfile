@@ -15,7 +15,7 @@ RUN  apt-get -qq update && \
      mkdir /opt/config/
 
 COPY conf/config_default.yml /opt/config/config.yml
-COPY conf/QuestionBank.db /opt/config/QuestionBank.db
+COPY conf/QuestionBank.db /opt/QuestionBank.db
 
 COPY ./dist/docker_linux_$TARGETARCH*/study_xxqg /opt/study_xxqg
 

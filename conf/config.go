@@ -89,6 +89,9 @@ type Config struct {
 	SuperUser     string `json:"super_user" yaml:"super_user"`
 	SuperPassword string `json:"super_password" yaml:"super_password"`
 
+	// github的代理地址，用于检查更新或者其他的
+	GithubProxy string `json:"github_proxy" yaml:"github_proxy"`
+
 	version string
 }
 

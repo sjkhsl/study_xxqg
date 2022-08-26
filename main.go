@@ -18,6 +18,8 @@ import (
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 
 	"github.com/johlanse/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/utils"
+
 	// "github.com/johlanse/study_xxqg/gui"
 	"github.com/johlanse/study_xxqg/lib"
 	"github.com/johlanse/study_xxqg/model"
@@ -59,6 +61,10 @@ func init() {
 		log.SetLevel(log.DebugLevel)
 	}
 	log.SetLevel(level)
+	if !utils.CheckQuestionDB() {
+		utils.DownloadDbFile()
+		log.Errorln("题库文件不存在或已损坏，请手动前往 https://github.com/johlanse/study_xxqg/blob/main/conf/QuestionBank.db 下载并放入程序根目录")
+	}
 }
 
 func init() {

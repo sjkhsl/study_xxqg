@@ -15,7 +15,9 @@ func init() {
 	if log.GetLevel() == log.DebugLevel {
 		client.DebugLog = true
 		client = client.DevMode()
+
 	}
+	client.EnableForceHTTP1()
 	client.SetLogger(&myLog{})
 	client.SetCommonHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36")
 }

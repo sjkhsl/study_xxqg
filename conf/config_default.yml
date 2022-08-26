@@ -116,6 +116,9 @@ special_min_score: 10
 # 题目搜索的顺序，为true则从2018年最开始搜题，否则从现在最新开始搜题
 reverse_order: false
 
+# github的代理地址
+github_proxy: https://github.com
+
 weekly_min_score:
 
 ji_guang_push:

@@ -17,6 +17,8 @@ import (
 	"github.com/kardianos/osext"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/johlanse/study_xxqg/conf"
 )
 
 // CheckUpdate 检查更新
@@ -156,6 +158,7 @@ func wait() {
 
 // SelfUpdate 自更新
 func SelfUpdate(github string, version string) {
+	github = conf.GetConfig().GithubProxy
 	if github == "" {
 		github = "https://github.com"
 	}
