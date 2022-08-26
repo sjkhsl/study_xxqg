@@ -5,6 +5,7 @@ package web
 import (
 	"embed"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -32,7 +33,13 @@ func RouterInit() *gin.Engine {
 	})
 
 	router.GET("/about", func(context *gin.Context) {
-		context.JSON(200, utils.GetAbout())
+		context.JSON(200, Resp{
+			Code:    200,
+			Message: "",
+			Data:    utils.GetAbout(),
+			Success: true,
+			Error:   "",
+		})
 	})
 
 	if utils.FileIsExist("./config/flutter_xxqg/") {
@@ -78,10 +85,11 @@ func RouterInit() *gin.Engine {
 func check() gin.HandlerFunc {
 	config := conf.GetConfig()
 	return func(ctx *gin.Context) {
-		token := ctx.GetHeader("xxqg_token")
+		token := ctx.GetHeader("Authorization")
+		token = strings.Split(token, " ")[1]
 		if token == "" || (utils.StrMd5(config.Web.Account+config.Web.Password) != token) {
-			ctx.JSON(403, Resp{
-				Code:    403,
+			ctx.JSON(401, Resp{
+				Code:    401,
 				Message: "the auth fail",
 				Data:    nil,
 				Success: false,

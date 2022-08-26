@@ -195,10 +195,7 @@ func do(m string) {
 
 	getPush := push.GetPush(config)
 	getPush("", "flush", "学习强国助手已上线")
-	failUser, _ := model.QueryFailUser()
-	for _, user := range failUser {
-		getPush(user.PushId, "flush", user.Nick+"的cookie已过期")
-	}
+
 	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 	defer core.Quit()
 	core.Init()
@@ -239,6 +236,22 @@ func do(m string) {
 		}
 		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟</br>%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
 		core2.Push(u.PushId, "flush", message)
+	}
+
+	failUser, _ := model.QueryFailUser()
+	for _, user := range failUser {
+		go func(user2 *model.User) {
+			c := &lib.Core{Push: getPush, ShowBrowser: config.ShowBrowser}
+			getPush(user2.PushId, "flush", user2.Nick+"的cookie已过期")
+			newUser, err := c.L(config.Retry.Times, user2.PushId)
+			if err != nil {
+				c.Push(user2.PushId, "flush", "用户"+user2.Nick+"登录超时！")
+				return
+			}
+			c.Init()
+			defer c.Quit()
+			study(c, newUser)
+		}(user)
 	}
 
 	// 用户小于1时自动登录

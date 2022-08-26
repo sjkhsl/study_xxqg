@@ -229,8 +229,7 @@ func study() gin.HandlerFunc {
 		user := model.Find(uid)
 		core := &lib.Core{
 			ShowBrowser: conf.GetConfig().ShowBrowser,
-			Push: func(id string, kind, message string) {
-			},
+			Push:        push.GetPush(conf.GetConfig()),
 		}
 		core.Init()
 		state.Store(uid, core)

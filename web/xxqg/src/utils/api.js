@@ -28,6 +28,8 @@ export async function checkToken() {
 
 }
 
+
+
 export async function login(data) {
     let responseData = await http.post(base+"/auth/login",data);
     return responseData.data;
@@ -46,6 +48,11 @@ export async function checkQrCode(code) {
     return resp.data
 }
 
+export async function getAbout(){
+    let resp = await http.get(base+"/about");
+    return resp.data;
+}
+
 export async function getToken(code,sign){
     let resp = await http.post(base+"/user/",{
         "code":code,
@@ -55,7 +62,7 @@ export async function getToken(code,sign){
 }
 
 export async function getUsers(){
-    let resp = await http.get(base+"/user/");
+    let resp = await http.get(base+"/user");
     return resp.data
 }
 

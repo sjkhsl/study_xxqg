@@ -3,8 +3,9 @@ import './App.css';
 import {Button, Dialog, Divider, Form, Input, List, Modal, NavBar, Popup, TextArea, Toast,} from "antd-mobile";
 import {UnorderedListOutline} from "antd-mobile-icons";
 import {ListItem} from "antd-mobile/es/components/list/list-item";
-import {checkQrCode, getLog, getScore, getToken, getUsers, getLink, stopStudy, study, login, checkToken} from "./utils/api";
+import {checkQrCode, getLog, getScore, getToken, getUsers, getLink, stopStudy, study, login, checkToken,getAbout} from "./utils/api";
 import QrCode from 'qrcode.react';
+import * as util from "util";
 
 
 class App extends React.Component<any, any> {
@@ -95,12 +96,12 @@ class Login extends Component<any, any>{
 
   onFinish = (value:string)=>{
     login(JSON.stringify(value)).then(resp => {
-      console.log(resp)
+      console.log(resp.message)
       if (resp.success){
         window.localStorage.setItem("xxqg_token",resp.data)
         this.props.parent.set_login()
       }else {
-        Dialog.show(resp.message)
+        Dialog.alert({content: resp.message,closeOnMaskClick:false})
       }
 
     })
@@ -253,9 +254,26 @@ class Log extends Component<any, any>{
 }
 
 class Help extends Component<any, any> {
+
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      about: ""
+    };
+  }
+
+  componentDidMount() {
+    getAbout().then((value)=>{
+      this.setState({
+        about:value.data
+      })
+    })
+
+  }
   render() {
     return <>
         <h2 style={{margin:10}}>项目地址：<a href="https://github.com/johlanse/study_xxqg">https://github.com/johlanse/study_xxqg</a></h2>
+      <br/><h2 style={{margin:10}}>{this.state.about}</h2>
     </>
   }
 }
@@ -365,6 +383,11 @@ class Users extends Component<any, any>{
           <Divider />
           </>
       )
+    }
+    if (this.state.users.length === 0){
+      elements.push(<>
+        <span style={{color:"red"}}>未获取到有效用户</span>
+      </>)
     }
 
     return <List>{elements}</List>;

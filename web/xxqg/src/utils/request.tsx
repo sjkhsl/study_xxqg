@@ -19,7 +19,7 @@ class Http {
             (value)=>{
                if (value.headers !== null){
                    // @ts-ignore
-                   value.headers.xxqg_token = localStorage.getItem("xxqg_token")
+                   value.headers.Authorization = "Bearer "+localStorage.getItem("xxqg_token")
                }
                return value
         },()=>{

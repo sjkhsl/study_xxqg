@@ -240,7 +240,7 @@ func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	}
 	// 等待几分钟后重新执行
 	time.Sleep(time.Duration(conf.GetConfig().Retry.Intervals) * time.Minute)
-	c.Push(pushID, "text", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
+	c.Push(pushID, "flush", fmt.Sprintf("登录超时，将进行第%d重新次登录", retryTimes))
 	return c.L(retryTimes-1, pushID)
 }
 
