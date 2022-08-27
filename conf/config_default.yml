@@ -119,6 +119,9 @@ reverse_order: false
 # github的代理地址
 github_proxy: https://github.com
 
+# 是否开启配置文件热重载 ，在修改配置文件并保存后会自动重启
+hot_reload: true
+
 weekly_min_score:
 
 ji_guang_push:

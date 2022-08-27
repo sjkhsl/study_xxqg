@@ -3,96 +3,101 @@ package conf
 import (
 	_ "embed"
 	"os"
+	"strings"
 
+	"github.com/fsnotify/fsnotify"
+	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
+	"github.com/spf13/viper"
 )
 
 // Config
 //  @Description:
 //
 type Config struct {
-	Model       int    `json:"model" yaml:"model"`
-	LogLevel    string `json:"log_level" yaml:"log_level"`
-	ShowBrowser bool   `json:"show_browser" yaml:"show_browser"`
-	Scheme      string `json:"scheme" yaml:"scheme"`
+	Model       int    `json:"model" yaml:"model" mapstructure:"model"`
+	LogLevel    string `json:"log_level" yaml:"log_level" mapstructure:"log_level"`
+	ShowBrowser bool   `json:"show_browser" yaml:"show_browser" mapstructure:"show_browser"`
+	Scheme      string `json:"scheme" yaml:"scheme" mapstructure:"scheme"`
 	Push        struct {
 		Ding struct {
-			Enable      bool   `json:"enable" yaml:"enable"`
-			AccessToken string `json:"access_token" yaml:"access_token"`
-			Secret      string `json:"secret" yaml:"secret"`
-		} `json:"ding" yaml:"ding"`
+			Enable      bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+			AccessToken string `json:"access_token" yaml:"access_token" mapstructure:"access_token"`
+			Secret      string `json:"secret" yaml:"secret" mapstructure:"secret"`
+		} `json:"ding" yaml:"ding" mapstructure:"ding"`
 		PushPlus struct {
-			Enable bool   `json:"enable" yaml:"enable"`
-			Token  string `json:"token" yaml:"token"`
-		} `json:"push_plus" yaml:"push_plus"`
-	} `json:"push" yaml:"push"`
+			Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+			Token  string `json:"token" yaml:"token" mapstructure:"token"`
+		} `json:"push_plus" yaml:"push_plus" mapstructure:"push_plus"`
+	} `json:"push" yaml:"push" mapstructure:"push"`
 	TG struct {
-		Enable    bool    `json:"enable" yaml:"enable"`
-		Token     string  `json:"token" yaml:"token"`
-		ChatID    int64   `json:"chat_id" yaml:"chat_id"`
-		Proxy     string  `json:"proxy" yaml:"proxy"`
-		CustomApi string  `json:"custom_api" yaml:"custom_api"`
-		WhiteList []int64 `json:"white_list" yaml:"white_list"`
-	} `json:"tg" yaml:"tg"`
+		Enable    bool    `json:"enable" yaml:"enable" mapstructure:"enable"`
+		Token     string  `json:"token" yaml:"token" mapstructure:"token"`
+		ChatID    int64   `json:"chat_id" yaml:"chat_id" mapstructure:"chat_id"`
+		Proxy     string  `json:"proxy" yaml:"proxy" mapstructure:"proxy"`
+		CustomApi string  `json:"custom_api" yaml:"custom_api" mapstructure:"custom_api"`
+		WhiteList []int64 `json:"white_list" yaml:"white_list" mapstructure:"white_list"`
+	} `json:"tg" yaml:"tg" mapstructure:"tg"`
 	QQ struct {
-	}
+	} `mapstructure:"qq"`
 	Web struct {
-		Enable       bool   `json:"enable" yaml:"enable"`
-		Account      string `json:"account" yaml:"account"`
-		Password     string `json:"password" yaml:"password"`
-		Host         string `json:"host" yaml:"host"`
-		Port         int    `json:"port" yaml:"port"`
-		Announcement string `json:"announcement" yaml:"announcement"`
-	} `json:"web"`
-	Cron           string `json:"cron" yaml:"cron"`
-	CronRandomWait int    `json:"cron_random_wait" yaml:"cron_random_wait"`
-	EdgePath       string `json:"edge_path" yaml:"edge_path"`
-	QrCOde         bool   `json:"qr_code" yaml:"qr_code"`
-	StartWait      int    `json:"start_wait" yaml:"start_wait"`
+		Enable       bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+		Account      string `json:"account" yaml:"account" mapstructure:"account"`
+		Password     string `json:"password" yaml:"password" mapstructure:"password"`
+		Host         string `json:"host" yaml:"host" mapstructure:"host"`
+		Port         int    `json:"port" yaml:"port" mapstructure:"port"`
+		Announcement string `json:"announcement" yaml:"announcement" mapstructure:"announcement"`
+	} `json:"web" mapstructure:"web"`
+	Cron           string `json:"cron" yaml:"cron" mapstructure:"cron"`
+	CronRandomWait int    `json:"cron_random_wait" yaml:"cron_random_wait" mapstructure:"cron_random_wait"`
+	EdgePath       string `json:"edge_path" yaml:"edge_path" mapstructure:"edge_path"`
+	QrCOde         bool   `json:"qr_code" yaml:"qr_code" mapstructure:"qr_code"`
+	StartWait      int    `json:"start_wait" yaml:"start_wait" mapstructure:"start_wait"`
 	// cookie强制过期时间，单位为h
-	ForceExpiration int `json:"force_expiration" yaml:"force_expiration"`
+	ForceExpiration int `json:"force_expiration" yaml:"force_expiration" mapstructure:"force_expiration"`
 	Retry           struct {
 		// 重试次数
-		Times int `json:"times" yaml:"times"`
+		Times int `json:"times" yaml:"times" mapstructure:"times"`
 		// 重试时间
-		Intervals int `json:"intervals" yaml:"intervals"`
-	} `json:"retry" yaml:"retry"`
+		Intervals int `json:"intervals" yaml:"intervals" mapstructure:"intervals"`
+	} `json:"retry" yaml:"retry" mapstructure:"retry"`
 
 	Wechat struct {
-		Enable        bool   `json:"enable" yaml:"enable"`
-		Token         string `json:"token" yaml:"token"`
-		Secret        string `json:"secret" yaml:"secret"`
-		AppID         string `json:"app_id" yaml:"app_id"`
-		LoginTempID   string `json:"login_temp_id" yaml:"login_temp_id"`
-		NormalTempID  string `json:"normal_temp_id" yaml:"normal_temp_id"`
-		PushLoginWarn bool   `json:"push_login_warn" yaml:"push_login_warn"`
-		SuperOpenID   string `json:"super_open_id" yaml:"super_open_id"`
-	} `json:"wechat" yaml:"wechat"`
+		Enable        bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+		Token         string `json:"token" yaml:"token" mapstructure:"token"`
+		Secret        string `json:"secret" yaml:"secret" mapstructure:"secret"`
+		AppID         string `json:"app_id" yaml:"app_id" mapstructure:"app_id"`
+		LoginTempID   string `json:"login_temp_id" yaml:"login_temp_id" mapstructure:"login_temp_id"`
+		NormalTempID  string `json:"normal_temp_id" yaml:"normal_temp_id" mapstructure:"normal_temp_id"`
+		PushLoginWarn bool   `json:"push_login_warn" yaml:"push_login_warn" mapstructure:"push_login_warn"`
+		SuperOpenID   string `json:"super_open_id" yaml:"super_open_id" mapstructure:"super_open_id"`
+	} `json:"wechat" yaml:"wechat" mapstructure:"wechat"`
 	// 专项答题可接受的最小值
-	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score"`
+	SpecialMinScore int `json:"special_min_score" yaml:"special_min_score" mapstructure:"special_min_score"`
 
 	PushDeer struct {
-		Enable bool   `json:"enable" yaml:"enable"`
-		Api    string `json:"api" yaml:"api"`
-		Token  string `json:"token" yaml:"token"`
-	} `json:"push_deer" yaml:"push_deer"`
+		Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+		Api    string `json:"api" yaml:"api" mapstructure:"api"`
+		Token  string `json:"token" yaml:"token" mapstructure:"token"`
+	} `json:"push_deer" yaml:"push_deer" mapstructure:"push_deer"`
 
-	ReverseOrder bool `json:"reverse_order" yaml:"reverse_order"`
+	ReverseOrder bool `json:"reverse_order" yaml:"reverse_order" mapstructure:"reverse_order"`
 
 	JiGuangPush struct {
-		Enable bool   `json:"enable" yaml:"enable"`
-		Secret string `json:"secret" yaml:"secret"`
-		AppKey string `json:"app_key" yaml:"app_key"`
-	} `json:"ji_guang_push" yaml:"ji_guang_push"`
+		Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+		Secret string `json:"secret" yaml:"secret" mapstructure:"secret"`
+		AppKey string `json:"app_key" yaml:"app_key" mapstructure:"app_key"`
+	} `json:"ji_guang_push" yaml:"ji_guang_push" mapstructure:"ji_guang_push"`
 
-	SuperUser     string `json:"super_user" yaml:"super_user"`
-	SuperPassword string `json:"super_password" yaml:"super_password"`
+	SuperUser     string `json:"super_user" yaml:"super_user" mapstructure:"super_user"`
+	SuperPassword string `json:"super_password" yaml:"super_password" mapstructure:"super_password"`
 
 	// github的代理地址，用于检查更新或者其他的
-	GithubProxy string `json:"github_proxy" yaml:"github_proxy"`
+	GithubProxy string `json:"github_proxy" yaml:"github_proxy" mapstructure:"github_proxy"`
 
-	version string
+	HotReload bool `json:"hot_reload" yaml:"hot_reload" mapstructure:"hot_reload"`
+
+	version string `mapstructure:"version"`
 }
 
 var (
@@ -124,37 +129,74 @@ func GetVersion() string {
 /* @Description: 初始化配置文件
  * @param path
  */
-func InitConfig(path string) {
+func InitConfig(path string, restart func()) {
 	if path == "" {
 		path = "./config/config.yml"
 	}
-	log.Infoln("配置文件路径 ==》 " + path)
-	file, err := os.ReadFile(path)
-	if err != nil {
-		log.Warningln("检测到配置文件可能不存在")
-		err := os.WriteFile(path, defaultConfig, 0666)
-		if err != nil {
-			log.Errorln("写入到配置文件出现错误")
-			log.Errorln(err.Error())
-			return
+
+	pathDir := strings.TrimSuffix(path, "config.yml")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(pathDir)
+	viper.SetConfigName("config")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			log.Warningln("检测到配置文件可能不存在，即将写入默认配置")
+			err := os.WriteFile(path, defaultConfig, 0666)
+			if err != nil {
+				log.Errorln("写入到配置文件出现错误")
+				log.Errorln(err.Error())
+				return
+			}
+			log.Infoln("成功写入到配置文件,即将重启应用")
+			restart()
+		} else {
+			log.Panicln("读取配置文件出现未知错误" + err.Error())
 		}
-		log.Infoln("成功写入到配置文件,请重启应用")
-		os.Exit(3)
 	}
-	err = yaml.Unmarshal(file, &config)
+	viper.SetDefault("scheme", "https://johlanse.github.io/study_xxqg/scheme.html?")
+	viper.SetDefault("special_min_score", 10)
+	viper.SetDefault("tg.custom_api", "https://api.telegram.org")
+	err := viper.Unmarshal(&config, func(decoderConfig *mapstructure.DecoderConfig) {
+
+	})
 	if err != nil {
-		log.Errorln(err.Error())
-		log.Panicln("配置文件解析失败，请检查配置文件")
+		log.Panicln("解析配置文件出现错误" + err.Error())
+		return
 	}
-	if config.Scheme == "" {
-		config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"
+	if viper.GetBool("hot_reload") {
+		log.Infoln("程序已开启热重载！")
+		viper.WatchConfig()
+		viper.OnConfigChange(func(in fsnotify.Event) {
+			log.Infoln("检测到配置文件变化，即将重启程序")
+			restart()
+		})
 	}
-	if config.SpecialMinScore == 0 {
-		config.SpecialMinScore = 10
-	}
-	if config.TG.CustomApi == "" {
-		config.TG.CustomApi = "https://api.telegram.org"
-	}
+	//file, err := os.ReadFile(path)
+	//if err != nil {
+	//	log.Warningln("检测到配置文件可能不存在")
+	//	err := os.WriteFile(path, defaultConfig, 0666)
+	//	if err != nil {
+	//		log.Errorln("写入到配置文件出现错误")
+	//		log.Errorln(err.Error())
+	//		return
+	//	}
+	//	log.Infoln("成功写入到配置文件,请重启应用")
+	//	os.Exit(3)
+	//}
+	//err = yaml.Unmarshal(file, &config)
+	//if err != nil {
+	//	log.Errorln(err.Error())
+	//	log.Panicln("配置文件解析失败，请检查配置文件")
+	//}
+	//if config.Scheme == "" {
+	//	config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"
+	//}
+	//if config.SpecialMinScore == 0 {
+	//	config.SpecialMinScore = 10
+	//}
+	//if config.TG.CustomApi == "" {
+	//	config.TG.CustomApi = "https://api.telegram.org"
+	//}
 }
 
 // GetConfig

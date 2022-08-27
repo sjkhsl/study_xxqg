@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
+	"sync"
 
 	"github.com/imroc/req/v3"
 	log "github.com/sirupsen/logrus"
@@ -20,14 +22,17 @@ import (
 /* @Description:
  */
 func Restart() {
-	cmd := exec.Command("./study_xxqg")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	go func() {
+	once := sync.Once{}
+	once.Do(func() {
+		log.Infoln("程序启动命令： " + strings.Join(os.Args, " "))
+		cmd := exec.Command(strings.Join(os.Args, " "))
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
 		cmd.Start()
 		os.Exit(3)
-	}()
+	})
+
 }
 
 func GetAbout() string {

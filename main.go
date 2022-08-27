@@ -42,7 +42,7 @@ func init() {
 	flag.StringVar(&configPath, "config", "./config/config.yml", "设置配置文件路径")
 	flag.Parse()
 	// 初始化配置文件
-	conf.InitConfig(configPath)
+	conf.InitConfig(configPath, utils.Restart)
 	config = conf.GetConfig()
 	logFormatter := &easy.Formatter{
 		TimestampFormat: "2006-01-02 15:04:05",
