@@ -6,6 +6,16 @@
   然后查看报错内容截图并在[github](https://github.com/johlanse/study_xxqg/issues) 提交issue
 ```
 
+
++ ### 关于cookie的时间问题
+```yaml
+原理是是通过带上当前cookie访问一个api即可，在1.0.35版本之后我通过cron定时执行保活，默认的cron是 0 */1 * * *
+
+目前暂不知道能够续期的次数
+
+如果你想让访问间隔时间更短或者更长，可以通过添加环境变量 CHECK_ENV 为cron值
+```
+
 + ### 浏览器中登录不上怎么办？显示一个白条没反应
 
 ```yaml

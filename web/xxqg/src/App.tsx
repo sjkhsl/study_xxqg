@@ -3,7 +3,7 @@ import './App.css';
 import {Button, Dialog, Divider, Form, Input, List, Modal, NavBar, Popup, TextArea, Toast,} from "antd-mobile";
 import {UnorderedListOutline} from "antd-mobile-icons";
 import {ListItem} from "antd-mobile/es/components/list/list-item";
-import {checkQrCode, getLog, getScore, getToken, getUsers, getLink, stopStudy, study, login, checkToken,getAbout} from "./utils/api";
+import {checkQrCode, getLog, getScore, getToken, getUsers, getLink, stopStudy, study, login, checkToken,getAbout,deleteUser} from "./utils/api";
 import QrCode from 'qrcode.react';
 import * as util from "util";
 
@@ -14,24 +14,46 @@ class App extends React.Component<any, any> {
     this.state = {
       popup_visible: false,
       index: "login",
-      is_login: false
+      is_login: false,
+      // 用户等级，1是管理员，2是普通用户
+      level: 2
     };
   }
 
+  set_level = (level:number)=>{
+    this.setState({
+      level: level
+    })
+  }
   set_login = ()=>{
     this.setState({
       is_login: true
     })
+    this.check_token()
+  }
+
+  check_token = ()=>{
+    checkToken().then((t) =>{
+      console.log(t)
+      if (!t){
+        console.log("未登录")
+      }else {
+        if (t.data === 1){
+          console.log("管理员登录")
+          this.set_level(1)
+        }else {
+          console.log("不是管理员登录")
+          this.set_level(2)
+        }
+        this.setState({
+          is_login: true
+        })
+      }
+    })
   }
 
   componentDidMount() {
-   checkToken().then((t) =>{
-     console.log(t)
-     if (t){
-       this.set_login()
-     }
-   })
-
+    this.check_token()
   }
 
 
@@ -43,7 +65,7 @@ class App extends React.Component<any, any> {
                   left={<UnorderedListOutline fontSize={36} onClick={this.back}/>}>
             {"study_xxqg"}
           </NavBar>
-          <Router data={this.state.index}/>
+          <Router data={this.state.index} level={this.state.level} set_level = {this.set_level}/>
           <Popup
               bodyStyle={{width: '50vw'}}
               visible={this.state.popup_visible}
@@ -97,11 +119,10 @@ class Login extends Component<any, any>{
   onFinish = (value:string)=>{
     login(JSON.stringify(value)).then(resp => {
       console.log(resp.message)
+      Dialog.alert({content: resp.message,closeOnMaskClick:false})
       if (resp.success){
         window.localStorage.setItem("xxqg_token",resp.data)
         this.props.parent.set_login()
-      }else {
-        Dialog.alert({content: resp.message,closeOnMaskClick:false})
       }
 
     })
@@ -154,7 +175,7 @@ class Router extends Component<any, any>{
       <QrCode style={{margin:10}} fgColor={"#000000"} size={200} value={this.state.img} />
     </>;
 
-    let userList = <Users data={"12"}/>;
+    let userList = <Users data={"12"} level={this.props.level}/>;
     let config = <h1>配置管理</h1>
     let help = <Help />
     let log = <Log />
@@ -364,10 +385,29 @@ class Users extends Component<any, any>{
     }
   }
 
+  delete_user = (uid:string,nick:string)=>{
+    Dialog.confirm({content:"你确定要删除用户"+nick+"吗?"}).then((confirm) => {
+      if (confirm){
+        deleteUser(uid).then((data) => {
+          if (data.success){
+            getUsers().then(users =>{
+              console.log(users)
+              this.setState({
+                users: users.data
+              })
+            })
+          }else {
+            Dialog.show({content:data.error})
+          }
+        })
+      }
+    })
+  }
 
   render() {
     let elements = []
     for (let i = 0; i < this.state.users.length; i++) {
+      console.log(this.props.level)
       elements.push(
           <>
          <ListItem key={this.state.users[i].uid} style={{border:"blue soild 1px"}}>
@@ -379,6 +419,8 @@ class Users extends Component<any, any>{
            </Button>
            <br />
            <Button onClick={this.getScore.bind(this,this.state.users[i].token,this.state.users[i].nick)} color={"success"} block={true}>积分查询</Button>
+           <br />
+           <Button  style={{display: this.props.level !== 1 ? "none" : "inline"}} onClick={this.delete_user.bind(this,this.state.users[i].uid,this.state.users[i].nick)} color={"danger"} block={true}>删除用户</Button>
          </ListItem>
           <Divider />
           </>

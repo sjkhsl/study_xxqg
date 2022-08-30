@@ -55,6 +55,10 @@ web:
   account: admin
   # 网页端登录密码
   password: admin
+  # web端登录普通用户的账号密码，支持多个用户,普通用户只能看到自己的信息
+  common_user:
+    # 代表账号为user,密码为123的普通用户，可添加多个，继续在下面写就好了
+    user: 123
 
 # 微信公众号测试号配置
 wechat:

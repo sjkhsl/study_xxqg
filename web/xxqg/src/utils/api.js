@@ -24,9 +24,10 @@ export async function checkToken() {
         return false
     }
     let responseData = await http.post(base + "/auth/check/"+token);
-    return responseData.data.success;
+    return responseData.data;
 
 }
+
 
 
 
@@ -54,10 +55,16 @@ export async function getAbout(){
 }
 
 export async function getToken(code,sign){
-    let resp = await http.post(base+"/user/",{
+    let token = window.localStorage.getItem("xxqg_token")
+    let resp = await http.post(base+"/user?register_id="+token,{
         "code":code,
         "state":sign
     });
+    return resp.data;
+}
+
+export async function deleteUser(uid){
+    let resp = await http.delete(base+"/user?uid="+uid);
     return resp.data;
 }
 

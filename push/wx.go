@@ -211,6 +211,22 @@ func handleRestart(id string) {
 //  @param message
 //
 func sendMsg(id, message string) {
+	// 登录消息单独采用模板发送
+	if strings.Contains(message, "login.xuexi.cn") {
+		_, err := wx.SendTemplateMessage(&mp.TemplateMessage{
+			ToUser:      id,
+			TemplateId:  conf.GetConfig().Wechat.LoginTempID,
+			URL:         message,
+			TopColor:    "",
+			RawJSONData: nil,
+		})
+		if err != nil {
+			log.Errorln(err.Error())
+			return
+		}
+		return
+	}
+
 	m := map[string]interface{}{
 		"data": map[string]string{
 			"value": message,

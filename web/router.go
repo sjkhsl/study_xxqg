@@ -87,7 +87,7 @@ func check() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("Authorization")
 		token = strings.Split(token, " ")[1]
-		if token == "" || (utils.StrMd5(config.Web.Account+config.Web.Password) != token) {
+		if token == "" {
 			ctx.JSON(401, Resp{
 				Code:    401,
 				Message: "the auth fail",
@@ -96,8 +96,33 @@ func check() gin.HandlerFunc {
 				Error:   "",
 			})
 			ctx.Abort()
-		} else {
+		} else if utils.StrMd5(config.Web.Account+config.Web.Password) == token {
+			ctx.Set("level", 1)
+			ctx.Set("token", token)
 			ctx.Next()
+		} else if checkCommonUser(token) {
+			ctx.Set("level", 2)
+			ctx.Set("token", token)
+			ctx.Next()
+		} else {
+			ctx.JSON(401, Resp{
+				Code:    401,
+				Message: "the auth fail",
+				Data:    nil,
+				Success: false,
+				Error:   "",
+			})
+			ctx.Abort()
 		}
 	}
+}
+
+func checkCommonUser(token string) bool {
+	config := conf.GetConfig()
+	for key, value := range config.Web.CommonUser {
+		if token == utils.StrMd5(key+value) {
+			return true
+		}
+	}
+	return false
 }

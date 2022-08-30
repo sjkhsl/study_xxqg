@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/guonaihong/gout"
@@ -20,10 +21,15 @@ func (d *Ding) Send() func(id string, kind string, message string) {
 	s := TypeSecret{Secret: d.Secret, Webhook: d.Token}
 	return func(id string, kind string, message string) {
 		if kind == "flush" {
+
+			if strings.Contains(message, "login.xuexi.cn") {
+				message = fmt.Sprintf("[点我登录](%v)", message)
+			}
+
 			err := s.SendMessage(map[string]interface{}{
 				"msgtype": "markdown",
 				"markdown": map[string]string{
-					"title": "学习强国登录",
+					"title": "study_xxqg信息推送",
 					"text":  message,
 				},
 			})

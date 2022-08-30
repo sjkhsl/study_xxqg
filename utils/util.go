@@ -48,17 +48,17 @@ func GetAbout() string {
  * @param user
  * @return bool
  */
-func CheckUserCookie(cookies []*http.Cookie) bool {
+func CheckUserCookie(cookies []*http.Cookie) (bool, error) {
 	client := req.C().DevMode()
 	response, err := client.R().SetCookies(cookies...).Get("https://pc-api.xuexi.cn/open/api/score/get")
 	if err != nil {
 		log.Errorln("获取用户总分错误" + err.Error())
-		return false
+		return true, err
 	}
 	if !gjson.GetBytes(response.Bytes(), "ok").Bool() {
-		return false
+		return false, err
 	}
-	return true
+	return true, err
 }
 
 var (

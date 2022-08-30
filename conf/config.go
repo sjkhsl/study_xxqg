@@ -41,12 +41,12 @@ type Config struct {
 	QQ struct {
 	} `mapstructure:"qq"`
 	Web struct {
-		Enable       bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
-		Account      string `json:"account" yaml:"account" mapstructure:"account"`
-		Password     string `json:"password" yaml:"password" mapstructure:"password"`
-		Host         string `json:"host" yaml:"host" mapstructure:"host"`
-		Port         int    `json:"port" yaml:"port" mapstructure:"port"`
-		Announcement string `json:"announcement" yaml:"announcement" mapstructure:"announcement"`
+		Enable     bool              `json:"enable" yaml:"enable" mapstructure:"enable"`
+		Account    string            `json:"account" yaml:"account" mapstructure:"account"`
+		Password   string            `json:"password" yaml:"password" mapstructure:"password"`
+		Host       string            `json:"host" yaml:"host" mapstructure:"host"`
+		Port       int               `json:"port" yaml:"port" mapstructure:"port"`
+		CommonUser map[string]string `json:"common_user" mapstructure:"common_user"`
 	} `json:"web" mapstructure:"web"`
 	Cron           string `json:"cron" yaml:"cron" mapstructure:"cron"`
 	CronRandomWait int    `json:"cron_random_wait" yaml:"cron_random_wait" mapstructure:"cron_random_wait"`
@@ -89,12 +89,9 @@ type Config struct {
 		AppKey string `json:"app_key" yaml:"app_key" mapstructure:"app_key"`
 	} `json:"ji_guang_push" yaml:"ji_guang_push" mapstructure:"ji_guang_push"`
 
-	SuperUser     string `json:"super_user" yaml:"super_user" mapstructure:"super_user"`
-	SuperPassword string `json:"super_password" yaml:"super_password" mapstructure:"super_password"`
-
 	// github的代理地址，用于检查更新或者其他的
 	GithubProxy string `json:"github_proxy" yaml:"github_proxy" mapstructure:"github_proxy"`
-
+	// 热重载
 	HotReload bool `json:"hot_reload" yaml:"hot_reload" mapstructure:"hot_reload"`
 
 	version string `mapstructure:"version"`

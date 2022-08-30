@@ -4,10 +4,12 @@ package model
 
 import (
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/playwright-community/playwright-go"
+	"github.com/robfig/cron/v3"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/johlanse/study_xxqg/utils"
@@ -66,7 +68,8 @@ func Query() ([]*User, error) {
 			return nil, err
 		}
 		if u.Status != 0 {
-			if utils.CheckUserCookie(u.ToCookies()) {
+
+			if ok, _ := utils.CheckUserCookie(u.ToCookies()); ok {
 				users = append(users, u)
 			} else {
 				log.Warningln(u.Nick + "的cookie已失效")
@@ -140,7 +143,7 @@ func QueryByPushID(pushID string) ([]*User, error) {
 			return users, err
 		}
 		if u.Status != 0 {
-			if utils.CheckUserCookie(u.ToCookies()) {
+			if ok, _ := utils.CheckUserCookie(u.ToCookies()); ok {
 				users = append(users, u)
 			} else {
 				log.Warningln(u.Nick + "的cookie已失效")
@@ -304,7 +307,14 @@ func check() {
 			log.Errorf("%v 出现错误，%v", "auth check", err)
 		}
 	}()
-	for {
+	c := cron.New()
+	cr := "0 */1 * * *"
+	if crEnv, ok := os.LookupEnv("CHECK_ENV"); ok {
+		cr = crEnv
+		log.Infoln("已成功自定义保活cron : " + cr)
+	}
+	_, err := c.AddFunc(cr, func() {
+		log.Infoln("开始执行保活任务")
 		users, _ := Query()
 		for _, user := range users {
 			response, _ := utils.GetClient().R().SetCookies(user.ToCookies()...).Get("https://pc-api.xuexi.cn/open/api/auth/check")
@@ -314,12 +324,16 @@ func check() {
 					token = cookie.Value
 				}
 			}
-			if token != "" {
+			if token != "" && user.Token != token {
 				user.Token = token
 				_ = UpdateUser(user)
 				log.Infoln("用户" + user.Nick + "的ck已成功保活cookie")
 			}
 		}
-		time.Sleep(time.Hour * time.Duration(2))
+	})
+	if err != nil {
+		log.Errorln("添加保活任务失败" + err.Error())
+		return
 	}
+	c.Start()
 }

@@ -37,7 +37,15 @@ func checkToken() gin.HandlerFunc {
 			ctx.JSON(200, Resp{
 				Code:    200,
 				Message: "",
-				Data:    nil,
+				Data:    1,
+				Success: true,
+				Error:   "",
+			})
+		} else if checkCommonUser(token) {
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "",
+				Data:    2,
 				Success: true,
 				Error:   "",
 			})
@@ -63,6 +71,14 @@ func userLogin() gin.HandlerFunc {
 		_ = ctx.BindJSON(u)
 		config := conf.GetConfig()
 		if u.Account == config.Web.Account && u.Password == config.Web.Password {
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "登录成功，尊贵的管理员用户",
+				Data:    utils.StrMd5(u.Account + u.Password),
+				Success: true,
+				Error:   "",
+			})
+		} else if checkCommonUser(utils.StrMd5(u.Account + u.Password)) {
 			ctx.JSON(200, Resp{
 				Code:    200,
 				Message: "登录成功",
@@ -162,6 +178,23 @@ func getUsers() gin.HandlerFunc {
 				Error:   "",
 			})
 			return
+		}
+		level := ctx.GetInt("level")
+		if level != 1 {
+			users, err = model.QueryByPushID(ctx.GetString("token"))
+			if err != nil {
+				return
+			}
+			if users == nil {
+				ctx.JSON(200, Resp{
+					Code:    200,
+					Message: "查询成功",
+					Data:    []interface{}{},
+					Success: true,
+					Error:   "",
+				})
+				return
+			}
 		}
 
 		var datas []map[string]interface{}
@@ -326,6 +359,17 @@ func generate() gin.HandlerFunc {
 func deleteUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		uid := ctx.Query("uid")
+		level := ctx.GetInt("level")
+		if level != 1 {
+			ctx.JSON(200, Resp{
+				Code:    401,
+				Message: "你没有权限删除用户！",
+				Data:    "",
+				Success: false,
+				Error:   "你没有权限删除用户！",
+			})
+			return
+		}
 		err := model.DeleteUser(uid)
 		if err != nil {
 			ctx.JSON(200, Resp{
