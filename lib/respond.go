@@ -396,7 +396,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 
 				for _, option := range options {
 					for _, tip := range tips {
-						if strings.Contains(option, tip) {
+						if strings.Contains(strings.ReplaceAll(option, " ", ""), strings.ReplaceAll(tip, " ", "")) {
 							answer = append(answer, option)
 						}
 					}
