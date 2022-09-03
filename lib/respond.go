@@ -380,7 +380,6 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 				err := FillBlank(page, tips)
 				if err != nil {
 					log.Errorln("填空题答题失败" + err.Error())
-
 					return
 				}
 			case strings.Contains(categoryText, "多选题"):

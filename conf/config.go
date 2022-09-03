@@ -94,6 +94,11 @@ type Config struct {
 	// 热重载
 	HotReload bool `json:"hot_reload" yaml:"hot_reload" mapstructure:"hot_reload"`
 
+	// 自定义消息推送
+	CustomMessage string `json:"custom_message" yaml:"custom_message"  mapstructure:"custom_message"`
+
+	CustomCron string `json:"custom_cron" yaml:"custom_cron" mapstructure:"custom_cron"`
+
 	version string `mapstructure:"version"`
 }
 

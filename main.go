@@ -174,6 +174,19 @@ func main() {
 	}
 	getPush := push.GetPush(config)
 	getPush("", "flush", "学习强国助手已上线")
+
+	if config.CustomCron != "" {
+		c2 := cron.New()
+		_, err := c2.AddFunc(config.CustomCron, func() {
+			getPush("all", "flush", config.CustomMessage)
+		})
+		if err != nil {
+			log.Errorln("添加自定义定时消息推送错误" + err.Error())
+			return
+		}
+		c2.Run()
+	}
+
 	model.SetPush(getPush)
 	if !config.TG.Enable && config.Cron == "" && !config.Wechat.Enable {
 		log.Infoln("已采用普通学习模式")

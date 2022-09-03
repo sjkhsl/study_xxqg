@@ -126,6 +126,11 @@ github_proxy: https://github.com
 # 是否开启配置文件热重载 ，在修改配置文件并保存后会自动重启
 hot_reload: true
 
+# 自定义消息推送，会在定时任务执行之前推送信息
+custom_message: ""
+# 自定义消息推送定时
+custom_cron: ""
+
 weekly_min_score:
 
 ji_guang_push:

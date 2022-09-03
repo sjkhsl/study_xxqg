@@ -159,6 +159,26 @@ func initWechat() {
 			(value.(WechatHandler))(r.FromUserName)
 		}()
 	})
+	wx.HandleFunc("text", func(wx *mp.WeiXin, w http.ResponseWriter, r *request.WeiXinRequest, timestamp, nonce string) {
+
+		if r.FromUserName != conf.GetConfig().Wechat.SuperOpenID {
+			log.Infoln("收到了微信文本消息，但不是管理员")
+			return
+		}
+
+		msg := strings.SplitN(r.Content, " ", 3)
+		if len(msg) < 3 {
+			return
+		} else {
+			if msg[0] == "发送" {
+				if msg[1] == "all" || msg[1] == "所有" {
+					sendMsg("all", msg[2])
+				} else {
+					sendMsg(msg[1], msg[2])
+				}
+			}
+		}
+	})
 }
 
 func handleGetOpenID(id string) {
@@ -211,6 +231,45 @@ func handleRestart(id string) {
 //  @param message
 //
 func sendMsg(id, message string) {
+
+	if id == "all" {
+		userList, err := wx.GetUserList("")
+		if err != nil {
+			log.Errorln("获取关注列表错误")
+			return
+		}
+		url := ""
+		color := ""
+		if strings.Contains(message, "$$$") {
+			splits := strings.Split(message, "$$$")
+			message = splits[0]
+			url = splits[1]
+			if len(splits) == 3 {
+				color = splits[2]
+			}
+		}
+		for _, user := range userList.Data.OpenId {
+			m := map[string]interface{}{
+				"data": map[string]string{
+					"value": message,
+				},
+			}
+			data, _ := json.Marshal(m)
+
+			_, err = wx.SendTemplateMessage(&mp.TemplateMessage{
+				ToUser:      user,
+				TemplateId:  conf.GetConfig().Wechat.NormalTempID,
+				URL:         url,
+				TopColor:    color,
+				RawJSONData: data,
+			})
+			if err != nil {
+				log.Errorln("向用户" + user + "推送消息错误")
+				continue
+			}
+		}
+	}
+
 	// 登录消息单独采用模板发送
 	if strings.Contains(message, "login.xuexi.cn") {
 		_, err := wx.SendTemplateMessage(&mp.TemplateMessage{
