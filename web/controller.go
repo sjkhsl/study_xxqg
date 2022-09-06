@@ -53,7 +53,7 @@ func checkToken() gin.HandlerFunc {
 			ctx.JSON(200, Resp{
 				Code:    403,
 				Message: "",
-				Data:    nil,
+				Data:    -1,
 				Success: false,
 				Error:   "",
 			})
@@ -140,9 +140,7 @@ func addUser() gin.HandlerFunc {
 			})
 			return
 		}
-		registerID, _ := ctx.GetQuery("register_id")
-		log.Infoln("the jpush register id is " + registerID)
-		_, err = lib.GetToken(p.Code, p.State, registerID)
+		_, err = lib.GetToken(p.Code, p.State, ctx.GetString("token"))
 		if err != nil {
 			ctx.JSON(403, Resp{
 				Code:    403,
@@ -276,12 +274,6 @@ func study() gin.HandlerFunc {
 				core.RespondDaily(user, "daily")
 				core.RespondDaily(user, "weekly")
 				core.RespondDaily(user, "special")
-			}
-			score, _ := lib.GetUserScore(user.ToCookies())
-			content := lib.FormatScore(score)
-			err := push.PushMessage(user.Nick+"学习情况", content, "score", user.PushId)
-			if err != nil {
-				log.Errorln(err.Error())
 			}
 			state.Delete(uid)
 		}()

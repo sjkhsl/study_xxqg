@@ -247,12 +247,6 @@ func do(m string) {
 		}
 
 		score, _ = lib.GetUserScore(u.ToCookies())
-		content := lib.FormatScore(score)
-		err = push.PushMessage(u.Nick+"学习情况", u.Nick+"学习情况"+content, "score", u.PushId)
-		if err != nil {
-			log.Errorln(err.Error())
-			err = nil
-		}
 		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟</br>%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
 		core2.Push(u.PushId, "flush", message)
 	}

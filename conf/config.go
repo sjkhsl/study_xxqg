@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"bytes"
 	_ "embed"
 	"os"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 // Config
@@ -38,16 +40,14 @@ type Config struct {
 		CustomApi string  `json:"custom_api" yaml:"custom_api" mapstructure:"custom_api"`
 		WhiteList []int64 `json:"white_list" yaml:"white_list" mapstructure:"white_list"`
 	} `json:"tg" yaml:"tg" mapstructure:"tg"`
-	QQ struct {
-	} `mapstructure:"qq"`
 	Web struct {
 		Enable     bool              `json:"enable" yaml:"enable" mapstructure:"enable"`
 		Account    string            `json:"account" yaml:"account" mapstructure:"account"`
 		Password   string            `json:"password" yaml:"password" mapstructure:"password"`
 		Host       string            `json:"host" yaml:"host" mapstructure:"host"`
 		Port       int               `json:"port" yaml:"port" mapstructure:"port"`
-		CommonUser map[string]string `json:"common_user" mapstructure:"common_user"`
-	} `json:"web" mapstructure:"web"`
+		CommonUser map[string]string `json:"common_user" yaml:"common_user" mapstructure:"common_user"`
+	} `json:"web" yaml:"web" mapstructure:"web"`
 	Cron           string `json:"cron" yaml:"cron" mapstructure:"cron"`
 	CronRandomWait int    `json:"cron_random_wait" yaml:"cron_random_wait" mapstructure:"cron_random_wait"`
 	EdgePath       string `json:"edge_path" yaml:"edge_path" mapstructure:"edge_path"`
@@ -125,6 +125,25 @@ func SetVersion(string2 string) {
  */
 func GetVersion() string {
 	return config.version
+}
+
+func SetConfig(config2 Config) error {
+	data, err := yaml.Marshal(&config2)
+	if err != nil {
+		log.Errorln("不能正确解析配置文件" + err.Error())
+		return err
+	}
+	err = viper.ReadConfig(bytes.NewReader(data))
+	if err != nil {
+		log.Errorln("viper不能正确解析配置文件" + err.Error())
+		return err
+	}
+	err = viper.WriteConfig()
+	if err != nil {
+		log.Errorln("保存到文件失败" + err.Error())
+		return err
+	}
+	return err
 }
 
 // InitConfig

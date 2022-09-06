@@ -11,6 +11,7 @@ import (
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils"
+	"github.com/johlanse/study_xxqg/utils/update"
 )
 
 // 将静态文件嵌入到可执行程序中来
@@ -42,6 +43,49 @@ func RouterInit() *gin.Engine {
 		})
 	})
 
+	router.POST("/restart", check(), func(ctx *gin.Context) {
+		if ctx.GetInt("level") == 1 {
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "",
+				Data:    nil,
+				Success: true,
+				Error:   "",
+			})
+			utils.Restart()
+		} else {
+			ctx.JSON(200, Resp{
+				Code:    401,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   "",
+			})
+		}
+	})
+
+	router.POST("/update", check(), func(ctx *gin.Context) {
+		if ctx.GetInt("level") == 1 {
+			update.SelfUpdate("", conf.GetVersion())
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "",
+				Data:    nil,
+				Success: true,
+				Error:   "",
+			})
+			utils.Restart()
+		} else {
+			ctx.JSON(200, Resp{
+				Code:    401,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   "",
+			})
+		}
+	})
+
 	if utils.FileIsExist("./config/flutter_xxqg/") {
 		router.StaticFS("/flutter_xxqg", http.Dir("./config/flutter_xxqg/"))
 	}
@@ -56,6 +100,11 @@ func RouterInit() *gin.Engine {
 	if utils.FileIsExist("./config/dist/") {
 		router.StaticFS("/dist", http.Dir("./config/dist/"))
 	}
+
+	config := router.Group("/config", check())
+
+	config.GET("", configGet())
+	config.POST("", configSet())
 
 	// 对用户管理的组
 	user := router.Group("/user", check())

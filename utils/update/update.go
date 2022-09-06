@@ -163,6 +163,11 @@ func SelfUpdate(github string, version string) {
 		github = "https://github.com"
 	}
 
+	if version == "unknown" {
+		log.Warningln("测试版本，不更新！")
+		return
+	}
+
 	log.Infof("正在检查更新.")
 	latest, err := lastVersion()
 	if err != nil {

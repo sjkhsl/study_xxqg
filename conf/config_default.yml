@@ -127,7 +127,7 @@ github_proxy: https://github.com
 hot_reload: true
 
 # 自定义消息推送，会在定时任务执行之前推送信息
-custom_message: ""
+custom_message: "自定义消息$$$https://www.baidu.com"
 # 自定义消息推送定时
 custom_cron: ""
 
