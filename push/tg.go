@@ -178,7 +178,7 @@ func (t *Telegram) Init() {
 					}
 				}
 				if !inWhiteList {
-					log.Infoln("已过滤非白名单的消息")
+					log.Warningln("已过滤非白名单的消息,若需允许用户使用，请将user_id添加到配置文件white_list中")
 					continue
 				}
 			}

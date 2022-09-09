@@ -34,6 +34,15 @@ func init() {
     push_id TEXT
 );
 `)
+
+	_, _ = db.Exec(`
+		create table wechat_user(
+		    open_id TEXT not null constraint user_pk primary key,
+		    remark TEXT default '',
+		    status INTEGER default 0,
+		    last_request_time INTEGER not null 
+		)
+	`)
 	_, _ = db.Exec(`alter table user
     add status integer default 1;
 `)

@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/imroc/req/v3"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
@@ -49,7 +48,7 @@ func GetAbout() string {
  * @return bool
  */
 func CheckUserCookie(cookies []*http.Cookie) (bool, error) {
-	client := req.C().DevMode()
+	client := GetClient()
 	response, err := client.R().SetCookies(cookies...).Get("https://pc-api.xuexi.cn/open/api/score/get")
 	if err != nil {
 		log.Errorln("获取用户总分错误" + err.Error())
@@ -99,7 +98,6 @@ func CheckQuestionDB() bool {
 		return false
 	}
 	return true
-
 }
 
 func DownloadDbFile() {

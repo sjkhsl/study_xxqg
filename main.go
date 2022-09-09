@@ -15,11 +15,11 @@ import (
 	rotates "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/robfig/cron/v3"
 	log "github.com/sirupsen/logrus"
-	easy "github.com/t-tomalak/logrus-easy-formatter"
+
+	nested "github.com/Lyrics-you/sail-logrus-formatter/sailor"
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils"
-
 	// "github.com/johlanse/study_xxqg/gui"
 	"github.com/johlanse/study_xxqg/lib"
 	"github.com/johlanse/study_xxqg/model"
@@ -37,6 +37,18 @@ var (
 var VERSION = "unknown"
 
 func init() {
+
+	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "******************************************************************")
+
+	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "软件仅可用户学习和个人使用，禁止用于任何商业活动！！！！")
+
+	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "软件仅可用户学习和个人使用，禁止用于任何商业活动！！！！")
+
+	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "软件仅可用户学习和个人使用，禁止用于任何商业活动！！！！")
+
+	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "******************************************************************")
+	time.Sleep(5 * time.Second)
+
 	flag.BoolVar(&u, "u", false, "更新应用")
 	flag.BoolVar(&i, "init", false, "init the app")
 	flag.StringVar(&configPath, "config", "./config/config.yml", "设置配置文件路径")
@@ -44,23 +56,40 @@ func init() {
 	// 初始化配置文件
 	conf.InitConfig(configPath, utils.Restart)
 	config = conf.GetConfig()
-	logFormatter := &easy.Formatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-		LogFormat:       "[%time%] [%lvl%]: %msg% \n",
-	}
 	w, err := rotates.New(path.Join("config", "logs", "%Y-%m-%d.log"), rotates.WithRotationTime(time.Hour*24))
 	if err != nil {
 		log.Errorf("rotates init err: %v", err)
 		panic(err)
 	}
-	gin.DefaultWriter = io.MultiWriter(w, os.Stdout)
+	gin.DefaultWriter = io.MultiWriter(w, &utils.LogWriter{})
 	log.SetOutput(io.MultiWriter(w, os.Stdout))
-	log.SetFormatter(logFormatter)
+
 	level, err := log.ParseLevel(config.LogLevel)
 	if err != nil {
 		log.SetLevel(log.DebugLevel)
 	}
 	log.SetLevel(level)
+
+	showPosition := false
+
+	if level == log.DebugLevel {
+		showPosition = true
+	}
+	log.SetFormatter(&nested.Formatter{
+		FieldsOrder:           nil,
+		TimeStampFormat:       "2006-01-02 15:04:05",
+		CharStampFormat:       "",
+		HideKeys:              false,
+		Position:              showPosition,
+		Colors:                true,
+		FieldsColors:          true,
+		FieldsSpace:           true,
+		ShowFullLevel:         false,
+		LowerCaseLevel:        true,
+		TrimMessages:          true,
+		CallerFirst:           false,
+		CustomCallerFormatter: nil,
+	})
 	if !utils.CheckQuestionDB() {
 		utils.DownloadDbFile()
 		log.Errorln("题库文件不存在或已损坏，请手动前往 https://github.com/johlanse/study_xxqg/blob/main/conf/QuestionBank.db 下载并放入程序根目录")
