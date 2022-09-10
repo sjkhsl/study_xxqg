@@ -23,7 +23,7 @@ func (d *Ding) Send() func(id string, kind string, message string) {
 		if kind == "flush" {
 
 			if strings.Contains(message, "login.xuexi.cn") {
-				message = fmt.Sprintf("[点我登录](%v)", message)
+				message = fmt.Sprintf("[点我登录](%v)", "dtxuexi://appclient/page/study_feeds?url="+strings.Split(message, "?")[1])
 			}
 
 			err := s.SendMessage(map[string]interface{}{
