@@ -115,13 +115,18 @@ func (c *Core) LearnArticle(user *model.User) {
 	if score.Content["article"].CurrentScore < score.Content["article"].MaxScore {
 		log.Infoln("开始加载文章学习模块")
 
-		context, err := c.browser.NewContext()
+		context, err := c.browser.NewContext(playwright.BrowserNewContextOptions{
+			Viewport: &playwright.BrowserNewContextOptionsViewport{
+				Width:  playwright.Int(1920),
+				Height: playwright.Int(1080),
+			}})
 		_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
 			Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
 		if err != nil {
 			log.Errorln("创建实例对象错误" + err.Error())
 			return
 		}
+
 		defer func(context playwright.BrowserContext) {
 			err := context.Close()
 			if err != nil {
@@ -228,7 +233,11 @@ func (c *Core) LearnVideo(user *model.User) {
 		// core := Core{}
 		// core.Init()
 
-		context, err := c.browser.NewContext()
+		context, err := c.browser.NewContext(playwright.BrowserNewContextOptions{
+			Viewport: &playwright.BrowserNewContextOptionsViewport{
+				Width:  playwright.Int(1920),
+				Height: playwright.Int(1080),
+			}})
 		_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
 			Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
 		if err != nil {
