@@ -112,6 +112,9 @@ func RouterInit() *gin.Engine {
 	user.POST("", addUser())
 	// 获取所以已登陆的用户
 	user.GET("", getUsers())
+
+	user.GET("/expired", getExpiredUser())
+
 	// 删除用户
 	user.DELETE("", deleteUser())
 

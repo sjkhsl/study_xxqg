@@ -3,9 +3,8 @@ import './App.css';
 import {Button, Dialog, Divider, Form, Input, List, Modal, NavBar, Popup, TextArea, Toast,} from "antd-mobile";
 import {UnorderedListOutline} from "antd-mobile-icons";
 import {ListItem} from "antd-mobile/es/components/list/list-item";
-import {checkQrCode, getLog, getScore, getToken, getUsers, getLink, stopStudy, study, login, checkToken,getAbout,deleteUser} from "./utils/api";
+import {checkQrCode, getLog, getScore, getToken, getUsers, getLink, stopStudy, study, login, checkToken,getAbout,deleteUser, getExpiredUsers} from "./utils/api";
 import QrCode from 'qrcode.react';
-import * as util from "util";
 
 
 class App extends React.Component<any, any> {
@@ -304,7 +303,8 @@ class Users extends Component<any, any>{
   constructor(props: any) {
     super(props);
     this.state = {
-      users:[]
+      users:[],
+      expired_users:[]
     };
   }
 
@@ -313,6 +313,13 @@ class Users extends Component<any, any>{
       console.log(users)
       this.setState({
         users: users.data
+      })
+    })
+
+    getExpiredUsers().then(users => {
+      console.log(users)
+      this.setState({
+        expired_users: users.data
       })
     })
 
@@ -426,6 +433,22 @@ class Users extends Component<any, any>{
           </>
       )
     }
+
+    for (let i = 0; i < this.state.expired_users.length; i++) {
+      console.log(this.state.expired_users[i].uid)
+      elements.push(
+          <>
+            <ListItem key={this.state.expired_users[i].uid} style={{border:"blue soild 1px",backgroundColor:"#cdced0"}}>
+              <h3>姓名：{this.state.expired_users[i].nick}</h3>
+              <h3>UID: {this.state.expired_users[i].uid}</h3>
+              <h3>登录时间：{this.format(this.state.expired_users[i].login_time)}</h3>
+              <Button  style={{display: this.props.level !== 1 ? "none" : "inline"}} onClick={this.delete_user.bind(this,this.state.expired_users[i].uid,this.state.expired_users[i].nick)} color={"danger"} block={true}>删除用户</Button>
+            </ListItem>
+            <Divider />
+          </>
+      )
+    }
+
     if (this.state.users.length === 0){
       elements.push(<>
         <span style={{color:"red"}}>未获取到有效用户</span>

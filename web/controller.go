@@ -3,6 +3,7 @@
 package web
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -155,6 +156,39 @@ func addUser() gin.HandlerFunc {
 			Code:    200,
 			Message: "登录成功",
 			Data:    "登录成功",
+			Success: true,
+			Error:   "",
+		})
+	}
+}
+
+func getExpiredUser() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		failUser, err := model.QueryFailUser()
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(200, Resp{
+					Code:    200,
+					Message: "",
+					Data:    []model.User{},
+					Success: true,
+					Error:   "",
+				})
+			} else {
+				ctx.JSON(502, Resp{
+					Code:    502,
+					Message: "",
+					Data:    []model.User{},
+					Success: false,
+					Error:   err.Error(),
+				})
+			}
+			return
+		}
+		ctx.JSON(200, Resp{
+			Code:    200,
+			Message: "",
+			Data:    failUser,
 			Success: true,
 			Error:   "",
 		})

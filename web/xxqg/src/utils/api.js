@@ -73,6 +73,12 @@ export async function getUsers(){
     return resp.data
 }
 
+
+export async function getExpiredUsers(){
+    let resp = await http.get(base+"/user/expired");
+    return resp.data
+}
+
 export async function getScore(token) {
     let resp = await http.get(base+"/score?token="+token);
     return resp.data;
