@@ -1,5 +1,7 @@
 package model
 
+import "database/sql"
+
 type WechatUser struct {
 	OpenID          string `json:"open_id"`
 	Remark          string `json:"remark"`
@@ -33,6 +35,9 @@ func FindWechatUser(openID string) (*WechatUser, error) {
 	ping()
 	w := new(WechatUser)
 	err := db.QueryRow(`select * from wechat_user  where open_id=?;`, openID).Scan(&w.OpenID, &w.Remark, &w.Status, &w.LastRequestTime)
+	if err == sql.ErrNoRows {
+		return nil, err
+	}
 	return w, err
 }
 

@@ -1,6 +1,7 @@
 package push
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -273,21 +274,26 @@ func handleTextPass(id, msg string) {
 *  @param msg
  */
 func handleEventUseRequest(id, msg string) {
-	count := model.WechatUserCount(id)
-	if count < 0 {
-		err := model.AddWechatUser(&model.WechatUser{
-			OpenID:          id,
-			Remark:          "",
-			Status:          0,
-			LastRequestTime: time.Now().Unix(),
-		})
-		if err != nil {
-			log.Errorln("添加用户出现错误" + err.Error())
+	user, err := model.FindWechatUser(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err := model.AddWechatUser(&model.WechatUser{
+				OpenID:          id,
+				Remark:          "",
+				Status:          0,
+				LastRequestTime: time.Now().Unix(),
+			})
+			if err != nil {
+				log.Errorln("添加用户出现错误" + err.Error())
+				return
+			}
+			sendMsg(conf.GetConfig().Wechat.SuperOpenID, fmt.Sprintf("用户%v申请使用测试号，通过则回复信息：\n通过 %v\n\n拒绝则回复:\n拒绝 %v", id, id, id))
+		} else {
+			log.Errorln("查询用户出现未知错误" + err.Error())
 			return
 		}
-		sendMsg(conf.GetConfig().Wechat.SuperOpenID, fmt.Sprintf("用户%v申请使用测试号，通过则回复信息：\n通过 %v\n\n拒绝则回复:\n拒绝 %v", id, id, id))
+
 	} else {
-		user, err := model.FindWechatUser(id)
 		if err != nil {
 			log.Errorln("查询wechat用户错误" + err.Error())
 			return
