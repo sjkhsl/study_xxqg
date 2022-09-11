@@ -166,11 +166,12 @@ func getExpiredUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		failUser, err := model.QueryFailUser()
 		if err != nil {
+			nilArray := make([]interface{}, 0)
 			if err == sql.ErrNoRows {
 				ctx.JSON(200, Resp{
 					Code:    200,
 					Message: "",
-					Data:    []interface{}{},
+					Data:    nilArray,
 					Success: true,
 					Error:   "",
 				})
@@ -178,7 +179,7 @@ func getExpiredUser() gin.HandlerFunc {
 				ctx.JSON(502, Resp{
 					Code:    502,
 					Message: "",
-					Data:    []interface{}{},
+					Data:    nilArray,
 					Success: false,
 					Error:   err.Error(),
 				})

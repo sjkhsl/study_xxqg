@@ -318,9 +318,12 @@ class Users extends Component<any, any>{
 
     getExpiredUsers().then(users => {
       console.log(users)
-      this.setState({
-        expired_users: users.data
-      })
+      if (users.data !== null){
+        this.setState({
+          expired_users: users.data
+        })
+      }
+
     })
 
   }
@@ -399,9 +402,12 @@ class Users extends Component<any, any>{
           if (data.success){
             getUsers().then(users =>{
               console.log(users)
-              this.setState({
-                users: users.data
-              })
+              if (users.data != null){
+                this.setState({
+                  users: users.data
+                })
+              }
+
             })
           }else {
             Dialog.show({content:data.error})
