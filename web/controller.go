@@ -170,7 +170,7 @@ func getExpiredUser() gin.HandlerFunc {
 				ctx.JSON(200, Resp{
 					Code:    200,
 					Message: "",
-					Data:    []model.User{},
+					Data:    []interface{}{},
 					Success: true,
 					Error:   "",
 				})
@@ -178,7 +178,7 @@ func getExpiredUser() gin.HandlerFunc {
 				ctx.JSON(502, Resp{
 					Code:    502,
 					Message: "",
-					Data:    []model.User{},
+					Data:    []interface{}{},
 					Success: false,
 					Error:   err.Error(),
 				})
