@@ -276,7 +276,7 @@ func do(m string) {
 		}
 
 		score, _ = lib.GetUserScore(u.ToCookies())
-		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟</br>%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
+		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟\n%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
 		core2.Push(u.PushId, "flush", message)
 	}
 
