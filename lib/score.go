@@ -122,8 +122,8 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 
 func PrintScore(score Score) string {
 	result := ""
-	result += fmt.Sprintf("当前学习总积分：%d\n 今日得分：%d\n", score.TotalScore, score.TodayScore)
-	result += fmt.Sprintf("[%v] [INFO]: 登录：%v/%v\n  文章学习：%v/%v\n  视频学习：%v/%v\n  视频时长：%v/%v\n[%v] [INFO]: 每日答题：%v/%v\n  每周答题：%v/%v\n  专项答题：%v/%v",
+	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
+	result += fmt.Sprintf("[%v] [INFO]: 登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n视频时长：%v/%v\n[%v] [INFO]: 每日答题：%v/%v\n每周答题：%v/%v\n专项答题：%v/%v",
 		time.Now().Format("2006-01-02 15:04:05"),
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
@@ -140,8 +140,8 @@ func PrintScore(score Score) string {
 
 func FormatScore(score Score) string {
 	result := ""
-	result += fmt.Sprintf("当前学习总积分：%d\n 今日得分：%d\n", score.TotalScore, score.TodayScore)
-	result += fmt.Sprintf("登录：%v/%v\n  文章学习：%v/%v\n  视频学习：%v/%v\n  视频时长：%v/%v\n  每日答题：%v/%v\n  每周答题：%v/%v\n  专项答题：%v/%v",
+	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
+	result += fmt.Sprintf("登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n视频时长：%v/%v\n每日答题：%v/%v\n每周答题：%v/%v\n专项答题：%v/%v",
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
@@ -155,8 +155,8 @@ func FormatScore(score Score) string {
 
 func FormatScoreShort(score Score) string {
 	result := ""
-	result += fmt.Sprintf("当前学习总积分：%d\n 今日得分：%d\n", score.TotalScore, score.TodayScore)
-	result += fmt.Sprintf("登录：%v/%v\n  文章学习：%v/%v\n  视频学习：%v/%v\n  视频时长：%v/%v\n  每日答题：%v/%v\n  每周答题：%v/%v\n  专项答题：%v/%v",
+	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
+	result += fmt.Sprintf("登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n视频时长：%v/%v\n每日答题：%v/%v\n每周答题：%v/%v\n专项答题：%v/%v",
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
