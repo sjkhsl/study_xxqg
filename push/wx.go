@@ -590,9 +590,13 @@ func handleStartStudy(id string, msg string) {
 		sendMsg(id, fmt.Sprintf("开始学习第%d个用户，用户名：%v", i+1, user.Nick))
 		core.LearnArticle(user)
 		core.LearnVideo(user)
-		core.RespondDaily(user, "daily")
-		core.RespondDaily(user, "weekly")
-		core.RespondDaily(user, "special")
+		if conf.GetConfig().Model == 2 {
+			core.RespondDaily(user, "daily")
+		} else if conf.GetConfig().Model == 3 {
+			core.RespondDaily(user, "weekly")
+			core.RespondDaily(user, "special")
+		}
+
 		datas1.Delete(user.UID)
 		score, _ := lib.GetUserScore(user.ToCookies())
 		sendMsg(id, fmt.Sprintf("第%d个用户%v学习完成，学习积分\n%v", i+1, user.Nick, lib.FormatScore(score)))

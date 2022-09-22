@@ -21,6 +21,10 @@
   然后查看报错内容截图并在[github](https://github.com/johlanse/study_xxqg/issues) 提交issue
 ```
 
++ ### web端账号密码
+```yaml
+  web端账号密码默认都是admin，不是你学习强国的手机号，需要修改可自行修改配置文件
+```
 
 + ### 关于cookie的时间问题
 ```yaml
@@ -31,13 +35,6 @@
 如果你想让访问间隔时间更短或者更长，可以通过添加环境变量 CHECK_ENV 为cron值
 ```
 
-+ ### 浏览器中登录不上怎么办？显示一个白条没反应
-
-```yaml
-浏览器登录是使用的study_xxqg的配置文件中的账号密码，
-是为了防止滥用，不是强国的账号密码，需要更改直接修改
-config.yml文件然后重启就可以
-```
 
 + ### windows下出现找不到浏览器的问题
 
@@ -55,9 +52,9 @@ config.yml文件然后重启就可以
   
   apt-get install chromium
  
-  ln -s /usr/bin/chromium ~/.cache/ms-playwright/chromium-907428/chrome-linux/chrome
+  ln -s /usr/bin/chromium ./tools/browser/chromium-978106/chrome-linux/chrome
  
-  ln -s /usr/bin/node ~/.cache/ms-playwright-go/1.14.0/node
+  ln -s /usr/bin/node ./tools/driver/ms-playwright-go/1.20.0-beta-1647057403000/node
 ```
 
 
@@ -95,30 +92,16 @@ study_xxqg进程会在运行的时候将pid输出到目录下的pid.pid文件，
   Missing libraries are:
       libgtk-3.so.0
       libgdk-3.so.0
-      libX11-xcb.so.1
-      libXcomposite.so.1
-      libXcursor.so.1
-      libXdamage.so.1
-      libXfixes.so.3
-      libXi.so.6
-      libXrender.so.1
-      libpangocairo-1.0.so.0
-      libpango-1.0.so.0
-      libharfbuzz.so.0
-      libatk-1.0.so.0
-      libcairo-gobject.so.2
-      libcairo.so.2
-      libgdk_pixbuf-2.0.so.0
-      libdbus-glib-1.so.2
-      libxcb-shm.so.0
-      libpangoft2-1.0.so.0
-      libXt.so.6
+
+```
+```shell
+sudo ./tools/driver/ms-playwright-go/1.20.0-beta-1647057403000/playwright.sh install-deps
 
 ```
 
-~~在debian11的系统上解决方式为：~~
+> 若运行后显示未找到apt-get，可百度对应系统安装apt-get的方法
 
-使用docker可以快速解决
+
 
 
 + ### 为什么运行了就卡住了

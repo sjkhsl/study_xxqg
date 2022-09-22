@@ -91,8 +91,8 @@ func init() {
 		CustomCallerFormatter: nil,
 	})
 	if !utils.CheckQuestionDB() {
-		utils.DownloadDbFile()
-		log.Errorln("题库文件不存在或已损坏，请手动前往 https://github.com/johlanse/study_xxqg/blob/main/conf/QuestionBank.db 下载并放入程序根目录")
+		go utils.DownloadDbFile()
+		//log.Errorln("题库文件不存在或已损坏，请手动前往 https://github.com/johlanse/study_xxqg/blob/main/conf/QuestionBank.db 下载并放入程序根目录")
 	}
 }
 
@@ -258,7 +258,11 @@ func do(m string) {
 			}
 		}()
 		startTime := time.Now()
+
 		core2.LearnArticle(u)
+
+		core2.LearnVideo(u)
+
 		core2.LearnVideo(u)
 		if config.Model == 2 {
 			core2.RespondDaily(u, "daily")
@@ -279,6 +283,21 @@ func do(m string) {
 		message := fmt.Sprintf("%v 学习完成,用时%.1f分钟\n%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
 		core2.Push(u.PushId, "flush", message)
 	}
+
+	c := make(chan *model.User, 1)
+
+	go func() {
+		for true {
+			u := <-c
+			if u.UID == "" {
+				break
+			} else {
+				l := &lib.Core{Push: getPush, ShowBrowser: config.ShowBrowser}
+				l.Init()
+				study(l, u)
+			}
+		}
+	}()
 
 	failUser, _ := model.QueryFailUser()
 	for _, user := range failUser {

@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/guonaihong/gout"
 	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/johlanse/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 var (
@@ -73,11 +73,12 @@ func getLinks(model string) ([]Link, error) {
 		resp []byte
 	)
 
-	err := gout.GET(learnUrl + "?_st=" + strconv.Itoa(UID)).BindBody(&resp).Do()
+	response, err := utils.GetClient().R().SetQueryParam("_st", strconv.Itoa(UID)).Get(learnUrl)
 	if err != nil {
-		log.Errorln("请求连接列表出现错误" + err.Error())
+		log.Errorln("请求链接列表出现错误！" + err.Error())
 		return nil, err
 	}
+	resp = response.Bytes()
 
 	var links []Link
 	err = json.Unmarshal(resp, &links)

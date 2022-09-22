@@ -2,9 +2,11 @@ package push
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 type PushPlus struct {
@@ -13,13 +15,13 @@ type PushPlus struct {
 
 func (p *PushPlus) Init() func(id string, kind, message string) {
 	send := func(data string) {
-		err := gout.POST("http://www.pushplus.plus/send").SetJSON(gout.H{
+		_, err := utils.GetClient().R().SetBodyJsonMarshal(map[string]string{
 			"token":    p.Token,
 			"title":    "study_xxqg",
 			"content":  data,
 			"template": "markdown",
 			"channel":  "wechat",
-		}).Do()
+		}).Post("http://www.pushplus.plus/send")
 		if err != nil {
 			log.Errorln(err.Error())
 			return
@@ -27,6 +29,7 @@ func (p *PushPlus) Init() func(id string, kind, message string) {
 	}
 
 	return func(id string, kind, message string) {
+		message = strings.ReplaceAll(message, "\n", "<br/>")
 		switch {
 		case kind == "image":
 			message = fmt.Sprintf("![](%v)", "data:image/png;base64,"+message)

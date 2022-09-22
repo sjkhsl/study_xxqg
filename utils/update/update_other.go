@@ -10,8 +10,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-
-	"github.com/klauspost/compress/gzip"
 )
 
 // update study_xxqg自我更新

@@ -3,11 +3,11 @@ package lib
 import (
 	"net/http"
 
-	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/johlanse/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 // GetUserInfo
@@ -20,16 +20,12 @@ import (
  */
 func GetUserInfo(cookies []*http.Cookie) (string, string, error) {
 	var resp []byte
-	err := gout.GET(userInfoUrl).
-		SetCookies(cookies...).
-		SetHeader(gout.H{
-			"Cache-Control": "no-cache",
-		}).BindBody(&resp).Do()
+	response, err := utils.GetClient().R().SetCookies(cookies...).SetHeader("Cache-Control", "no-cache").Get(userInfoUrl)
 	if err != nil {
-		log.Errorln("获取用户信息失败")
-
+		log.Errorln("获取用户信息失败" + err.Error())
 		return "", "", err
 	}
+	resp = response.Bytes()
 	log.Debugln("[user] 用户信息：", gjson.GetBytes(resp, "@this|@pretty").String())
 	uid := gjson.GetBytes(resp, "data.uid").String()
 	nick := gjson.GetBytes(resp, "data.nick").String()

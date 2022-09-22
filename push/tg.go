@@ -549,16 +549,14 @@ func study(bot *Telegram, from int64, args []string) {
 		defer datas.Delete(u)
 		core.Init()
 		defer core.Quit()
-		if config.Model == 1 {
-			core.LearnArticle(user)
-			core.LearnVideo(user)
-		} else if config.Model == 2 {
-			core.LearnArticle(user)
-			core.LearnVideo(user)
+
+		core.LearnArticle(user)
+
+		core.LearnVideo(user)
+
+		if config.Model == 2 {
 			core.RespondDaily(user, "daily")
 		} else if config.Model == 3 {
-			core.LearnArticle(user)
-			core.LearnVideo(user)
 			core.RespondDaily(user, "daily")
 			core.RespondDaily(user, "weekly")
 			core.RespondDaily(user, "special")

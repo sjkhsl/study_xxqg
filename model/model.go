@@ -54,7 +54,7 @@ func initQuestionDb() {
 		var err error
 		db1, err = sql.Open("sqlite", "./QuestionBank.db")
 		if err != nil {
-			log.Errorln("题目数据库打开失败，请检查config目录权限")
+			log.Errorln("题目数据库打开失败，请检查QuestionDB是否存在")
 			log.Panicln(err.Error())
 		}
 	})

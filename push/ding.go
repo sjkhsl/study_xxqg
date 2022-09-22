@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guonaihong/gout"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 type Ding struct {
@@ -85,8 +86,11 @@ func MarkDown(title, text string, ats ...string) map[string]interface{} {
 // SendMessage Function to send message
 //goland:noinspection GoUnhandledErrorResult
 func (t *TypeSecret) SendMessage(data map[string]interface{}) error {
-	gout.POST(t.getURL()).SetJSON(data).Do()
-	return nil
+	_, err := utils.GetClient().R().SetBodyJsonMarshal(data).Post(t.getURL())
+	if err != nil {
+		log.Errorln(err.Error())
+	}
+	return err
 }
 
 func (t *TypeSecret) hmacSha256(stringToSign string, secret string) string {

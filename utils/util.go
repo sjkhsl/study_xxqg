@@ -61,7 +61,7 @@ func CheckUserCookie(cookies []*http.Cookie) (bool, error) {
 }
 
 var (
-	dbSum = "a71c289c9423dd71a88d1fd9db48d51479a4beed8e013f9519c691f524613cff"
+	dbSum = "d6e455f03b419af108cced07ea1d17f8268400ad1b6d80cb75d58e952a5609bf"
 )
 
 // CheckQuestionDB
@@ -101,8 +101,15 @@ func CheckQuestionDB() bool {
 }
 
 func DownloadDbFile() {
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Errorln("下载题库文件意外错误")
+			log.Errorln(err)
+		}
+	}()
 	log.Infoln("正在从github下载题库文件！")
-	response, err := http.Get("https://github.com/johlanse/study_xxqg/releases/download/v1.0.34/QuestionBank.db")
+	response, err := http.Get("https://github.com/johlanse/study_xxqg/releases/download/v1.0.36/QuestionBank.db")
 	if err != nil {
 		log.Errorln("下载db文件错误" + err.Error())
 		return

@@ -1,13 +1,12 @@
 package update
 
 import (
+	"archive/zip"
 	"bytes"
 	"crypto/sha256"
 	"errors"
 	"io"
 	"net/http"
-
-	"github.com/klauspost/compress/zip"
 )
 
 // update study_xxqg自我更新
