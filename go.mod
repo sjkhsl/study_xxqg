@@ -15,6 +15,7 @@ require (
 	github.com/imroc/req/v3 v3.8.2
 	github.com/johlanse/wechat v0.0.0-20220909140933-49a96a4c0412
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
+	github.com/klauspost/compress v1.15.10
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/playwright-community/playwright-go v0.2000.1
