@@ -6,6 +6,68 @@ import (
 	"github.com/johlanse/study_xxqg/conf"
 )
 
+func configFileGet() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		level := ctx.GetInt("level")
+		if level != 1 {
+			ctx.JSON(200, Resp{
+				Code:    403,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   "",
+			})
+			return
+		}
+		ctx.JSON(200, Resp{
+			Code:    200,
+			Message: "获取成功",
+			Data:    conf.GetConfigFile(),
+			Success: true,
+			Error:   "",
+		})
+
+	}
+}
+
+func configFileSet() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		level := ctx.GetInt("level")
+		if level != 1 {
+			ctx.JSON(200, Resp{
+				Code:    403,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   "",
+			})
+			return
+		}
+		var body map[string]string
+		_ = ctx.ShouldBindJSON(&body)
+
+		err := conf.SaveConfigFile(body["data"])
+		if err != nil {
+			ctx.JSON(200, Resp{
+				Code:    503,
+				Message: "",
+				Data:    nil,
+				Success: false,
+				Error:   err.Error(),
+			})
+			return
+		}
+		ctx.JSON(200, Resp{
+			Code:    200,
+			Message: "获取成功",
+			Data:    conf.GetConfigFile(),
+			Success: true,
+			Error:   "",
+		})
+
+	}
+}
+
 func configGet() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		level := ctx.GetInt("level")

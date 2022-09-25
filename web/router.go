@@ -105,6 +105,8 @@ func RouterInit() *gin.Engine {
 
 	config.GET("", configGet())
 	config.POST("", configSet())
+	config.GET("/file", configFileGet())
+	config.POST("/file", configFileSet())
 
 	// 对用户管理的组
 	user := router.Group("/user", check())

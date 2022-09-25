@@ -106,6 +106,8 @@ var (
 	config = Config{
 		Model: 1,
 	}
+
+	configPath = "./config/config.yml"
 )
 
 //go:embed config_default.yml
@@ -154,7 +156,7 @@ func InitConfig(path string, restart func()) {
 	if path == "" {
 		path = "./config/config.yml"
 	}
-
+	configPath = path
 	pathDir := strings.TrimSuffix(path, "config.yml")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(pathDir)
@@ -177,6 +179,7 @@ func InitConfig(path string, restart func()) {
 	viper.SetDefault("scheme", "https://johlanse.github.io/study_xxqg/scheme.html?")
 	viper.SetDefault("special_min_score", 10)
 	viper.SetDefault("tg.custom_api", "https://api.telegram.org")
+	viper.AutomaticEnv()
 	err := viper.Unmarshal(&config, func(decoderConfig *mapstructure.DecoderConfig) {
 
 	})
@@ -227,4 +230,24 @@ func InitConfig(path string, restart func()) {
  */
 func GetConfig() Config {
 	return config
+}
+
+// GetConfigFile
+/* @Description:
+*  @return string
+ */
+func GetConfigFile() string {
+	file, err := os.ReadFile(configPath)
+	if err != nil {
+		return err.Error()
+	}
+	return string(file)
+}
+
+func SaveConfigFile(data string) error {
+	err := os.WriteFile(configPath, []byte(data), 0666)
+	if err != nil {
+		return err
+	}
+	return err
 }
