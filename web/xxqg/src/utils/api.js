@@ -83,6 +83,11 @@ export async function restart() {
     return resp.data;
 }
 
+export async function update() {
+    let resp = await http.post(base+"/update");
+    return resp.data;
+}
+
 export async function saveConfig(data) {
     let resp = await http.post(base+"/config/file",{
         "data":data
