@@ -9,7 +9,7 @@
 
 ### 一键安装脚本
 ```shell
-wget -o tdlib_install.py https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py
+wget -o study_xxqg_install.py https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py
 ```
 
 ## docker运行
