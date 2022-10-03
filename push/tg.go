@@ -29,6 +29,12 @@ var (
 )
 
 func TgInit() {
+	defer func() {
+		recover()
+		tgPush = func(id string, kind string, message string) {
+
+		}
+	}()
 	config := conf.GetConfig()
 	log.Infoln("已采用tg交互模式")
 	telegram := Telegram{
