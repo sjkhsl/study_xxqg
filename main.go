@@ -394,7 +394,7 @@ func runBack() {
 			_ = cmd.Wait()
 			if cmd.ProcessState.Exited() {
 				log.Infoln(cmd.ProcessState)
-				if cmd.ProcessState.ExitCode() != 1001 {
+				if cmd.ProcessState.ExitCode() != 201 {
 					break
 				} else {
 					log.Infoln("检测到重启,开始重启程序")

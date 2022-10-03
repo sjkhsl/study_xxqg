@@ -28,7 +28,7 @@ func Restart() {
 	//	cmd.Start()
 	//	os.Exit(3)
 	//})
-	os.Exit(1001)
+	os.Exit(201)
 
 }
 
