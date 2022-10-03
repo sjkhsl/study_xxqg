@@ -7,6 +7,10 @@
 + 使用vim修改对应配置文件，linux建议使用tg模式运行，详情配置参考[配置](../config.md),推送方式查看[push](../push.md)
 + 再次运行即可
 
+### 一键安装脚本
+```shell
+wget -o tdlib_install.py https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py
+```
 
 ## docker运行
 
