@@ -6,9 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
-	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -21,16 +18,17 @@ import (
 /* @Description:
  */
 func Restart() {
-	once := sync.Once{}
-	once.Do(func() {
-		log.Infoln("程序启动命令： " + strings.Join(os.Args, " "))
-		cmd := exec.Command(strings.Join(os.Args, " "))
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-		cmd.Start()
-		os.Exit(3)
-	})
+	//once := sync.Once{}
+	//once.Do(func() {
+	//	log.Infoln("程序启动命令： " + strings.Join(os.Args, " "))
+	//	cmd := exec.Command(strings.Join(os.Args, " "))
+	//	cmd.Stdout = os.Stdout
+	//	cmd.Stderr = os.Stderr
+	//	cmd.Stdin = os.Stdin
+	//	cmd.Start()
+	//	os.Exit(3)
+	//})
+	os.Exit(1001)
 
 }
 

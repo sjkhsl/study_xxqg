@@ -389,6 +389,7 @@ func (c *Core) initNotWindows() {
 func (c *Core) Quit() {
 	err := c.browser.Close()
 	if err != nil {
+		log.Errorln("关闭浏览器失败" + err.Error())
 		return
 	}
 	err = c.pw.Stop()

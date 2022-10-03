@@ -45,7 +45,7 @@ class Home extends Component<any, any>{
 
 
             </Routes>
-            <div style={{position:"fixed","height":"60px",width:"100%",bottom:0,zIndex:9}}>
+            <div style={{position:"fixed","height":"60px",width:"100%",bottom:0,zIndex:9,color: "#f0f", backgroundColor: "#5f6d6e"}}>
 
                 <TabBar activeKey={this.props.location.pathname} onChange={value => this.props.navigate("/home"+value)}>
                     {tableItems.map(item => (

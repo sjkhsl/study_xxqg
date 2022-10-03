@@ -12,6 +12,7 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
 	github.com/google/uuid v1.3.0
+	github.com/huoxue1/xdaemon v0.0.0-20221003021252-8ce95c07edb0
 	github.com/imroc/req/v3 v3.8.2
 	github.com/johlanse/wechat v0.0.0-20220909140933-49a96a4c0412
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0

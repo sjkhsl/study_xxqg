@@ -159,6 +159,8 @@ github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/hcl v1.0.0 h1:0Anlzjpi4vEasTeNFn2mLJgTSwt0+6sfsiTG8qcWGx4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
+github.com/huoxue1/xdaemon v0.0.0-20221003021252-8ce95c07edb0 h1:SePyM2Way5A1kaXfMfaES0uBrsiDEJqKGxmFCpbLcQc=
+github.com/huoxue1/xdaemon v0.0.0-20221003021252-8ce95c07edb0/go.mod h1:2o/jLOwlNdu8qpZc0nYDbPGhPgKkpkG8JdcQn7HY1gA=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/imroc/req/v3 v3.8.2 h1:wFZ7B0dclCQyjClP5GwXRboUGIek5l0mCpodrGgT01c=

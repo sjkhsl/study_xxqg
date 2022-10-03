@@ -7,8 +7,11 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"os/exec"
+	"os/signal"
 	"path"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +20,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	nested "github.com/Lyrics-you/sail-logrus-formatter/sailor"
+	"github.com/huoxue1/xdaemon"
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils"
@@ -37,7 +41,7 @@ var (
 var VERSION = "unknown"
 
 func init() {
-
+	runBack()
 	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "******************************************************************")
 
 	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "软件仅可用户学习和个人使用，禁止用于任何商业活动！！！！")
@@ -47,7 +51,7 @@ func init() {
 	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "软件仅可用户学习和个人使用，禁止用于任何商业活动！！！！")
 
 	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "******************************************************************")
-	time.Sleep(5 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	flag.BoolVar(&u, "u", false, "更新应用")
 	flag.BoolVar(&i, "init", false, "init the app")
@@ -235,10 +239,6 @@ func do(m string) {
 		}
 	}()
 
-	log.Infoln(` 刷课模式，默认为1，
- 1：只刷文章何视频
- 2：只刷文章和视频和每日答题
- 3：刷文章和视频和每日答题每周答题和专项答题`)
 	log.Infoln("检测到模式", config.Model)
 
 	getPush := push.GetPush(config)
@@ -284,20 +284,20 @@ func do(m string) {
 		core2.Push(u.PushId, "flush", message)
 	}
 
-	c := make(chan *model.User, 1)
-
-	go func() {
-		for true {
-			u := <-c
-			if u.UID == "" {
-				break
-			} else {
-				l := &lib.Core{Push: getPush, ShowBrowser: config.ShowBrowser}
-				l.Init()
-				study(l, u)
-			}
-		}
-	}()
+	//c := make(chan *model.User, 1)
+	//
+	//go func() {
+	//	for true {
+	//		u := <-c
+	//		if u.UID == "" {
+	//			break
+	//		} else {
+	//			l := &lib.Core{Push: getPush, ShowBrowser: config.ShowBrowser}
+	//			l.Init()
+	//			study(l, u)
+	//		}
+	//	}
+	//}()
 
 	failUser, _ := model.QueryFailUser()
 	for _, user := range failUser {
@@ -381,4 +381,39 @@ func do(m string) {
 
 	study(core, user)
 	core.Push(user.PushId, "flush", "")
+}
+
+func runBack() {
+	cmd, err := xdaemon.Background(os.Stdout, false)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	if xdaemon.IsParent() {
+		go onKill(cmd)
+		for true {
+			_ = cmd.Wait()
+			if cmd.ProcessState.Exited() {
+				if cmd.ProcessState.ExitCode() != 1001 {
+					break
+				}
+			}
+			cmd, err = xdaemon.Background(os.Stdout, false)
+			if err != nil {
+				return
+			}
+		}
+		os.Exit(0)
+	}
+}
+
+func onKill(cmd *exec.Cmd) {
+	c := make(chan os.Signal)
+	//监听指定信号 ctrl+c kill
+	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	<-c
+
+	if cmd.Process != nil {
+		cmd.Process.Kill()
+	}
+	os.Exit(1)
 }
