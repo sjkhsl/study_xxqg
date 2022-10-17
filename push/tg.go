@@ -30,9 +30,11 @@ var (
 
 func TgInit() {
 	defer func() {
-		recover()
-		tgPush = func(id string, kind string, message string) {
+		err := recover()
+		if err != nil {
+			tgPush = func(id string, kind string, message string) {
 
+			}
 		}
 	}()
 	config := conf.GetConfig()
