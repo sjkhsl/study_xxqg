@@ -42,6 +42,11 @@ func CheckUpdate(version string) string {
 		log.Warnf("检查更新失败: %v", err)
 		return ""
 	}
+	if strings.Contains(latest, "must") {
+		log.Infoln("检测到强制更新，开始强制更新")
+		SelfUpdate("", version)
+		return ""
+	}
 	if versionCompare(version, latest) {
 		log.Infof("当前有更新的 study_xxqg 可供更新, 请前往 https://github.com/johlanse/study_xxqg/releases 下载.")
 		log.Infof("当前版本: %v 最新版本: %v", version, latest)
@@ -76,6 +81,9 @@ func lastVersion() (string, error) {
 //  @return bool
 //
 func versionCompare(nowVersion, lastVersion string) bool {
+	nowVersion = strings.ReplaceAll(nowVersion, "must", "beta")
+	lastVersion = strings.ReplaceAll(lastVersion, "must", "beta")
+
 	NowBeta := strings.Contains(nowVersion, "beta")
 	LastBeta := strings.Contains(lastVersion, "beta")
 
