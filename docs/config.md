@@ -121,5 +121,8 @@ special_min_score: 10
 # 题目搜索的顺序，为true则从2018年最开始搜题，否则从现在最新开始搜题
 reverse_order: false
 
+# 定时任务运行时协程池的大小
+pool_size: 1
+
 
 ```

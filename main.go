@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"path"
 	"strconv"
+	"sync"
 	"syscall"
 	"time"
 
@@ -35,6 +36,7 @@ import (
 var (
 	u          bool
 	i          bool
+	now        bool
 	configPath = ""
 )
 
@@ -55,6 +57,7 @@ func init() {
 
 	flag.BoolVar(&u, "u", false, "更新应用")
 	flag.BoolVar(&i, "init", false, "init the app")
+	flag.BoolVar(&now, "now", false, "run cron now")
 	flag.StringVar(&configPath, "config", "./config/config.yml", "设置配置文件路径")
 	flag.Parse()
 	// 初始化配置文件
@@ -219,8 +222,11 @@ func main() {
 		}
 		c2.Run()
 	}
-
+	inittask()
 	model.SetPush(getPush)
+	if now {
+		do("cron")
+	}
 	if !config.TG.Enable && config.Cron == "" && !config.Wechat.Enable {
 		log.Infoln("已采用普通学习模式")
 		do("normal")
@@ -244,9 +250,6 @@ func do(m string) {
 	getPush := push.GetPush(config)
 	getPush("", "flush", "学习强国助手已上线")
 
-	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
-	defer core.Quit()
-	core.Init()
 	var user *model.User
 	users, _ := model.Query()
 	study := func(core2 *lib.Core, u *model.User) {
@@ -284,21 +287,6 @@ func do(m string) {
 		core2.Push(u.PushId, "flush", message)
 	}
 
-	//c := make(chan *model.User, 1)
-	//
-	//go func() {
-	//	for true {
-	//		u := <-c
-	//		if u.UID == "" {
-	//			break
-	//		} else {
-	//			l := &lib.Core{Push: getPush, ShowBrowser: config.ShowBrowser}
-	//			l.Init()
-	//			study(l, u)
-	//		}
-	//	}
-	//}()
-
 	failUser, _ := model.QueryFailUser()
 	for _, user := range failUser {
 		go func(user2 *model.User) {
@@ -318,6 +306,7 @@ func do(m string) {
 	// 用户小于1时自动登录
 	if len(users) < 1 {
 		log.Infoln("未检测到有效用户信息，将采用登录模式")
+		core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 		u, err := core.L(config.Retry.Times, "")
 		if err != nil {
 			log.Errorln(err.Error())
@@ -325,12 +314,27 @@ func do(m string) {
 		}
 		user = u
 	} else {
+		s := &sync.WaitGroup{}
 		// 如果为定时模式则直接循环所以用户依次运行
 		if m == "cron" {
 			for _, u := range users {
-				study(core, u)
+				//study(core, u)
+				core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
+				core.Init()
+				t := &Task{
+					Core: core,
+					User: u,
+					wg:   s,
+				}
+				run(t)
+				s.Add(1)
 			}
+			s.Wait()
 			if len(users) < 1 {
+				core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
+
+				core.Init()
+				defer core.Quit()
 				user, err := core.L(config.Retry.Times, "")
 				if err != nil {
 					core.Push(user.PushId, "msg", "登录超时")
@@ -338,6 +342,7 @@ func do(m string) {
 				}
 				study(core, user)
 			}
+			log.Infoln("定时任务执行完成")
 			return
 		}
 
@@ -367,6 +372,7 @@ func do(m string) {
 		}
 
 		if i == 0 {
+			core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 			u, err := core.L(config.Retry.Times, "")
 			if err != nil {
 				log.Errorln(err.Error())
@@ -379,6 +385,10 @@ func do(m string) {
 		}
 	}
 
+	core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
+
+	core.Init()
+	defer core.Quit()
 	study(core, user)
 	core.Push(user.PushId, "flush", "")
 }

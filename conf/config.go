@@ -99,6 +99,8 @@ type Config struct {
 
 	CustomCron string `json:"custom_cron" yaml:"custom_cron" mapstructure:"custom_cron"`
 
+	PoolSize int `json:"pool_size" yaml:"pool_size" mapstructure:"pool_size"`
+
 	version string `mapstructure:"version"`
 }
 
@@ -179,6 +181,7 @@ func InitConfig(path string, restart func()) {
 	viper.SetDefault("scheme", "https://johlanse.github.io/study_xxqg/scheme.html?")
 	viper.SetDefault("special_min_score", 10)
 	viper.SetDefault("tg.custom_api", "https://api.telegram.org")
+	viper.SetDefault("pool_size", 1)
 	viper.AutomaticEnv()
 	err := viper.Unmarshal(&config, func(decoderConfig *mapstructure.DecoderConfig) {
 
@@ -195,32 +198,6 @@ func InitConfig(path string, restart func()) {
 			restart()
 		})
 	}
-	//file, err := os.ReadFile(path)
-	//if err != nil {
-	//	log.Warningln("检测到配置文件可能不存在")
-	//	err := os.WriteFile(path, defaultConfig, 0666)
-	//	if err != nil {
-	//		log.Errorln("写入到配置文件出现错误")
-	//		log.Errorln(err.Error())
-	//		return
-	//	}
-	//	log.Infoln("成功写入到配置文件,请重启应用")
-	//	os.Exit(3)
-	//}
-	//err = yaml.Unmarshal(file, &config)
-	//if err != nil {
-	//	log.Errorln(err.Error())
-	//	log.Panicln("配置文件解析失败，请检查配置文件")
-	//}
-	//if config.Scheme == "" {
-	//	config.Scheme = "https://johlanse.github.io/study_xxqg/scheme.html?"
-	//}
-	//if config.SpecialMinScore == 0 {
-	//	config.SpecialMinScore = 10
-	//}
-	//if config.TG.CustomApi == "" {
-	//	config.TG.CustomApi = "https://api.telegram.org"
-	//}
 }
 
 // GetConfig
