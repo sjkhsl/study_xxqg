@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 
 	"github.com/johlanse/study_xxqg/conf"
@@ -25,6 +26,7 @@ func RouterInit() *gin.Engine {
 	router := gin.Default()
 	router.RemoveExtraSlash = true
 	router.Use(cors())
+	router.Use(gzip.Gzip(1, gzip.WithExcludedExtensions([]string{"js", "css", "map", "png", "ico"})))
 
 	// 挂载静态文件
 	router.StaticFS("/static", http.FS(static))

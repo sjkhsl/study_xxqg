@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/url"
@@ -14,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
-	goqrcode "github.com/skip2/go-qrcode"
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/model"
@@ -134,22 +132,10 @@ func (c *Core) GenerateCode(pushID string) (string, string, error) {
 	log.Infoln(g.Result)
 	codeURL := fmt.Sprintf("https://login.xuexi.cn/login/qrcommit?showmenu=false&code=%v&appId=dingoankubyrfkttorhpou", g.Result)
 
-	err = goqrcode.WriteFile(codeURL, goqrcode.Medium, 128, "qrcode.png")
-	if err != nil {
-		log.Errorln("图片生成错误" + err.Error())
-		err = nil
-	} else {
-		log.Infoln("二维码已生成到目录下的qrcode.png")
-	}
-	if conf.GetConfig().QrCOde {
-		data, _ := os.ReadFile("qrcode.png")
-		c.Push(pushID, "image", base64.StdEncoding.EncodeToString(data))
-	}
-
 	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
 	qrCodeString.Print()
 	c.Push(pushID, "flush", conf.GetConfig().Scheme+url.QueryEscape(codeURL))
-	c.Push(pushID, "flush", "请点击链接登录")
+	c.Push(pushID, "flush", "请在一分钟内点击链接登录")
 	return codeURL, g.Result, err
 }
 
@@ -220,7 +206,7 @@ func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i := 0; i < 150; i++ {
+	for i := 0; i < 30; i++ {
 		user, b, err := c.CheckQrCode(codeData, pushID)
 		if b && err == nil {
 			return user, err

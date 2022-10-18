@@ -8,6 +8,7 @@ import (
 	rand2 "math/rand"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/model"
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 const (
@@ -802,4 +804,127 @@ func getweekID(cookies []*http.Cookie) (int, error) {
 	}
 	log.Warningln("你已不存在未答的每周答题了")
 	return 0, errors.New("未找到每周答题")
+}
+
+func GetSpecialContent(cookies []*http.Cookie, id int) *SpecialContent {
+	response, err := utils.GetClient().R().SetCookies(cookies...).SetQueryParams(map[string]string{
+		"type":   "2",
+		"id":     strconv.Itoa(id),
+		"forced": "true",
+	}).Get("https://pc-proxy-api.xuexi.cn/api/exam/service/detail/queryV3")
+	if err != nil {
+		return nil
+	}
+	data, _ := base64.StdEncoding.DecodeString(gjson.GetBytes(response.Bytes(), "data_str").String())
+	log.Println(string(data))
+	content := new(SpecialContent)
+	_ = json.Unmarshal(data, content)
+	return content
+}
+
+func getweekIDs(cookies []*http.Cookie) []int {
+	c := req.C()
+	c.SetCommonCookies(cookies...)
+	repo, err := c.R().SetQueryParams(map[string]string{"pageSize": "500", "pageNo": "1"}).Get(queryWeekList)
+	if err != nil {
+		log.Errorln("获取每周答题列表错误" + err.Error())
+		return nil
+	}
+	dataB64, err := repo.ToString()
+	if err != nil {
+		log.Errorln("获取每周答题列表获取string错误" + err.Error())
+		return nil
+	}
+	data, err := base64.StdEncoding.DecodeString(gjson.Get(dataB64, "data_str").String())
+	if err != nil {
+		log.Errorln("获取每周答题列表转换b64错误" + err.Error())
+		return nil
+	}
+	list := new(WeekList)
+	err = json.Unmarshal(data, list)
+	if err != nil {
+		log.Errorln("获取每周答题列表转换json错误" + err.Error())
+		return nil
+	}
+	log.Infoln(fmt.Sprintf("共获取到每周答题%d个", list.TotalCount))
+	var ids []int
+	for _, l := range list.List {
+		for _, practice := range l.Practices {
+			ids = append(ids, practice.Id)
+		}
+	}
+	return ids
+}
+func getSpecialIDs(cookies []*http.Cookie) []int {
+	c := req.C()
+
+	c.SetCommonCookies(cookies...)
+	// 获取专项答题列表
+	repo, err := c.R().SetQueryParams(map[string]string{"pageSize": "1000", "pageNo": "1"}).Get(querySpecialList)
+	if err != nil {
+		log.Errorln("获取专项答题列表错误" + err.Error())
+		return nil
+	}
+	dataB64, err := repo.ToString()
+	if err != nil {
+		log.Errorln("获取专项答题列表获取string错误" + err.Error())
+		return nil
+	}
+	// 因为返回内容使用base64编码，所以需要对内容进行转码
+	data, err := base64.StdEncoding.DecodeString(gjson.Get(dataB64, "data_str").String())
+	if err != nil {
+		log.Errorln("获取专项答题列表转换b64错误" + err.Error())
+		return nil
+	}
+	// 创建实例对象
+	list := new(SpecialList)
+	// json序列号
+	err = json.Unmarshal(data, list)
+	if err != nil {
+		log.Errorln("获取专项答题列表转换json错误" + err.Error())
+		return nil
+	}
+	log.Infoln(fmt.Sprintf("共获取到专项答题%d个", list.TotalCount))
+	var ids []int
+	for _, l := range list.List {
+		ids = append(ids, l.Id)
+	}
+	return ids
+}
+
+type SpecialContent struct {
+	Perfect   bool `json:"perfect"`
+	TotalTime int  `json:"totalTime"`
+	Questions []struct {
+		HasDescribe bool `json:"hasDescribe"`
+		// 提示信息
+		QuestionDesc string `json:"questionDesc"`
+		QuestionId   int    `json:"questionId"`
+		Origin       string `json:"origin"`
+		// 答案
+		Answers []struct {
+			AnswerId int    `json:"answerId"`
+			Label    string `json:"label"`
+			Content  string `json:"content"`
+		} `json:"answers"`
+		QuestionScore int `json:"questionScore"`
+		// 题目呢偶然
+		Body               string `json:"body"`
+		OriginTitle        string `json:"originTitle"`
+		AllCorrect         bool   `json:"allCorrect"`
+		Supplier           string `json:"supplier"`
+		QuestionDescOrigin string `json:"questionDescOrigin"`
+		QuestionDisplay    int    `json:"questionDisplay"`
+		Recommender        string `json:"recommender"`
+	} `json:"questions"`
+	Type               int    `json:"type"`
+	TotalScore         int    `json:"totalScore"`
+	PassScore          int    `json:"passScore"`
+	FinishedNum        int    `json:"finishedNum"`
+	UsedTime           int    `json:"usedTime"`
+	Name               string `json:"name"`
+	QuestionNum        int    `json:"questionNum"`
+	Id                 int    `json:"id"`
+	UniqueId           string `json:"uniqueId"`
+	TipScoreReasonType int    `json:"tipScoreReasonType"`
 }

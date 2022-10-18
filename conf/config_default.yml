@@ -108,9 +108,6 @@ cron_random_wait: 0
 #windows环境自定义浏览器路径，仅支持chromium系列
 edge_path: ""
 
-# 是否推送二维码
-qr_code: false
-
 # 启动时等待时间，为了防止代理启动比软件慢而报错，默认不等待，单位秒
 start_wait: 0
 
@@ -130,6 +127,8 @@ hot_reload: true
 custom_message: "自定义消息$$$https://www.baidu.com"
 # 自定义消息推送定时
 custom_cron: ""
+
+pool_size: 1
 
 weekly_min_score:
 
