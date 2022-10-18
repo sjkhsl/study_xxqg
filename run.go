@@ -62,7 +62,7 @@ func inittask() {
 		core2.Push(u.PushId, "flush", message)
 	}
 
-	pool1, err := ants.NewPoolWithFunc(1, func(i2 interface{}) {
+	pool1, err := ants.NewPoolWithFunc(config.PoolSize, func(i2 interface{}) {
 		task := i2.(*Task)
 		log.Infoln("开始执行" + task.User.Nick)
 		study(task.Core, task.User)
