@@ -107,7 +107,7 @@ func DownloadDbFile() {
 		}
 	}()
 	log.Infoln("正在从github下载题库文件！")
-	response, err := http.Get("https://github.com/johlanse/study_xxqg/releases/download/v1.0.36/QuestionBank.db")
+	response, err := http.Get("https://github.com/johlanse/study_xxqg/releases/download/v1.0.37-beta3/QuestionBank.db")
 	if err != nil {
 		log.Errorln("下载db文件错误" + err.Error())
 		return
