@@ -237,13 +237,6 @@ func main() {
 }
 
 func do(m string) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("do 方法执行错误")
-			log.Errorln(err)
-		}
-	}()
 
 	log.Infoln("检测到模式", config.Model)
 
