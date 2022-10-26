@@ -180,13 +180,6 @@ func main() {
 			c := cron.New()
 
 			_, err := c.AddFunc(config.Cron, func() {
-				defer func() {
-					i := recover()
-					if i != nil {
-						log.Errorln(i)
-						log.Errorln("执行定时任务出现异常")
-					}
-				}()
 				log.Infoln("即将开始执行定时任务")
 				// 检测是否开启了随机等待
 				if config.CronRandomWait > 0 {
