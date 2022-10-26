@@ -169,13 +169,7 @@ func main() {
 
 	if config.Cron != "" {
 		go func() {
-			defer func() {
-				err := recover()
-				if err != nil {
-					log.Errorln("定时任务执行出现问题")
-					log.Errorln(err)
-				}
-			}()
+
 			log.Infoln("已采用定时执行模式")
 			c := cron.New()
 
@@ -237,6 +231,7 @@ func do(m string) {
 	getPush("", "flush", "学习强国助手已上线")
 
 	var user *model.User
+	log.Infoln(user.Nick)
 	users, _ := model.Query()
 	study := func(core2 *lib.Core, u *model.User) {
 		defer func() {
