@@ -186,13 +186,31 @@ func getExpiredUser() gin.HandlerFunc {
 			}
 			return
 		}
-		ctx.JSON(200, Resp{
-			Code:    200,
-			Message: "",
-			Data:    failUser,
-			Success: true,
-			Error:   "",
-		})
+		level := ctx.GetInt("level")
+		if level == 1 {
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "",
+				Data:    failUser,
+				Success: true,
+				Error:   "",
+			})
+		} else {
+			var myFaileUser []*model.User
+			for _, user := range failUser {
+				if user.Token == ctx.GetString("token") {
+					myFaileUser = append(myFaileUser, user)
+				}
+			}
+			ctx.JSON(200, Resp{
+				Code:    200,
+				Message: "",
+				Data:    myFaileUser,
+				Success: true,
+				Error:   "",
+			})
+		}
+
 	}
 }
 

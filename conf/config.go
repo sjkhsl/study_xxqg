@@ -30,6 +30,7 @@ type Config struct {
 		PushPlus struct {
 			Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
 			Token  string `json:"token" yaml:"token" mapstructure:"token"`
+			Topic  string `json:"topic" yaml:"topic" mapstructure:"topic"`
 		} `json:"push_plus" yaml:"push_plus" mapstructure:"push_plus"`
 	} `json:"push" yaml:"push" mapstructure:"push"`
 	TG struct {

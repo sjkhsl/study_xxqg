@@ -6,6 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/utils"
 )
 
@@ -21,6 +22,7 @@ func (p *PushPlus) Init() func(id string, kind, message string) {
 			"content":  data,
 			"template": "markdown",
 			"channel":  "wechat",
+			"topic":    conf.GetConfig().Push.PushPlus.Topic,
 		}).Post("http://www.pushplus.plus/send")
 		if err != nil {
 			log.Errorln(err.Error())
