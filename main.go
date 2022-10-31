@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path"
+	"runtime"
 	"strconv"
 	"sync"
 	"syscall"
@@ -215,7 +216,12 @@ func main() {
 	if now {
 		do()
 	}
-	cli.RunCli()
+	if runtime.GOOS == "windows" {
+		cli.RunCli()
+	} else {
+		select {}
+	}
+
 }
 
 func do() {
