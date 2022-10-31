@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
 	"github.com/google/uuid"
 	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
@@ -131,9 +130,7 @@ func (c *Core) GenerateCode(pushID string) (string, string, error) {
 	}
 	log.Infoln(g.Result)
 	codeURL := fmt.Sprintf("https://login.xuexi.cn/login/qrcommit?showmenu=false&code=%v&appId=dingoankubyrfkttorhpou", g.Result)
-
-	qrCodeString := qrcodeTerminal.New2(qrcodeTerminal.ConsoleColors.BrightBlack, qrcodeTerminal.ConsoleColors.BrightWhite, qrcodeTerminal.QRCodeRecoveryLevels.Low).Get(codeURL)
-	qrCodeString.Print()
+	log.Infoln("登录链接： " + conf.GetConfig().Scheme + url.QueryEscape(codeURL))
 	c.Push(pushID, "flush", conf.GetConfig().Scheme+url.QueryEscape(codeURL))
 	c.Push(pushID, "flush", "请在一分钟内点击链接登录")
 	return codeURL, g.Result, err

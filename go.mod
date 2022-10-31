@@ -5,10 +5,11 @@ go 1.18
 replace github.com/willf/bitset v1.2.1 => github.com/bits-and-blooms/bitset v1.2.1
 
 require (
-	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f
 	github.com/Lyrics-you/sail-logrus-formatter v1.3.1
+	github.com/desertbit/grumble v1.1.3
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.5.4
+	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
 	github.com/google/uuid v1.3.0
@@ -31,14 +32,18 @@ require (
 
 require (
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
-	github.com/gin-contrib/gzip v0.0.6 // indirect
+	github.com/desertbit/closer/v3 v3.1.2 // indirect
+	github.com/desertbit/columnize v2.1.0+incompatible // indirect
+	github.com/desertbit/go-shlex v0.1.1 // indirect
+	github.com/desertbit/readline v1.5.1 // indirect
+	github.com/fatih/color v1.13.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
-	github.com/hashicorp/errwrap v1.0.0 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
@@ -55,7 +60,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
-	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
