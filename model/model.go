@@ -22,6 +22,7 @@ func init() {
 		log.Errorln("用户数据库打开失败，请检查config目录权限")
 		log.Panicln(err.Error())
 	}
+	db.SetMaxOpenConns(1)
 
 	_, _ = db.Exec(`create table user
 (
@@ -57,6 +58,7 @@ func initQuestionDb() {
 			log.Errorln("题目数据库打开失败，请检查QuestionDB是否存在")
 			log.Panicln(err.Error())
 		}
+		db1.SetMaxOpenConns(1)
 	})
 }
 

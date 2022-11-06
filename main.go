@@ -26,6 +26,7 @@ import (
 
 	"github.com/johlanse/study_xxqg/cli"
 	"github.com/johlanse/study_xxqg/conf"
+	"github.com/johlanse/study_xxqg/lib/state"
 	"github.com/johlanse/study_xxqg/utils"
 	// "github.com/johlanse/study_xxqg/gui"
 	"github.com/johlanse/study_xxqg/lib"
@@ -211,7 +212,7 @@ func main() {
 		}
 		c2.Run()
 	}
-	inittask()
+	initTask()
 	model.SetPush(getPush)
 	if now {
 		do()
@@ -244,63 +245,51 @@ func do() {
 			}
 			c.Init()
 			defer c.Quit()
-			study(c, newUser)
+			lib.Study(c, newUser)
 		}(user)
 	}
 
 	s := &sync.WaitGroup{}
 	// 如果为定时模式则直接循环所以用户依次运行
 
-	for _, u := range users {
-		core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
-		core.Init()
-		t := &Task{
-			Core: core,
-			User: u,
-			wg:   s,
+	if config.PoolSize == 1 {
+		for _, user := range users {
+			if state.IsStudy(user.UID) {
+				log.Infoln("检测到该用户已在学习中！")
+				continue
+			} else {
+				core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
+				core.Init()
+				state.Add(user.UID, core)
+				lib.Study(core, user)
+				core.Quit()
+				state.Delete(user.UID)
+			}
+
 		}
-		run(t)
-		s.Add(1)
+	} else {
+		for _, u := range users {
+			if state.IsStudy(u.UID) {
+				log.Infoln("检测到该用户已在学习中！")
+				continue
+			} else {
+				core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
+				core.Init()
+				t := &Task{
+					Core: core,
+					User: u,
+					wg:   s,
+				}
+
+				run(t)
+				s.Add(1)
+			}
+		}
+		s.Wait()
 	}
-	s.Wait()
 	log.Infoln("定时任务执行完成")
 	return
 
-}
-
-func study(core2 *lib.Core, u *model.User) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Errorln("学习过程异常")
-			log.Errorln(err)
-		}
-	}()
-	startTime := time.Now()
-
-	core2.LearnArticle(u)
-
-	core2.LearnVideo(u)
-
-	core2.LearnVideo(u)
-	if config.Model == 2 {
-		core2.RespondDaily(u, "daily")
-	} else if config.Model == 3 {
-		core2.RespondDaily(u, "daily")
-		core2.RespondDaily(u, "weekly")
-		core2.RespondDaily(u, "special")
-	}
-	endTime := time.Now()
-	score, err := lib.GetUserScore(u.ToCookies())
-	if err != nil {
-		log.Errorln("获取成绩失败")
-		log.Debugln(err.Error())
-		return
-	}
-
-	score, _ = lib.GetUserScore(u.ToCookies())
-	message := fmt.Sprintf("%v 学习完成,用时%.1f分钟\n%v", u.Nick, endTime.Sub(startTime).Minutes(), lib.FormatScoreShort(score))
-	core2.Push(u.PushId, "flush", message)
 }
 
 func runBack() {

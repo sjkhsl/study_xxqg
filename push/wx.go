@@ -15,6 +15,7 @@ import (
 
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/lib"
+	"github.com/johlanse/study_xxqg/lib/state"
 	"github.com/johlanse/study_xxqg/model"
 	"github.com/johlanse/study_xxqg/utils"
 	"github.com/johlanse/study_xxqg/utils/update"
@@ -23,7 +24,6 @@ import (
 var (
 	wx        *mp.WeiXin
 	lastNonce = ""
-	datas1    sync.Map
 	wxPush    func(id, kind, message string)
 )
 
@@ -580,12 +580,11 @@ func handleStartStudy(id string, msg string) {
 	core.Init()
 	defer core.Quit()
 	for i, user := range users {
-		_, ok := datas1.Load(user.UID)
-		if ok {
-			log.Warningln("用户" + user.Nick + "已经在学习中了，跳过该用户")
+		if state.IsStudy(user.UID) {
+			log.Infoln("该用户已经在学习中了，跳过学习")
 			continue
 		} else {
-			datas1.Store(user.UID, "")
+			state.Add(user.UID, core)
 		}
 		sendMsg(id, fmt.Sprintf("开始学习第%d个用户，用户名：%v", i+1, user.Nick))
 		core.LearnArticle(user)
@@ -597,7 +596,7 @@ func handleStartStudy(id string, msg string) {
 			core.RespondDaily(user, "special")
 		}
 
-		datas1.Delete(user.UID)
+		state.Delete(user.UID)
 		score, _ := lib.GetUserScore(user.ToCookies())
 		sendMsg(id, fmt.Sprintf("第%d个用户%v学习完成，学习积分\n%v", i+1, user.Nick, lib.FormatScore(score)))
 	}

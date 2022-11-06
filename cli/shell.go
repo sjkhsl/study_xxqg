@@ -35,7 +35,7 @@ func study() *grumble.Command {
 		Name:     "study",
 		Aliases:  []string{"study"},
 		Help:     "study xxqg",
-		LongHelp: "study the xxqg",
+		LongHelp: "对选定序号的用户进行学习",
 		Args: func(a *grumble.Args) {
 			a.Int("index", "the index user")
 		},
@@ -75,7 +75,7 @@ func addUser() *grumble.Command {
 		Name:     "add user",
 		Aliases:  []string{"add"},
 		Help:     "add a user",
-		LongHelp: "add a user",
+		LongHelp: "添加一个用户",
 		Run: func(c *grumble.Context) error {
 			core := &lib.Core{
 				Push: push.GetPush(conf.GetConfig()),
@@ -96,7 +96,7 @@ func getUser() *grumble.Command {
 		Help:      "get all user",
 		LongHelp:  "input the user,can get all user",
 		HelpGroup: "",
-		Usage:     "get all user",
+		Usage:     "获取用户列表",
 		Run: func(c *grumble.Context) error {
 			users, err := model.Query()
 			if err != nil {

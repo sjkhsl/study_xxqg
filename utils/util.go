@@ -135,7 +135,7 @@ func Time2Stamp() int64 {
 /*时间戳->字符串*/
 func Stamp2Str(stamp int64) string {
 	timeLayout := "2006-01-02 15:04:05"
-	str := time.Unix(stamp/1000, 0).Format(timeLayout)
+	str := time.Unix(stamp, 0).Format(timeLayout)
 	return str
 }
 
