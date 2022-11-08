@@ -160,7 +160,7 @@ func qqGetScore(event *Event, args []string) {
 			event.Send(err.Error())
 			continue
 		}
-		event.Send(lib.FormatScore(score))
+		event.Send(user.Nick + "\n" + lib.FormatScore(score))
 	}
 }
 
