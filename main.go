@@ -149,6 +149,10 @@ func main() {
 	engine := web.RouterInit()
 	go func() {
 		h := http.NewServeMux()
+		if config.QQ.Enable {
+			h.Handle("/qq", push.InitQQ())
+			log.Infoln(fmt.Sprintf("已开启qq配置,监听地址： ==》 %v:%v", config.Web.Host, config.Web.Port))
+		}
 		if config.Web.Enable {
 			log.Infoln(fmt.Sprintf("已开启web配置，web监听地址 ==> %v:%v", config.Web.Host, config.Web.Port))
 			h.Handle("/", engine)

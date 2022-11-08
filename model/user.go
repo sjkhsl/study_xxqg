@@ -69,7 +69,7 @@ func changeStatus(uid string, status int) {
 func QueryFailUser() ([]*User, error) {
 	var users []*User
 	_ = engine.Ping()
-	err := engine.Where("status=", 0).Find(users)
+	err := engine.Where("status=?", 0).Find(&users)
 	if err != nil {
 		return users, err
 	}

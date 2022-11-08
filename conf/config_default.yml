@@ -81,6 +81,15 @@ wechat:
   # 微信管理员的openid,可点击关于按钮获得，配置后请重启程序
   super_open_id: ""
 
+# gocq推送配置
+qq:
+  # 是否启用qq推送
+  enable: false
+  # gocq的监听地址
+  post_addr: "http://127.0.0.1:5700"
+  super_user: 123
+  white_list:
+    - 123
 
 # pushDeer推送配置,详情参考psuhDeer官网：http://www.pushdeer.com/official.html
 push_deer:

@@ -49,6 +49,13 @@ func GetPush(config conf.Config) func(id string, kind string, message string) {
 		log.Infoln("已配置pushDeer推送")
 		pushs = append(pushs, InitPushDeer())
 	}
+	if config.QQ.Enable {
+		log.Infoln("已配置qq推送")
+		pushs = append(pushs, func(id, kind, message string) {
+			e := &Event{qq: qq}
+			e.sendPrivateMsg(conf.GetConfig().QQ.SuperUser, message)
+		})
+	}
 	pushs = append(pushs, func(id, kind, message string) {
 		log.Debugln(fmt.Sprintf("消息id: %v，消息类型：%v,消息内容：%v", id, kind, message))
 	})
