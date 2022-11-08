@@ -403,9 +403,9 @@ func studyAll(bot *Telegram, from int64, args []string) {
 			c := make(chan int, 1)
 			go func() {
 
-				bot.SendMsg(from, "已创建运行实例："+user.UID)
-				state.Add(user.UID, &core)
-				defer state.Delete(user.UID)
+				bot.SendMsg(from, "已创建运行实例："+user.Uid)
+				state.Add(user.Uid, &core)
+				defer state.Delete(user.Uid)
 				core.Init()
 				defer core.Quit()
 				core.LearnArticle(user)
@@ -479,7 +479,7 @@ func deleteUser(bot *Telegram, from int64, args []string) {
 			bot.SendMsg(from, "错误的序号")
 			return
 		}
-		err = model.DeleteUser(users[i].UID)
+		err = model.DeleteUser(users[i].Uid)
 		if err != nil {
 			bot.SendMsg(from, err.Error())
 			return
@@ -550,9 +550,9 @@ func study(bot *Telegram, from int64, args []string) {
 	timer := time.After(time.Minute * 30)
 	c := make(chan int, 1)
 	go func() {
-		bot.SendMsg(from, "已创建运行实例："+user.UID)
-		state.Add(user.UID, &core)
-		defer state.Delete(user.UID)
+		bot.SendMsg(from, "已创建运行实例："+user.Uid)
+		state.Add(user.Uid, &core)
+		defer state.Delete(user.Uid)
 		core.Init()
 		defer core.Quit()
 

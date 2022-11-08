@@ -9,7 +9,7 @@ import (
 func TestInsert(t *testing.T) {
 	err := AddUser(&User{
 		Nick:      "123",
-		UID:       "123",
+		Uid:       "123",
 		Token:     "123444444444444444444444444",
 		LoginTime: 1031312,
 	})
@@ -24,7 +24,7 @@ func TestQuery(t *testing.T) {
 		log.Errorln(err.Error())
 		return
 	}
-	log.Infoln(users[0].UID)
+	log.Infoln(users[0].Uid)
 }
 
 func TestFind(t *testing.T) {

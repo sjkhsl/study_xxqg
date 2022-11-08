@@ -30,10 +30,10 @@ func initTask() {
 	pool1, err := ants.NewPoolWithFunc(config.PoolSize, func(i2 interface{}) {
 		task := i2.(*Task)
 		log.Infoln("开始执行" + task.User.Nick)
-		state.Add(task.User.UID, task.Core)
+		state.Add(task.User.Uid, task.Core)
 		lib.Study(task.Core, task.User)
 		defer task.Core.Quit()
-		defer state.Delete(task.User.UID)
+		defer state.Delete(task.User.Uid)
 		task.wg.Done()
 	})
 	if err != nil {

@@ -254,22 +254,22 @@ func do() {
 
 	if config.PoolSize == 1 {
 		for _, user := range users {
-			if state.IsStudy(user.UID) {
+			if state.IsStudy(user.Uid) {
 				log.Infoln("检测到该用户已在学习中！")
 				continue
 			} else {
 				core := &lib.Core{ShowBrowser: config.ShowBrowser, Push: getPush}
 				core.Init()
-				state.Add(user.UID, core)
+				state.Add(user.Uid, core)
 				lib.Study(core, user)
 				core.Quit()
-				state.Delete(user.UID)
+				state.Delete(user.Uid)
 			}
 
 		}
 	} else {
 		for _, u := range users {
-			if state.IsStudy(u.UID) {
+			if state.IsStudy(u.Uid) {
 				log.Infoln("检测到该用户已在学习中！")
 				continue
 			} else {

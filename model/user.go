@@ -5,7 +5,6 @@ package model
 import (
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/playwright-community/playwright-go"
@@ -13,10 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/johlanse/study_xxqg/utils"
-)
-
-var (
-	lock sync.RWMutex
 )
 
 func init() {
@@ -31,19 +26,6 @@ func SetPush(push func(id, kind, message string)) {
 	pushFunc = push
 }
 
-// User
-/**
- * @Description:
- */
-type User struct {
-	Nick      string `json:"nick"`
-	UID       string `json:"uid"`
-	Token     string `json:"token"`
-	LoginTime int64  `json:"login_time"`
-	PushId    string `json:"push_id"`
-	Status    int    `json:"status"`
-}
-
 // Query
 /**
  * @Description: 查询所有未掉线的用户
@@ -51,45 +33,33 @@ type User struct {
  * @return error
  */
 func Query() ([]*User, error) {
-	var users []*User
-	ping()
-	lock.Lock()
-	defer lock.Unlock()
-	results, err := db.Query("select * from user")
+	var (
+		users  []*User
+		result []*User
+	)
+	_ = engine.Ping()
+	err := engine.Where("status=?", 1).Find(&users)
 	if err != nil {
-		return nil, err
+		return users, err
 	}
-	var failusers []*User
-	for results.Next() {
-		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
-		if err != nil {
-			_ = results.Close()
-			return nil, err
-		}
-		if u.Status != 0 {
 
-			if ok, _ := utils.CheckUserCookie(u.ToCookies()); ok {
-				users = append(users, u)
-			} else {
-				log.Warningln(u.Nick + "的cookie已失效")
-				failusers = append(failusers, u)
-				if pushFunc != nil {
-					pushFunc(u.PushId, "flush", u.Nick+"的cookie已失效")
-				}
+	for _, user := range users {
+		if ok, _ := utils.CheckUserCookie(user.ToCookies()); ok {
+			result = append(result, user)
+		} else {
+			log.Warningln(user.Nick + "的cookie已失效")
+			changeStatus(user.Uid, 0)
+			if pushFunc != nil {
+				pushFunc(user.PushId, "flush", user.Nick+"的cookie已失效")
 			}
 		}
 	}
-	_ = results.Close()
-	for _, failuser := range failusers {
-		changeStatus(failuser.UID, 0)
-	}
-	return users, err
+	return result, err
 }
 
 func changeStatus(uid string, status int) {
-	ping()
-	_, err := db.Exec("update user set status = ? where uid = ?", status, uid)
+	_ = engine.Ping()
+	_, err := engine.Table(new(User)).Where("uid=?", uid).Update(map[string]any{"status": status})
 	if err != nil {
 		log.Errorln("改变status失败" + err.Error())
 		return
@@ -98,23 +68,11 @@ func changeStatus(uid string, status int) {
 
 func QueryFailUser() ([]*User, error) {
 	var users []*User
-	ping()
-	lock.Lock()
-	defer lock.Unlock()
-	results, err := db.Query("select * from user where status = 0")
+	_ = engine.Ping()
+	err := engine.Where("status=", 0).Find(users)
 	if err != nil {
-		return nil, err
+		return users, err
 	}
-	for results.Next() {
-		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
-		if err != nil {
-			_ = results.Close()
-			return nil, err
-		}
-		users = append(users, u)
-	}
-	_ = results.Close()
 	return users, err
 }
 
@@ -125,37 +83,28 @@ func QueryFailUser() ([]*User, error) {
  * @return error
  */
 func QueryByPushID(pushID string) ([]*User, error) {
-	lock.Lock()
-	defer lock.Unlock()
-	var users []*User
-	ping()
-	results, err := db.Query("select * from user where push_id = ?", pushID)
+	var (
+		users  []*User
+		result []*User
+	)
+	_ = engine.Ping()
+	err := engine.Where("status=? and push_id=?", 1, pushID).Find(users)
 	if err != nil {
 		return users, err
 	}
 
-	var failusers []*User
-	for results.Next() {
-		u := new(User)
-		err := results.Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
-		if err != nil {
-			_ = results.Close()
-			return users, err
-		}
-		if u.Status != 0 {
-			if ok, _ := utils.CheckUserCookie(u.ToCookies()); ok {
-				users = append(users, u)
-			} else {
-				log.Warningln(u.Nick + "的cookie已失效")
-				failusers = append(failusers, u)
+	for _, user := range users {
+		if ok, _ := utils.CheckUserCookie(user.ToCookies()); ok {
+			result = append(result, user)
+		} else {
+			log.Warningln(user.Nick + "的cookie已失效")
+			changeStatus(user.Uid, 0)
+			if pushFunc != nil {
+				pushFunc(user.PushId, "flush", user.Nick+"的cookie已失效")
 			}
 		}
 	}
-	_ = results.Close()
-	for _, failuser := range failusers {
-		changeStatus(failuser.UID, 0)
-	}
-	return users, err
+	return result, err
 }
 
 // Find
@@ -166,7 +115,7 @@ func QueryByPushID(pushID string) ([]*User, error) {
  */
 func Find(uid string) *User {
 	u := new(User)
-	err := db.QueryRow("select * from user where uid=?;", uid).Scan(&u.Nick, &u.UID, &u.Token, &u.LoginTime, &u.PushId, &u.Status)
+	_, err := engine.Where("uid=?", uid).Get(u)
 	if err != nil {
 		return nil
 	}
@@ -180,25 +129,20 @@ func Find(uid string) *User {
  * @return error
  */
 func AddUser(user *User) error {
-	lock.Lock()
-
-	ping()
-	count := UserCount(user.UID)
+	_ = engine.Ping()
+	count, _ := engine.Where("uid=?", user.Uid).Count(new(User))
 	if count < 1 {
-		_, err := db.Exec("insert into user (nick, uid, token, login_time,push_id) values (?,?,?,?,?)", user.Nick, user.UID, user.Token, user.LoginTime, user.PushId)
+		user.Status = 1
+		_, err := engine.InsertOne(user)
 		if err != nil {
-			log.Errorln("数据库插入失败")
-			log.Errorln(err.Error())
-			lock.Unlock()
 			return err
 		}
-		lock.Unlock()
-		return err
-	}
-	lock.Unlock()
-	err := UpdateUser(user)
-	if err != nil {
-		return err
+	} else {
+		user.Status = 1
+		err := UpdateUser(user)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -210,30 +154,11 @@ func AddUser(user *User) error {
  * @return error
  */
 func UpdateUser(user *User) error {
-	ping()
-	_, err := db.Exec("update user set token=?,login_time=?,push_id=?,status=1 where uid = ?", user.Token, user.LoginTime, user.PushId, user.UID)
+	_, err := engine.Where("uid=?", user.Uid).Update(user)
 	if err != nil {
-		log.Errorln("更新数据失败")
-		log.Errorln(err.Error())
 		return err
 	}
-	return err
-}
-
-// UserCount
-/**
- * @Description:
- * @param uid
- * @return int
- */
-func UserCount(uid string) int {
-	ping()
-	var count int
-	err := db.QueryRow("select count(*) from user where uid = ?", uid).Scan(&count)
-	if err != nil {
-		return 0
-	}
-	return count
+	return nil
 }
 
 // DeleteUser
@@ -242,10 +167,8 @@ func UserCount(uid string) int {
  * @return error
  */
 func DeleteUser(uid string) error {
-	lock.Lock()
-	defer lock.Unlock()
-	ping()
-	_, err := db.Exec("delete from user where uid = ?;", uid)
+	_ = engine.Ping()
+	_, err := engine.Where("uid=?", uid).Delete(new(User))
 	if err != nil {
 		return err
 	}

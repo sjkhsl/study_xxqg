@@ -100,7 +100,7 @@ func GetToken(code, sign, pushId string) (bool, error) {
 	}
 	user := &model.User{
 		Nick:      nick,
-		UID:       uid,
+		Uid:       uid,
 		Token:     token,
 		LoginTime: time.Now().Unix(),
 		PushId:    pushId,
@@ -177,7 +177,7 @@ func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
 		}
 		user := &model.User{
 			Nick:      nick,
-			UID:       uid,
+			Uid:       uid,
 			Token:     response.Cookies()[0].Value,
 			LoginTime: time.Now().Unix(),
 			PushId:    pushID,

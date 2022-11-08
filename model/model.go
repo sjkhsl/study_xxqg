@@ -2,51 +2,38 @@ package model
 
 import (
 	"database/sql"
+	"os"
 	"sync"
 
 	_ "modernc.org/sqlite"
+	"xorm.io/xorm"
 
 	log "github.com/sirupsen/logrus"
+
+	"github.com/johlanse/study_xxqg/utils"
 )
 
 var (
-	db *sql.DB
+	engine *xorm.Engine
 
 	db1 *sql.DB
 )
 
 func init() {
-	var err error
-	db, err = sql.Open("sqlite", "./config/user.db")
+	en, err := xorm.NewEngine("sqlite", "./config/user.db")
 	if err != nil {
-		log.Errorln("用户数据库打开失败，请检查config目录权限")
-		log.Panicln(err.Error())
+		log.Errorln("打开数据库失败！" + err.Error())
+		os.Exit(3)
 	}
-	db.SetMaxOpenConns(1)
+	err = en.Sync2(new(User), new(WechatUser))
+	if err != nil {
+		log.Errorln("同步数据库结构失败" + err.Error())
+		return
+	}
+	en.SetLogger(&utils.MyLog{})
+	en.ShowSQL(true)
 
-	_, _ = db.Exec(`create table user
-(
-    nick       TEXT,
-    uid        TEXT    not null
-        constraint user_pk
-            primary key,
-    token      TEXT    not null,
-    login_time integer not null,
-    push_id TEXT
-);
-`)
-
-	_, _ = db.Exec(`
-		create table wechat_user(
-		    open_id TEXT not null constraint user_pk primary key,
-		    remark TEXT default '',
-		    status INTEGER default 0,
-		    last_request_time INTEGER not null 
-		)
-	`)
-	_, _ = db.Exec(`alter table user
-    add status integer default 1;
-`)
+	engine = en
 }
 
 func initQuestionDb() {
@@ -62,9 +49,22 @@ func initQuestionDb() {
 	})
 }
 
-func ping() {
-	err := db.Ping()
-	if err != nil {
-		log.Errorln("数据库断开了连接")
-	}
+// User
+/**
+ * @Description:
+ */
+type User struct {
+	Nick      string `xorm:"TEXT" json:"nick,omitempty"`
+	Uid       string `xorm:"TEXT" json:"uid,omitempty"`
+	Token     string `xorm:"TEXT" json:"token,omitempty"`
+	LoginTime int64  `xorm:"integer" json:"loginTime,omitempty"`
+	PushId    string `xorm:"TEXT" json:"pushId,omitempty"`
+	Status    int    `xorm:"integer" json:"status,omitempty"`
+}
+
+type WechatUser struct {
+	OpenId          string `xorm:"TEXT" json:"openId,omitempty"`
+	Remark          string `xorm:"TEXT" json:"remark,omitempty"`
+	Status          int    `xorm:"INTEGER" json:"status,omitempty"`
+	LastRequestTime int64  `xorm:"INTEGER" json:"lastRequestTime,omitempty"`
 }

@@ -248,10 +248,10 @@ func getUsers() gin.HandlerFunc {
 		for _, user := range users {
 			datas = append(datas, map[string]interface{}{
 				"nick":       user.Nick,
-				"uid":        user.UID,
+				"uid":        user.Uid,
 				"token":      user.Token,
 				"login_time": user.LoginTime,
-				"is_study":   state.IsStudy(user.UID),
+				"is_study":   state.IsStudy(user.Uid),
 			})
 		}
 		ctx.JSON(200, Resp{
@@ -307,7 +307,7 @@ func study() gin.HandlerFunc {
 			Push:        push.GetPush(conf.GetConfig()),
 		}
 		core.Init()
-		state.Add(user.UID, core)
+		state.Add(user.Uid, core)
 		config := conf.GetConfig()
 		go func() {
 			core.LearnArticle(user)

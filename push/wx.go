@@ -212,14 +212,14 @@ func handleTextUserList(id, msg string) {
 		return
 	}
 
-	users, err := model.QueryWechatByCondition("")
+	users, err := model.QueryWechatUser()
 	if err != nil {
 		log.Errorln("获取用户列表出现错误" + err.Error())
 		return
 	}
 	message := ""
 	for _, user := range users {
-		message += fmt.Sprintf("open_id:%v\n\n备注：%v\n\n状态:%d", user.OpenID, user.Remark, user.Status)
+		message += fmt.Sprintf("open_id:%v\n\n备注：%v\n\n状态:%d", user.OpenId, user.Remark, user.Status)
 	}
 	sendMsg(id, message)
 }
@@ -242,8 +242,8 @@ func handleTextReject(id, msg string) {
 		log.Errorln("更新用户信息出现错误" + err.Error())
 		return
 	}
-	sendMsg(user.OpenID, "管理员已拒绝了你的使用申请！")
-	sendMsg(id, fmt.Sprintf("已拒绝用户(%v)%v使用", user.Remark, user.OpenID))
+	sendMsg(user.OpenId, "管理员已拒绝了你的使用申请！")
+	sendMsg(id, fmt.Sprintf("已拒绝用户(%v)%v使用", user.Remark, user.OpenId))
 }
 
 func handleTextPass(id, msg string) {
@@ -264,8 +264,8 @@ func handleTextPass(id, msg string) {
 		log.Errorln("更新用户信息出现错误" + err.Error())
 		return
 	}
-	sendMsg(user.OpenID, "管理员已通过了你的使用申请！")
-	sendMsg(id, fmt.Sprintf("已允许用户(%v)%v使用", user.Remark, user.OpenID))
+	sendMsg(user.OpenId, "管理员已通过了你的使用申请！")
+	sendMsg(id, fmt.Sprintf("已允许用户(%v)%v使用", user.Remark, user.OpenId))
 }
 
 // handleEventUseRequest
@@ -278,7 +278,7 @@ func handleEventUseRequest(id, msg string) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err := model.AddWechatUser(&model.WechatUser{
-				OpenID:          id,
+				OpenId:          id,
 				Remark:          "",
 				Status:          0,
 				LastRequestTime: time.Now().Unix(),
@@ -334,7 +334,7 @@ func handleTextRemark(id, msg string) {
 	count := model.WechatUserCount(id)
 	if count < 1 {
 		err := model.AddWechatUser(&model.WechatUser{
-			OpenID:          id,
+			OpenId:          id,
 			Remark:          data,
 			Status:          0,
 			LastRequestTime: 0,
@@ -580,11 +580,11 @@ func handleStartStudy(id string, msg string) {
 	core.Init()
 	defer core.Quit()
 	for i, user := range users {
-		if state.IsStudy(user.UID) {
+		if state.IsStudy(user.Uid) {
 			log.Infoln("该用户已经在学习中了，跳过学习")
 			continue
 		} else {
-			state.Add(user.UID, core)
+			state.Add(user.Uid, core)
 		}
 		sendMsg(id, fmt.Sprintf("开始学习第%d个用户，用户名：%v", i+1, user.Nick))
 		core.LearnArticle(user)
@@ -596,7 +596,7 @@ func handleStartStudy(id string, msg string) {
 			core.RespondDaily(user, "special")
 		}
 
-		state.Delete(user.UID)
+		state.Delete(user.Uid)
 		score, _ := lib.GetUserScore(user.ToCookies())
 		sendMsg(id, fmt.Sprintf("第%d个用户%v学习完成，学习积分\n%v", i+1, user.Nick, lib.FormatScore(score)))
 	}
