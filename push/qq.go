@@ -289,7 +289,7 @@ func (e *Event) sendGroupMsg(groupId int64, message any) int {
 			},
 		}
 	}
-	response, err := utils.GetClient().R().SetBodyJsonMarshal(map[string]any{
+	response, err := utils.GetClient().R().SetHeader("Authorization", conf.GetConfig().QQ.AccessToken).SetBodyJsonMarshal(map[string]any{
 		"action": "send_group_msg",
 		"params": map[string]any{
 			"group_id": groupId,
@@ -319,7 +319,7 @@ func (e *Event) sendPrivateMsg(userId int64, message any) int {
 			},
 		}
 	}
-	response, err := utils.GetClient().R().SetBodyJsonMarshal(map[string]any{
+	response, err := utils.GetClient().R().SetHeader("Authorization", conf.GetConfig().QQ.AccessToken).SetBodyJsonMarshal(map[string]any{
 		"action": "send_private_msg",
 		"params": map[string]any{
 			"user_id": userId,

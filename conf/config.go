@@ -50,10 +50,11 @@ type Config struct {
 		CommonUser map[string]string `json:"common_user" yaml:"common_user" mapstructure:"common_user"`
 	} `json:"web" yaml:"web" mapstructure:"web"`
 	QQ struct {
-		Enable    bool    `json:"enable" mapstructure:"enable"`
-		PostAddr  string  `json:"post_addr" mapstructure:"post_addr"`
-		SuperUser int64   `json:"super_user" mapstructure:"super_user"`
-		WhiteList []int64 `json:"white_list" mapstructure:"white_list"`
+		Enable      bool    `json:"enable" mapstructure:"enable"`
+		PostAddr    string  `json:"post_addr" mapstructure:"post_addr"`
+		SuperUser   int64   `json:"super_user" mapstructure:"super_user"`
+		WhiteList   []int64 `json:"white_list" mapstructure:"white_list"`
+		AccessToken string  `json:"access_token" mapstructure:"access_token"`
 	}
 	Cron           string `json:"cron" yaml:"cron" mapstructure:"cron"`
 	CronRandomWait int    `json:"cron_random_wait" yaml:"cron_random_wait" mapstructure:"cron_random_wait"`
