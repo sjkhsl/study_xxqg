@@ -27,7 +27,6 @@ class Config  extends Component<any, any>{
         }
     }
     editorDidMount = (editor:any, monaco:any) => {
-        console.log('editorDidMount', editor);
         editor.focus();
     }
     onChange = (newValue:any, e:any)=> {
@@ -41,7 +40,8 @@ class Config  extends Component<any, any>{
             if (resp.code === 200){
                 Toast.show("保存成功")
             }else {
-                Dialog.show({content:resp.err})
+                console.log(resp)
+                Dialog.show({content:"配置提交失败"+resp.error,closeOnMaskClick:true,closeOnAction:true})
             }
         })
     }

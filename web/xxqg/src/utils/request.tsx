@@ -1,4 +1,5 @@
 import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
+import {useNavigate} from "react-router-dom";
 
 type TAxiosOption = {
     baseURL: string;
@@ -23,7 +24,16 @@ class Http {
                }
                return value
         },()=>{
-
+                console.log("请求异常")
+        })
+        this.service.interceptors.response.use((value)=>{
+            console.log(value.data)
+            return value
+        },(error)=>{
+            console.log(error.message)
+            if (error.message === "Request failed with status code 401"){
+                window.location.hash = "/login"
+            }
         })
     }
 

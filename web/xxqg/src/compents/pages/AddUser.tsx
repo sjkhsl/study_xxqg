@@ -84,6 +84,19 @@ class AddUser extends Component<any, any>{
             <h2 style={{margin:10,color:"red",display:this.isWechat()}}>当前环境为微信环境，请点击右上角在浏览器中打开</h2>
             <Button onClick={this.click} color={"primary"} style={{marginRight:10,marginTop:10,marginBottom:10}} block>生成链接</Button>
             <span>{this.state.link}</span>
+            {/*<QRCode*/}
+            {/*    id="qrCode"*/}
+            {/*    value={this.state.img}*/}
+            {/*    size={400} // 二维码的大小*/}
+            {/*    fgColor="#000000" // 二维码的颜色*/}
+            {/*    style={{ margin: 'auto' ,display:this.state.img === "你还未获取登录链接" ? "none" : "block"}}*/}
+            {/*    imageSettings={{ // 二维码中间的logo图片*/}
+            {/*        src: qr,*/}
+            {/*        height: 100,*/}
+            {/*        width: 100,*/}
+            {/*        excavate: true, // 中间图片所在的位置是否镂空*/}
+            {/*    }}*/}
+            {/*/>*/}
         </div>;
     }
 }

@@ -115,7 +115,7 @@ class Users extends Component<any, any>{
 
                         })
                     }else {
-                        Dialog.show({content:data.error})
+                        Dialog.show({content:data.error,closeOnMaskClick:true,closeOnAction:true})
                     }
                 })
             }
