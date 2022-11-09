@@ -164,6 +164,52 @@ tg:
 `/study_all` 按顺序对cookie有效的所有用户进行学习
 
 
+### QQ推送配置
+
+qq推送配置支持双向交互，不过需要对接go-cqhttp框架
+配置：
+```yaml
+qq:
+  # 是否启用qq推送
+  enable: true
+  # gocq端监听的地址，默认是5700端口，ip根据自己的网络环境调整
+  post_addr: "http://127.0.0.1:5700"
+  # 管理员qq号
+  super_user: 123
+  # gocq端配置的access_token
+  access_token: 123
+  # 白名单消息
+  white_list:
+    - 123
+```
+
+gocq端配置
+```yaml
+servers:
+  # HTTP 通信设置
+  - http:
+      # 是否关闭正向HTTP服务器
+      disabled: false
+      # 服务端监听地址
+      host: 127.0.0.1
+      # 服务端监听端口
+      port: 5700
+      # 反向HTTP超时时间, 单位秒
+      # 最小值为5，小于5将会忽略本项设置
+      timeout: 5
+      middlewares:
+        <<: *default # 引用默认中间件
+      # 反向HTTP POST地址列表
+      post:
+        -
+          url: 'http://127.0.0.1:8085/qq' # 此处配置为study_xxqg的网页地址加上/qq
+          secret: ''          # 密钥
+
+```
+
+更多细节请查看go-cqhttp文档
+qq命令请输入```.help```查看
+
 ### PushDeer推送配置
 
 pishDeer也仅支持单向推送

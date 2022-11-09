@@ -88,6 +88,7 @@ qq:
   # gocq的监听地址
   post_addr: "http://127.0.0.1:5700"
   super_user: 123
+  access_token: 123
   white_list:
     - 123
 

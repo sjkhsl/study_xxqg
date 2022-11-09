@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
+	"gopkg.in/yaml.v3"
 
 	"github.com/johlanse/study_xxqg/conf"
 )
@@ -46,7 +47,19 @@ func configFileSet() gin.HandlerFunc {
 		var body map[string]string
 		_ = ctx.ShouldBindJSON(&body)
 
-		err := conf.SaveConfigFile(body["data"])
+		err := yaml.Unmarshal([]byte(body["data"]), new(conf.Config))
+		if err != nil {
+			ctx.JSON(200, Resp{
+				Code:    503,
+				Message: "配置提交失败！！",
+				Data:    nil,
+				Success: false,
+				Error:   err.Error(),
+			})
+			return
+		}
+
+		err = conf.SaveConfigFile(body["data"])
 		if err != nil {
 			ctx.JSON(200, Resp{
 				Code:    503,
