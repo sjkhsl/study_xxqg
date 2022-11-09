@@ -123,7 +123,7 @@ var (
 func init() {
 	_, err := os.Stat(`./config/`)
 	if err != nil {
-		os.Mkdir("./config/", 0666) //nolint:errcheck
+		_ = os.Mkdir("./config/", 0666)
 		return
 	}
 }
@@ -161,7 +161,7 @@ func main() {
 			log.Infoln(fmt.Sprintf("已开启wechat公众号配置,监听地址： ==》 %v:%v", config.Web.Host, config.Web.Port))
 			h.HandleFunc("/wx", push.HandleWechat)
 		}
-		if config.Web.Enable || config.Wechat.Enable {
+		if config.Web.Enable || config.Wechat.Enable || config.QQ.Enable {
 			err := http.ListenAndServe(fmt.Sprintf("%s:%d", config.Web.Host, config.Web.Port), h)
 			if err != nil {
 				return

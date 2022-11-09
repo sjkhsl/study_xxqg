@@ -88,7 +88,7 @@ func QueryByPushID(pushID string) ([]*User, error) {
 		result []*User
 	)
 	_ = engine.Ping()
-	err := engine.Where("status=? and push_id=?", 1, pushID).Find(users)
+	err := engine.Where("status=? and push_id=?", 1, pushID).Find(&users)
 	if err != nil {
 		return users, err
 	}

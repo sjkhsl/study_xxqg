@@ -148,7 +148,7 @@ func qqStudy(event *Event, args []string) {
 
 }
 
-func qqGetScore(event *Event, args []string) {
+func qqGetScore(event *Event, _ []string) {
 	users, err := model.Query()
 	if err != nil {
 		event.Send(err.Error())
