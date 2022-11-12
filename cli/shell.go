@@ -27,6 +27,7 @@ func RunCli() {
 	app.AddCommand(getUser())
 	app.AddCommand(addUser())
 	app.AddCommand(study())
+	app.AddCommand(score())
 	grumble.Main(app)
 }
 
@@ -66,6 +67,30 @@ func study() *grumble.Command {
 				}
 			}()
 			return nil
+		},
+	}
+}
+
+func score() *grumble.Command {
+	return &grumble.Command{
+		Name:     "get score",
+		Aliases:  []string{"score"},
+		Help:     "get score",
+		LongHelp: "查询用户积分",
+		Run: func(c *grumble.Context) error {
+			users, err := model.Query()
+			if err != nil {
+				return err
+			}
+			for _, user := range users {
+				score, err := lib.GetUserScore(user.ToCookies())
+				if err != nil {
+					return err
+				}
+				_, _ = c.App.Println(user.Nick + "\n" + lib.FormatScore(score) + "\n\n")
+			}
+
+			return err
 		},
 	}
 }

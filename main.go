@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/johlanse/study_xxqg/utils/stop"
 	"io"
 	"math/rand"
 	"net/http"
@@ -24,7 +25,6 @@ import (
 	nested "github.com/Lyrics-you/sail-logrus-formatter/sailor"
 	"github.com/huoxue1/xdaemon"
 
-	"github.com/johlanse/study_xxqg/cli"
 	"github.com/johlanse/study_xxqg/conf"
 	"github.com/johlanse/study_xxqg/lib/state"
 	"github.com/johlanse/study_xxqg/utils"
@@ -46,7 +46,9 @@ var (
 var VERSION = "unknown"
 
 func init() {
-	runBack()
+	if runtime.GOOS != "windows" {
+		runBack()
+	}
 	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "******************************************************************")
 
 	fmt.Printf("\033[1;31;40m%s\033[0m\n\n", "软件仅可用户学习和个人使用，禁止用于任何商业活动！！！！")
@@ -221,11 +223,7 @@ func main() {
 	if now {
 		do()
 	}
-	if runtime.GOOS == "windows" {
-		cli.RunCli()
-	} else {
-		select {}
-	}
+	stop.Stop()
 
 }
 

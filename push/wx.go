@@ -1,7 +1,6 @@
 package push
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -275,23 +274,19 @@ func handleTextPass(id, msg string) {
  */
 func handleEventUseRequest(id, msg string) {
 	user, err := model.FindWechatUser(id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			err := model.AddWechatUser(&model.WechatUser{
-				OpenId:          id,
-				Remark:          "",
-				Status:          0,
-				LastRequestTime: time.Now().Unix(),
-			})
-			if err != nil {
-				log.Errorln("添加用户出现错误" + err.Error())
-				return
-			}
-			sendMsg(conf.GetConfig().Wechat.SuperOpenID, fmt.Sprintf("用户%v申请使用测试号，通过则回复信息：\n通过 %v\n\n拒绝则回复:\n拒绝 %v", id, id, id))
-		} else {
-			log.Errorln("查询用户出现未知错误" + err.Error())
+	if user.OpenId == "" {
+
+		err := model.AddWechatUser(&model.WechatUser{
+			OpenId:          id,
+			Remark:          "",
+			Status:          0,
+			LastRequestTime: time.Now().Unix(),
+		})
+		if err != nil {
+			log.Errorln("添加用户出现错误" + err.Error())
 			return
 		}
+		sendMsg(conf.GetConfig().Wechat.SuperOpenID, fmt.Sprintf("用户%v申请使用测试号，通过则回复信息：\n通过 %v\n\n拒绝则回复:\n拒绝 %v", id, id, id))
 
 	} else {
 		if err != nil {
@@ -626,6 +621,11 @@ func handleGetUser(id string, msg string) {
 			}
 		}
 
+	}
+	if message == "" {
+		log.Warningln("还未存在绑定的用户登录")
+		sendMsg(id, "你还没有已登陆的用户，请点击下方登录按钮登录！")
+		return
 	}
 	sendMsg(id, message)
 }

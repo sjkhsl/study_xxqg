@@ -26,7 +26,7 @@ func UpdateWechatUser(user *WechatUser) error {
 			return err
 		}
 	} else {
-		_, err := engine.Table(new(WechatUser)).Update(user)
+		_, err := engine.Where("open_id=?", user.OpenId).Update(user)
 		if err != nil {
 			return err
 		}
