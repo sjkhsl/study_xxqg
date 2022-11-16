@@ -53,7 +53,10 @@ func CheckUserCookie(cookies []*http.Cookie) (bool, error) {
 		log.Errorln("获取用户总分错误" + err.Error())
 		return true, err
 	}
-	if !gjson.GetBytes(response.Bytes(), "ok").Bool() {
+	log.Infoln(gjson.GetBytes(response.Bytes(), "@this|@pretty"))
+	if !gjson.GetBytes(response.Bytes(), "ok").Bool() &&
+		gjson.GetBytes(response.Bytes(), "code").Int() == 401 &&
+		gjson.GetBytes(response.Bytes(), "message").String() == "token check failed" {
 		return false, err
 	}
 	return true, err
