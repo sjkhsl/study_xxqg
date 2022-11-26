@@ -3,6 +3,7 @@
   * [Windows运行](./windows/index)
   * [linux运行](./linux/index)
   * [源码运行](./custom/index)
+  * [手机运行](./lazy/index)
 * [推送配置](./push.md)
 * [配置文件](./config.md)
 * [跳板搭建](./scheme.md)
