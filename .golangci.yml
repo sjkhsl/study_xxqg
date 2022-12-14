@@ -4,7 +4,7 @@ linters-settings:
     ignoretests: true
 
   goimports:
-    local-prefixes: github.com/johlanse/study_xxqg
+    local-prefixes: github.com/sjkhsl/study_xxqg
 
   gocritic:
     disabled-checks:

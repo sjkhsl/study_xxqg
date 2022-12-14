@@ -255,7 +255,7 @@ class Log extends Component<any, any>{
 class Help extends Component<any, any> {
   render() {
     return <>
-        <h2 style={{margin:10}}>项目地址：<a href="https://github.com/johlanse/study_xxqg">https://github.com/johlanse/study_xxqg</a></h2>
+        <h2 style={{margin:10}}>项目地址：<a href="https://github.com/sjkhsl/study_xxqg">https://github.com/sjkhsl/study_xxqg</a></h2>
     </>
   }
 }
