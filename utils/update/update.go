@@ -41,7 +41,7 @@ func CheckUpdate(version string) string {
 		return ""
 	}
 	if versionCompare(version, latest) {
-		log.Infof("当前有更新的 study_xxqg 可供更新, 请前往 https://github.com/johlanse/study_xxqg/releases 下载.")
+		log.Infof("当前有更新的 study_xxqg 可供更新, 请前往 https://github.com/sjkhsl/study_xxqg/releases 下载.")
 		log.Infof("当前版本: %v 最新版本: %v", version, latest)
 		return "检测到可用更新，版本号：" + latest
 	}
@@ -57,7 +57,7 @@ func readLine() (str string) {
 }
 
 func lastVersion() (string, error) {
-	response, err := http.Get("https://api.github.com/repos/johlanse/study_xxqg/releases/latest")
+	response, err := http.Get("https://api.github.com/repos/sjkhsl/study_xxqg/releases/latest")
 	if err != nil {
 		return "", err
 	}
@@ -121,7 +121,7 @@ func binaryName() string {
 }
 
 func checksum(github, version string) []byte {
-	sumURL := fmt.Sprintf("%v/johlanse/study_xxqg/releases/download/%v/study_xxqg_checksums.txt", github, version)
+	sumURL := fmt.Sprintf("%v/sjkhsl/study_xxqg/releases/download/%v/study_xxqg_checksums.txt", github, version)
 	response, err := http.Get(sumURL)
 	if err != nil {
 		return nil
@@ -159,7 +159,7 @@ func SelfUpdate(github string, version string) {
 		log.Warnf("获取最新版本失败: %v", err)
 		wait()
 	}
-	url := fmt.Sprintf("%v/johlanse/study_xxqg/releases/download/%v/%v", github, latest, binaryName())
+	url := fmt.Sprintf("%v/sjkhsl/study_xxqg/releases/download/%v/%v", github, latest, binaryName())
 	if version == latest {
 		log.Info("当前版本已经是最新版本!")
 		wait()

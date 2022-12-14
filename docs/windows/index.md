@@ -1,6 +1,6 @@
 ## windows使用教程
 
-+ 浏览器访问[Release](https://github.com/johlanse/study_xxqg/releases)
++ 浏览器访问[Release](https://github.com/sjkhsl/study_xxqg/releases)
 + 选择最新版本下载 ```study_xxqg_amd64.zip```
 + 将其解压到合适的位置
 + 进入解压后的文件夹，双击运行```study_xxqg.exe```,第一次打开可能会出现闪退，发现文件夹下生成了config文件夹

@@ -25,9 +25,9 @@ import (
 	goqrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/image/bmp"
 
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/utils"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/utils"
 )
 
 // Core
