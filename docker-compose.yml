@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   xuexi-auto:
-    image: jolanse/study_xxqg:latest
+    image: sjkhsl/study_xxqg:latest
     # 容器名
     container_name: xuexi-auto
     environment:

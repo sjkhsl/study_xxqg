@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/johlanse/study_xxqg/lib"
+	"github.com/sjkhsl/study_xxqg/lib"
 )
 
 // 该文件的方法为保存当前正在学习的用户

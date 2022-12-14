@@ -16,13 +16,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 
-	"github.com/johlanse/study_xxqg/conf"
-	// "github.com/johlanse/study_xxqg/gui"
-	"github.com/johlanse/study_xxqg/lib"
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/push"
-	"github.com/johlanse/study_xxqg/utils/update"
-	"github.com/johlanse/study_xxqg/web"
+	"github.com/sjkhsl/study_xxqg/conf"
+	// "github.com/sjkhsl/study_xxqg/gui"
+	"github.com/sjkhsl/study_xxqg/lib"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/push"
+	"github.com/sjkhsl/study_xxqg/utils/update"
+	"github.com/sjkhsl/study_xxqg/web"
 )
 
 var (
