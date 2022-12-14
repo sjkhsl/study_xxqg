@@ -4,8 +4,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/utils/update"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/utils/update"
 )
 
 // Restart
