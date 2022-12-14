@@ -18,7 +18,7 @@
 + ### windows打开**study_xxqg.exe**出现直接闪退
 ```yaml
   在文件路径栏输入**cmd**,然后再黑色命令窗口中输入```./study_xxqg.exe```,
-  然后查看报错内容截图并在[github](https://github.com/johlanse/study_xxqg/issues) 提交issue
+  然后查看报错内容截图并在[github](https://github.com/sjkhsl/study_xxqg/issues) 提交issue
 ```
 
 + ### web端账号密码
