@@ -8,8 +8,8 @@ import (
 	"github.com/panjf2000/ants/v2"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/johlanse/study_xxqg/lib"
-	"github.com/johlanse/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/lib"
+	"github.com/sjkhsl/study_xxqg/model"
 )
 
 type Task struct {

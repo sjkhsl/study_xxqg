@@ -10,5 +10,5 @@
 - cookie保存时间长
 - 支持多种推送方式
 
-[GitHub](https://github.com/johlanse/study_xxqg)
+[GitHub](https://github.com/sjkhsl/study_xxqg)
 [Get Started](./start.md)
