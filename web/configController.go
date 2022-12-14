@@ -3,7 +3,7 @@ package web
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/johlanse/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/conf"
 )
 
 func configGet() gin.HandlerFunc {
