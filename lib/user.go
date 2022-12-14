@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
-	"github.com/johlanse/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/model"
 )
 
 // GetUserInfo
