@@ -12,12 +12,12 @@ import (
 	"github.com/johlanse/wechat/mp/request"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/lib"
-	"github.com/johlanse/study_xxqg/lib/state"
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/utils"
-	"github.com/johlanse/study_xxqg/utils/update"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/lib"
+	"github.com/sjkhsl/study_xxqg/lib/state"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/utils"
+	"github.com/sjkhsl/study_xxqg/utils/update"
 )
 
 var (

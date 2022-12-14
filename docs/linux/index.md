@@ -1,6 +1,6 @@
 ## 可执行文件运行
 
-+ 本地访问[Releases]([Release](https://github.com/johlanse/study_xxqg/releases)) ,查找对应版本并复制链接
++ 本地访问[Releases]([Release](https://github.com/sjkhsl/study_xxqg/releases)) ,查找对应版本并复制链接
 + 使用wget下载对应版本压缩包
 + > tar -xzvf study_xxqg_linux_amd64.tar.gz
 + 运行 ```./study_xxqg --init```,首次运行会生成默认配置文件
@@ -9,25 +9,25 @@
 
 ### 一键安装脚本
 ```shell
-wget  https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py
+wget  https://raw.githubusercontent.com/sjkhsl/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py
 ```
 
 ## docker运行
 
 ```
-docker run --name study_xxqg --restart always -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  jolanse/study_xxqg:latest
+docker run --name study_xxqg --restart always -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  sjkhsl/study_xxqg:latest
 ```
 各个参数的含义：
 + **--restart always 容器总是自动重启
 + **--name study_xxqg** 运行的容器的名称，可以根据自己实际情况进行修改
 + **-p 8080:8080** 将容器内部的8080端口映射到容器外面，前面是宿主机的端口，就是网页上访问的端口，后面是容器内部需要运行的端口，对应配置文件内web配置的端口就好
 + **-v /etc/study_xxqg/:/opt/config/** 将容器内的/opt/config/目录映射到宿主机的/etc/study_xxqg/目录，可根据实际情况修改前面宿主机路径，映射后对应的config.yml配置文件位置就在该目录下
-+ **jolanse/study_xxqg:latest**镜像名称和镜像的版本，latest代表开发中的最新版本
++ **sjkhsl/study_xxqg:latest**镜像名称和镜像的版本，latest代表开发中的最新版本
 
 ## docker-compose运行
 
 ```shell
-wget https://raw.githubusercontent.com/johlanse/study_xxqg/main/docker-compose.yml
+wget https://raw.githubusercontent.com/sjkhsl/study_xxqg/main/docker-compose.yml
 docker-compose up -d
 ```
 

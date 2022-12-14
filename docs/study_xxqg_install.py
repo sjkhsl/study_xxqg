@@ -59,12 +59,12 @@ def updateDependent() -> str:
 
 
 def last_version() -> str:
-    return requests.get("https://api.github.com/repos/johlanse/study_xxqg/releases/latest").json().get("tag_name")
+    return requests.get("https://api.github.com/repos/sjkhsl/study_xxqg/releases/latest").json().get("tag_name")
 
 
 def download(github: str, version: str, binaryName: str):
     print("正在下载文件中，请耐心等待！！！")
-    content = requests.get(f"{github}/johlanse/study_xxqg/releases/download/{version}/{binaryName}").content
+    content = requests.get(f"{github}/sjkhsl/study_xxqg/releases/download/{version}/{binaryName}").content
     if platform.system().lower() == "windows":
         with zipfile.ZipFile(io.BytesIO(content)) as zf:
             data = zf.open("study_xxqg.exe")
