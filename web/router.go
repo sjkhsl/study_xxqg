@@ -9,9 +9,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/utils"
-	"github.com/johlanse/study_xxqg/utils/update"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/utils"
+	"github.com/sjkhsl/study_xxqg/utils/update"
 )
 
 // 将静态文件嵌入到可执行程序中来
