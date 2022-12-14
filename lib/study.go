@@ -11,8 +11,8 @@ import (
 	"github.com/playwright-community/playwright-go"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/utils"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/utils"
 )
 
 var (

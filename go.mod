@@ -1,4 +1,4 @@
-module github.com/johlanse/study_xxqg
+module github.com/sjkhsl/study_xxqg
 
 go 1.18
 

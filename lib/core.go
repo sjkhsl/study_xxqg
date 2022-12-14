@@ -16,9 +16,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	goqrcode "github.com/skip2/go-qrcode"
 
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/utils"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/utils"
 )
 
 // Core
