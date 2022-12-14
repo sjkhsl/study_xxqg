@@ -11,11 +11,11 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/lib"
-	"github.com/johlanse/study_xxqg/lib/state"
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/utils"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/lib"
+	"github.com/sjkhsl/study_xxqg/lib/state"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/utils"
 )
 
 var (

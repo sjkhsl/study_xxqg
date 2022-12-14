@@ -24,16 +24,16 @@ import (
 	nested "github.com/Lyrics-you/sail-logrus-formatter/sailor"
 	"github.com/huoxue1/xdaemon"
 
-	"github.com/johlanse/study_xxqg/cli"
-	"github.com/johlanse/study_xxqg/conf"
-	"github.com/johlanse/study_xxqg/lib/state"
-	"github.com/johlanse/study_xxqg/utils"
-	// "github.com/johlanse/study_xxqg/gui"
-	"github.com/johlanse/study_xxqg/lib"
-	"github.com/johlanse/study_xxqg/model"
-	"github.com/johlanse/study_xxqg/push"
-	"github.com/johlanse/study_xxqg/utils/update"
-	"github.com/johlanse/study_xxqg/web"
+	"github.com/sjkhsl/study_xxqg/cli"
+	"github.com/sjkhsl/study_xxqg/conf"
+	"github.com/sjkhsl/study_xxqg/lib/state"
+	"github.com/sjkhsl/study_xxqg/utils"
+	// "github.com/sjkhsl/study_xxqg/gui"
+	"github.com/sjkhsl/study_xxqg/lib"
+	"github.com/sjkhsl/study_xxqg/model"
+	"github.com/sjkhsl/study_xxqg/push"
+	"github.com/sjkhsl/study_xxqg/utils/update"
+	"github.com/sjkhsl/study_xxqg/web"
 )
 
 var (
@@ -102,7 +102,7 @@ func init() {
 	})
 	if !utils.CheckQuestionDB() {
 		go utils.DownloadDbFile()
-		//log.Errorln("题库文件不存在或已损坏，请手动前往 https://github.com/johlanse/study_xxqg/blob/main/conf/QuestionBank.db 下载并放入程序根目录")
+		//log.Errorln("题库文件不存在或已损坏，请手动前往 https://github.com/sjkhsl/study_xxqg/blob/main/conf/QuestionBank.db 下载并放入程序根目录")
 	}
 }
 
