@@ -76,7 +76,7 @@ docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  s
 ## docker-compose运行
 
 ```
-wget https://raw.githubusercontent.com/johlanse/study_xxqg/main/docker-compose.yml
+wget https://raw.githubusercontent.com/sjkhsl/study_xxqg/main/docker-compose.yml
 docker-compose up -d
 ```
 
