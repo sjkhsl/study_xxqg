@@ -57,13 +57,13 @@
 ### 一键安装脚本
 
 ```
-wget  https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py
+wget  https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py  废弃
 ```
 
 ## docker运行
 
 ```
-docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  jolanse/study_xxqg:latest
+docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  study_xxqg:latest
 ```
 
 各个参数的含义：
