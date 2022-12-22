@@ -54,7 +54,7 @@
 - 再次运行即可
   
 
-### 一键安装脚本
+### 一键安装脚本  废弃
 
 ```
 wget  https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg_install.py && python3 study_xxqg_install.py  废弃
@@ -63,7 +63,7 @@ wget  https://raw.githubusercontent.com/johlanse/study_xxqg/main/docs/study_xxqg
 ## docker运行
 
 ```
-docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  study_xxqg:latest
+docker run --name study_xxqg -d -p 8080:8080 -v /etc/study_xxqg/:/opt/config/  sjkhsl/study_xxqg:latest
 ```
 
 各个参数的含义：
