@@ -54,7 +54,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	}
 	resp = response.Bytes()
 	datas := gjson.GetBytes(resp, "data.taskProgress").Array()
-	m := make(map[string]Data, 7)
+	m := make(map[string]Data, 6)
 	m["article"] = Data{
 		CurrentScore: int(datas[0].Get("currentScore").Int()),
 		MaxScore:     int(datas[0].Get("dayMaxScore").Int()),
@@ -63,25 +63,25 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 		CurrentScore: int(datas[1].Get("currentScore").Int()),
 		MaxScore:     int(datas[1].Get("dayMaxScore").Int()),
 	}
-	m["weekly"] = Data{
+	// m["weekly"] = Data{
+	// 	CurrentScore: int(datas[2].Get("currentScore").Int()),
+	//	MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
+	// }
+	m["video_time"] = Data{
 		CurrentScore: int(datas[2].Get("currentScore").Int()),
 		MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
 	}
-	m["video_time"] = Data{
+	m["login"] = Data{
 		CurrentScore: int(datas[3].Get("currentScore").Int()),
 		MaxScore:     int(datas[3].Get("dayMaxScore").Int()),
 	}
-	m["login"] = Data{
+	m["special"] = Data{
 		CurrentScore: int(datas[4].Get("currentScore").Int()),
 		MaxScore:     int(datas[4].Get("dayMaxScore").Int()),
 	}
-	m["special"] = Data{
+	m["daily"] = Data{
 		CurrentScore: int(datas[5].Get("currentScore").Int()),
 		MaxScore:     int(datas[5].Get("dayMaxScore").Int()),
-	}
-	m["daily"] = Data{
-		CurrentScore: int(datas[6].Get("currentScore").Int()),
-		MaxScore:     int(datas[6].Get("dayMaxScore").Int()),
 	}
 
 	score.Content = m
