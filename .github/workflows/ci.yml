@@ -54,6 +54,7 @@ jobs:
           export LD_FLAGS="-w -s -X main.VERSION=unknown"
           go mod tidy
           go build -o "output/$BINARY_NAME" -trimpath -ldflags "$LD_FLAGS" ./
+          echo "FIRMWARE=$PWD/output/*" >> $GITHUB_ENV
   
       - name: Generate release tag
         id: tag
@@ -69,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: ${{ env.FIRMWARE/* }}
+          files: ${{ env.FIRMWARE }}
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
