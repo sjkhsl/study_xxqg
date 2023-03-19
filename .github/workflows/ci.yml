@@ -59,4 +59,11 @@ jobs:
         with:
           name: ${{ matrix.goos }}_${{ matrix.goarch }}
           path: output/
+          
+      - name: Upload firmware directory
+        uses: actions/upload-artifact@main
+        if: true
+        with:
+          name: ${{ matrix.goos }}_${{ matrix.goarch }}
+          path: output/
 
