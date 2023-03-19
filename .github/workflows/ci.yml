@@ -72,7 +72,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: $FIRMWARE
+          files: $FIRMWARE/*
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
