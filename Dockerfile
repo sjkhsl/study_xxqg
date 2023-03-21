@@ -17,7 +17,7 @@ RUN  apt-get -qq update && \
 COPY conf/config_default.yml /opt/config/config.yml
 COPY conf/QuestionBank.db /opt/QuestionBank.db
 
-COPY ./dist/docker_linux_$TARGETARCH*/study_xxqg /opt/study_xxqg
+COPY ./study_xxqg /opt/study_xxqg
 
 RUN  chmod -R 777 /opt/study_xxqg && \
      cd /opt/ && \
