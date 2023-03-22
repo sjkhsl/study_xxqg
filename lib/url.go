@@ -4,7 +4,7 @@ const (
 	userInfoUrl            = "https://pc-api.xuexi.cn/open/api/user/info"
 	userTotalscoreUrl      = "https://pc-proxy-api.xuexi.cn/delegate/score/get"
 	userTodaytotalscoreUrl = "https://pc-proxy-api.xuexi.cn/delegate/score/today/query"
-	userRatescoreUrl       = "https://pc-proxy-api.xuexi.cn/api/score/days/listScoreProgress?sence=score&deviceType=2"
+	userRatescoreUrl       = "https://pc-proxy-api.xuexi.cn/delegate/score/days/listScoreProgress?sence=score&deviceType=2"
 
 	// pageSize=1000&pageNo=1
 	querySpecialList = "https://pc-proxy-api.xuexi.cn/api/exam/service/paper/pc/list"
