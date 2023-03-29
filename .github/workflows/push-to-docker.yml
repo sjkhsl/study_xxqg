@@ -20,9 +20,6 @@ jobs:
         with:
           fetch-depth: 0
       -
-        name: Fetch all tags
-        run: git fetch --force --tags
-      -
         name: Set up Go
         uses: actions/setup-go@v3
         with:
@@ -64,7 +61,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: sjkhsl/study_xxqg
+          images: xlh001/study_xxqg
           tags: |
             type=raw,value=latest
             type=ref,event=tag
