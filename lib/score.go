@@ -67,18 +67,18 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	// 	CurrentScore: int(datas[2].Get("currentScore").Int()),
 	//	MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
 	// }
-	m["video_time"] = Data{
-		CurrentScore: int(datas[2].Get("currentScore").Int()),
-		MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
-	}
+	// m["video_time"] = Data{
+	// 	CurrentScore: int(datas[2].Get("currentScore").Int()),
+	// 	MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
+	// }
 	m["login"] = Data{
 		CurrentScore: int(datas[3].Get("currentScore").Int()),
 		MaxScore:     int(datas[3].Get("dayMaxScore").Int()),
 	}
-	m["special"] = Data{
-		CurrentScore: int(datas[4].Get("currentScore").Int()),
-		MaxScore:     int(datas[4].Get("dayMaxScore").Int()),
-	}
+	// m["special"] = Data{
+	// 	CurrentScore: int(datas[4].Get("currentScore").Int()),
+	// 	MaxScore:     int(datas[4].Get("dayMaxScore").Int()),
+	// }
 	m["daily"] = Data{
 		CurrentScore: int(datas[5].Get("currentScore").Int()),
 		MaxScore:     int(datas[5].Get("dayMaxScore").Int()),
@@ -92,16 +92,16 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 func PrintScore(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
-	result += fmt.Sprintf("[%v] [INFO]: 登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n视频时长：%v/%v\n[%v] [INFO]: 每日答题：%v/%v\n每周答题：%v/%v\n专项答题：%v/%v",
+	result += fmt.Sprintf("[%v] [INFO]: 登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n[%v] [INFO]: 每日答题：%v/%v",
 		time.Now().Format("2006-01-02 15:04:05"),
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
-		score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
+		// score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
 		time.Now().Format("2006-01-02 15:04:05"),
 		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
-		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
-		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
+		// score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
+		// score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
 	log.Infoln(result)
 	return result
@@ -110,14 +110,14 @@ func PrintScore(score Score) string {
 func FormatScore(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
-	result += fmt.Sprintf("登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n视频时长：%v/%v\n每日答题：%v/%v\n每周答题：%v/%v\n专项答题：%v/%v",
+	result += fmt.Sprintf("登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n每日答题：%v/%v\n",
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
-		score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
+		// score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
 		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
-		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
-		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
+		// score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
+		// score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
 	return result
 }
@@ -125,14 +125,14 @@ func FormatScore(score Score) string {
 func FormatScoreShort(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
-	result += fmt.Sprintf("登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n视频时长：%v/%v\n每日答题：%v/%v\n每周答题：%v/%v\n专项答题：%v/%v",
+	result += fmt.Sprintf("登录：%v/%v\n文章学习：%v/%v\n视频学习：%v/%v\n每日答题：%v/%v",
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
-		score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
+		// score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
 		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
-		score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
-		score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
+		// score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
+		// score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
 	return result
 }
