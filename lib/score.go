@@ -54,7 +54,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	}
 	resp = response.Bytes()
 	datas := gjson.GetBytes(resp, "data.taskProgress").Array()
-	m := make(map[string]Data, 6)
+	m := make(map[string]Data, 4)
 	m["article"] = Data{
 		CurrentScore: int(datas[0].Get("currentScore").Int()),
 		MaxScore:     int(datas[0].Get("dayMaxScore").Int()),
@@ -63,25 +63,13 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 		CurrentScore: int(datas[1].Get("currentScore").Int()),
 		MaxScore:     int(datas[1].Get("dayMaxScore").Int()),
 	}
-	// m["weekly"] = Data{
-	// 	CurrentScore: int(datas[2].Get("currentScore").Int()),
-	//	MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
-	// }
-	// m["video_time"] = Data{
-	// 	CurrentScore: int(datas[2].Get("currentScore").Int()),
-	// 	MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
-	// }
 	m["login"] = Data{
+		CurrentScore: int(datas[2].Get("currentScore").Int()),
+		MaxScore:     int(datas[2].Get("dayMaxScore").Int()),
+	}
+	m["daily"] = Data{
 		CurrentScore: int(datas[3].Get("currentScore").Int()),
 		MaxScore:     int(datas[3].Get("dayMaxScore").Int()),
-	}
-	// m["special"] = Data{
-	// 	CurrentScore: int(datas[4].Get("currentScore").Int()),
-	// 	MaxScore:     int(datas[4].Get("dayMaxScore").Int()),
-	// }
-	m["daily"] = Data{
-		CurrentScore: int(datas[5].Get("currentScore").Int()),
-		MaxScore:     int(datas[5].Get("dayMaxScore").Int()),
 	}
 
 	score.Content = m
@@ -97,11 +85,8 @@ func PrintScore(score Score) string {
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
-		// score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
 		time.Now().Format("2006-01-02 15:04:05"),
 		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
-		// score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
-		// score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
 	log.Infoln(result)
 	return result
@@ -114,10 +99,7 @@ func FormatScore(score Score) string {
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
-		// score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
 		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
-		// score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
-		// score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
 	return result
 }
@@ -129,10 +111,7 @@ func FormatScoreShort(score Score) string {
 		score.Content["login"].CurrentScore, score.Content["login"].MaxScore,
 		score.Content["article"].CurrentScore, score.Content["article"].MaxScore,
 		score.Content["video"].CurrentScore, score.Content["video"].MaxScore,
-		// score.Content["video_time"].CurrentScore, score.Content["video_time"].MaxScore,
 		score.Content["daily"].CurrentScore, score.Content["daily"].MaxScore,
-		// score.Content["weekly"].CurrentScore, score.Content["weekly"].MaxScore,
-		// score.Content["special"].CurrentScore, score.Content["special"].MaxScore,
 	)
 	return result
 }
