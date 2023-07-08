@@ -25,12 +25,9 @@ import (
 const (
 	MyPointsUri = "https://pc.xuexi.cn/points/my-points.html"
 
-	DailyBUTTON = `#app > div > div.layout-body > div >
-div.my-points-section > div.my-points-content > div:nth-child(5) > div.my-points-card-footer > div.buttonbox > div`
-	WEEKEND = `#app > div > div.layout-body > div > div.my-points-section > div.my-points-content >
-div:nth-child(7) > div.my-points-card-footer > div.buttonbox > div`
-	SPECIALBUTTON = `#app > div > div.layout-body > 
-div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-points-card-footer > div.buttonbox > div`
+	DailyBUTTON   = `#app > div > div.layout-body > div > div.my-points-section > div.my-points-content > div:nth-child(4) > div.my-points-card-footer > div.buttonbox > div`
+	WEEKEND       = `#app > div > div.layout-body > div > div.my-points-section > div.my-points-content > div:nth-child(7) > div.my-points-card-footer > div.buttonbox > div`
+	SPECIALBUTTON = `#app > div > div.layout-body > div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-points-card-footer > div.buttonbox > div`
 )
 
 // RespondDaily
