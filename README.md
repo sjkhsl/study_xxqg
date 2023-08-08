@@ -2,6 +2,7 @@
 
 ### 学习强国自动化学习
 
+小改一下，by Niyah
 
 该项目基于[playwright-go](https://github.com/mxschmitt/playwright-go) 开发，支持*windows*，*linux*,*mac*
 
