@@ -311,7 +311,7 @@ func study() gin.HandlerFunc {
 		config := conf.GetConfig()
 		go func() {
 			core.LearnArticle(user)
-			core.LearnVideo(user)
+			core.RadioStation(user)
 			if config.Model == 2 {
 				core.RespondDaily(user, "daily")
 			} else if config.Model == 3 {

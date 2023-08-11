@@ -75,7 +75,6 @@ func TgInit() {
 
 // Telegram
 // @Description:
-//
 type Telegram struct {
 	Token  string
 	ChatId int64
@@ -263,25 +262,21 @@ func getFailUser(bot *Telegram, from int64, args []string) {
 	bot.SendMsg(from, "当前过期用户:\n"+msg)
 }
 
-//
-//  checkVersion
-//  @Description: 检查版本信息
-//  @param bot
-//  @param from
-//  @param args
-//
+// checkVersion
+// @Description: 检查版本信息
+// @param bot
+// @param from
+// @param args
 func checkVersion(bot *Telegram, from int64, args []string) {
 	about := utils.GetAbout()
 	bot.SendMsg(from, about)
 }
 
-//
-//  botRestart
-//  @Description: 重启程序
-//  @param bot
-//  @param from
-//  @param args
-//
+// botRestart
+// @Description: 重启程序
+// @param bot
+// @param from
+// @param args
 func botRestart(bot *Telegram, from int64, args []string) {
 	if from != conf.GetConfig().TG.ChatID {
 		bot.SendMsg(from, "请联系管理员解决！！")
@@ -291,13 +286,11 @@ func botRestart(bot *Telegram, from int64, args []string) {
 	utils.Restart()
 }
 
-//
-//  botUpdate
-//  @Description: 更新程序
-//  @param bot
-//  @param from
-//  @param args
-//
+// botUpdate
+// @Description: 更新程序
+// @param bot
+// @param from
+// @param args
 func botUpdate(bot *Telegram, from int64, args []string) {
 	if from != conf.GetConfig().TG.ChatID {
 		bot.SendMsg(from, "请联系管理员解决！！")
@@ -409,7 +402,7 @@ func studyAll(bot *Telegram, from int64, args []string) {
 				core.Init()
 				defer core.Quit()
 				core.LearnArticle(user)
-				core.LearnVideo(user)
+				core.RadioStation(user)
 				core.RespondDaily(user, "daily")
 				core.RespondDaily(user, "weekly")
 				core.RespondDaily(user, "special")

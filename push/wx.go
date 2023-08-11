@@ -381,21 +381,17 @@ func handleGetOpenID(id string, msg string) {
 	sendMsg(id, "你的open_id为"+id)
 }
 
-//
-//  handleCheckUpdate
-//  @Description: 检查更新
-//  @param id
-//
+// handleCheckUpdate
+// @Description: 检查更新
+// @param id
 func handleCheckUpdate(id string, msg string) {
 	about := utils.GetAbout()
 	sendMsg(id, about)
 }
 
-//
-//  handleUpdate
-//  @Description: 开始更新
-//  @param id
-//
+// handleUpdate
+// @Description: 开始更新
+// @param id
 func handleUpdate(id string, msg string) {
 	if conf.GetConfig().Wechat.SuperOpenID != id {
 		sendMsg(id, "请联系管理员处理！")
@@ -406,11 +402,9 @@ func handleUpdate(id string, msg string) {
 	utils.Restart()
 }
 
-//
-//  handleRestart
-//  @Description: 重启程序
-//  @param id
-//
+// handleRestart
+// @Description: 重启程序
+// @param id
 func handleRestart(id string, msg string) {
 	if conf.GetConfig().Wechat.SuperOpenID != id {
 		sendMsg(id, "请联系管理员处理！")
@@ -420,12 +414,10 @@ func handleRestart(id string, msg string) {
 	utils.Restart()
 }
 
-//
-//  sendMsg
-//  @Description: 发送消息
-//  @param id
-//  @param message
-//
+// sendMsg
+// @Description: 发送消息
+// @param id
+// @param message
 func sendMsg(id, message string) {
 
 	if wx == nil {
@@ -527,11 +519,9 @@ func HandleWechat(rep http.ResponseWriter, req *http.Request) {
 	wx.ServeHTTP(rep, req)
 }
 
-//
-//  handleLogin
-//  @Description: 用户登录
-//  @param id
-//
+// handleLogin
+// @Description: 用户登录
+// @param id
 func handleLogin(id string, msg string) {
 	core := &lib.Core{Push: func(id1 string, kind, message string) {
 		if kind == "flush" && strings.Contains(message, "login.xuexi.cn") {
@@ -555,11 +545,9 @@ func handleLogin(id string, msg string) {
 	sendMsg(id, "登录成功")
 }
 
-//
-//  handleStartStudy
-//  @Description: 开始学习
-//  @param id
-//
+// handleStartStudy
+// @Description: 开始学习
+// @param id
 func handleStartStudy(id string, msg string) {
 	users, err := model.QueryByPushID(id)
 	if err != nil {
@@ -583,7 +571,7 @@ func handleStartStudy(id string, msg string) {
 		}
 		sendMsg(id, fmt.Sprintf("开始学习第%d个用户，用户名：%v", i+1, user.Nick))
 		core.LearnArticle(user)
-		core.LearnVideo(user)
+		core.RadioStation(user)
 		if conf.GetConfig().Model == 2 {
 			core.RespondDaily(user, "daily")
 		} else if conf.GetConfig().Model == 3 {

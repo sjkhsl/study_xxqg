@@ -48,7 +48,7 @@ func GetAbout() string {
  */
 func CheckUserCookie(cookies []*http.Cookie) (bool, error) {
 	client := GetClient()
-	response, err := client.R().SetCookies(cookies...).Get("https://pc-api.xuexi.cn/open/api/score/get")
+	response, err := client.R().SetCookies(cookies...).Get("https://pc-api.xuexi.cn/delegate/score/get")
 	if err != nil {
 		log.Errorln("获取用户总分错误" + err.Error())
 		return true, err

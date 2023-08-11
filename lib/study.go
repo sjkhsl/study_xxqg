@@ -36,6 +36,13 @@ var (
 		"https://www.xuexi.cn/lgdata/3o3ufqgl8rsn.json",
 		"https://www.xuexi.cn/lgdata/525pi8vcj24p.json",
 		"https://www.xuexi.cn/lgdata/1742g60067k.json"}
+	yp_url_list = []string{
+		"https://www.xuexi.cn/lgdata/1ode6kjlu7m.json",
+		"https://www.xuexi.cn/lgdata/1ggb81u8f7m.json",
+		"https://www.xuexi.cn/lgdata/139993ri8nm.json",
+		"https://www.xuexi.cn/lgdata/u07dubuq7m.json",
+		"https://www.xuexi.cn/lgdata/spisr390nm.json",
+		"https://www.xuexi.cn/lgdata/1elt18mm57m.json"}
 )
 
 type Link struct {
@@ -66,6 +73,8 @@ func getLinks(model string) ([]Link, error) {
 		learnUrl = article_url_list[rand.Intn(7)]
 	} else if model == "video" {
 		learnUrl = video_url_list[rand.Intn(7)]
+	} else if model == "yp" {
+		learnUrl = yp_url_list[rand.Intn(7)]
 	} else {
 		return nil, errors.New("model选择出现错误")
 	}
@@ -314,5 +323,113 @@ func (c *Core) LearnVideo(user *model.User) {
 		}
 	} else {
 		log.Infoln("检测到视频学习已经完成")
+	}
+}
+
+/**
+ * @Description: 音频
+ */
+func (c *Core) RadioStation(user *model.User) {
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Errorln("电台学习模块异常结束")
+			log.Errorln(err)
+		}
+	}()
+	if c.IsQuit() {
+		return
+	}
+	score, err := GetUserScore(user.ToCookies())
+	if err != nil {
+		log.Errorln(err.Error())
+		return
+	}
+	links, _ := getLinks("yp")
+	if !(score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore) {
+		log.Infoln("开始加载音频学习模块")
+		// core := Core{}
+		// core.Init()
+
+		context, err := c.browser.NewContext(playwright.BrowserNewContextOptions{
+			Viewport: &playwright.BrowserNewContextOptionsViewport{
+				Width:  playwright.Int(1920),
+				Height: playwright.Int(1080),
+			}})
+		_ = context.AddInitScript(playwright.BrowserContextAddInitScriptOptions{
+			Script: playwright.String("Object.defineProperties(navigator, {webdriver:{get:()=>undefined}});")})
+		if err != nil {
+			log.Errorln("创建实例对象错误" + err.Error())
+			return
+		}
+		defer func(context playwright.BrowserContext) {
+			err := context.Close()
+			if err != nil {
+				log.Errorln("错误的关闭了实例对象" + err.Error())
+			}
+		}(context)
+
+		page, err := context.NewPage()
+		if err != nil {
+			return
+		}
+		defer func() {
+			page.Close()
+		}()
+
+		err = context.AddCookies(user.ToBrowserCookies()...)
+		if err != nil {
+			log.Errorln("添加cookie失败" + err.Error())
+			return
+		}
+		tryCount := 0
+		for {
+			if tryCount < 20 {
+				PrintScore(score)
+				n := rand.Intn(len(links))
+				_, err := page.Goto(links[n].Url, playwright.PageGotoOptions{
+					Referer:   playwright.String(links[rand.Intn(len(links))].Url),
+					Timeout:   playwright.Float(10000),
+					WaitUntil: playwright.WaitUntilStateDomcontentloaded,
+				})
+				if err != nil {
+					log.Errorln("页面跳转失败")
+				}
+				log.Infoln("正在收听：" + links[n].Title)
+				c.Push(user.PushId, "text", "正在收听："+links[n].Title)
+				log.Infoln("音频发布时间：" + links[n].PublishTime)
+				log.Infoln("音频学习链接：" + links[n].Url)
+				learnTime := 60 + rand.Intn(10)
+				for i := 0; i < learnTime; i++ {
+					if c.IsQuit() {
+						return
+					}
+					fmt.Printf("\r[%v] [INFO]: 正在进行音频学习中，剩余%d个，当前剩余时间%d秒", time.Now().Format("2006-01-02 15:04:05"), score.Content["video"].MaxScore-score.Content["video"].CurrentScore, learnTime-i)
+
+					if rand.Float32() > 0.5 {
+						go func() {
+							_, err := page.Evaluate(fmt.Sprintf(`let h = document.body.scrollHeight/120*%d;document.documentElement.scrollTop=h;`, i))
+							if err != nil {
+								log.Errorln("视频滑动失败")
+							}
+						}()
+					}
+					time.Sleep(1 * time.Second)
+				}
+				fmt.Println()
+				score, _ = GetUserScore(user.ToCookies())
+				if score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore {
+					log.Infoln("检测到本次音频学习分数已满，退出学习")
+					break
+				}
+
+				tryCount++
+			} else {
+				log.Errorln("音频学习出现异常，稍后可重新学习")
+				return
+			}
+		}
+	} else {
+		log.Infoln("检测到音频学习已经完成")
 	}
 }
