@@ -11,6 +11,7 @@ const (
 	queryWeekList    = "https://pc-proxy-api.xuexi.cn/api/exam/service/practice/pc/weekly/more"
 )
 
+// 专项答题JSON结构
 type SpecialList struct {
 	PageNo         int `json:"pageNo"`
 	PageSize       int `json:"pageSize"`

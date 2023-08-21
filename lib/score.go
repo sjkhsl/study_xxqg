@@ -22,6 +22,7 @@ type Data struct {
 	MaxScore     int `json:"max_score"`
 }
 
+// 获取用户总分
 func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	var score Score
 	var resp []byte
@@ -41,7 +42,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 
 	response, err = client.R().SetCookies(cookies...).SetHeaders(header).Get(userTodaytotalscoreUrl)
 	if err != nil {
-		log.Errorln("获取用户总分错误" + err.Error())
+		log.Errorln("获取用户今日得分错误" + err.Error())
 		return Score{}, err
 	}
 	resp = response.Bytes()
@@ -49,7 +50,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 
 	response, err = client.R().SetCookies(cookies...).SetHeaders(header).Get(userRatescoreUrl)
 	if err != nil {
-		log.Errorln("获取用户总分错误" + err.Error())
+		log.Errorln("获取用户详情得分错误" + err.Error())
 		return Score{}, err
 	}
 	resp = response.Bytes()
@@ -77,6 +78,7 @@ func GetUserScore(cookies []*http.Cookie) (Score, error) {
 	return score, err
 }
 
+// 输出总分
 func PrintScore(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
@@ -92,6 +94,7 @@ func PrintScore(score Score) string {
 	return result
 }
 
+// 格式化总分
 func FormatScore(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)
@@ -104,6 +107,7 @@ func FormatScore(score Score) string {
 	return result
 }
 
+// 格式化短格式总分
 func FormatScoreShort(score Score) string {
 	result := ""
 	result += fmt.Sprintf("当前学习总积分：%d\n今日得分：%d\n", score.TotalScore, score.TodayScore)

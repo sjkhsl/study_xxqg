@@ -6,7 +6,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-func cookieToJar(cookies []Cookie) []*http.Cookie {
+func CookieToJar(cookies []Cookie) []*http.Cookie {
 	var (
 		cooks []*http.Cookie
 	)
@@ -28,7 +28,7 @@ func cookieToJar(cookies []Cookie) []*http.Cookie {
 	return cooks
 }
 
-func cookieToParam(cookies []Cookie) []playwright.BrowserContextAddCookiesOptionsCookies {
+func CookieToParam(cookies []Cookie) []playwright.BrowserContextAddCookiesOptionsCookies {
 	var (
 		cooks []playwright.BrowserContextAddCookiesOptionsCookies
 	)

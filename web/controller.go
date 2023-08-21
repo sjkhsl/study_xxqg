@@ -316,7 +316,7 @@ func study() gin.HandlerFunc {
 				core.RespondDaily(user, "daily")
 			} else if config.Model == 3 {
 				core.RespondDaily(user, "daily")
-				core.RespondDaily(user, "weekly")
+				// core.RespondDaily(user, "weekly")
 				core.RespondDaily(user, "special")
 			}
 			state.Delete(uid)

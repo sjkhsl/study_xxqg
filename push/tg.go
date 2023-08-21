@@ -92,11 +92,11 @@ type Mather struct {
 	handle  func(bot *Telegram, from int64, args []string)
 }
 
-func (m Mather) getCommand() string {
+func (m Mather) GetCommand() string {
 	return m.command
 }
 
-func (m Mather) execute(bot *Telegram, from int64, args []string) {
+func (m Mather) Execute(bot *Telegram, from int64, args []string) {
 	m.handle(bot, from, args)
 }
 
@@ -404,7 +404,7 @@ func studyAll(bot *Telegram, from int64, args []string) {
 				core.LearnArticle(user)
 				core.RadioStation(user)
 				core.RespondDaily(user, "daily")
-				core.RespondDaily(user, "weekly")
+				// core.RespondDaily(user, "weekly")
 				core.RespondDaily(user, "special")
 				c <- 1
 			}()

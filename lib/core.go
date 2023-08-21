@@ -63,11 +63,7 @@ type checkQrCodeResp struct {
 	Data    string `json:"data"`
 }
 
-// Init
-/**
- * @Description:
- * @receiver c
- */
+// 初始化
 func (c *Core) Init() {
 	if runtime.GOOS == "windows" {
 		c.initWindows()
@@ -76,6 +72,7 @@ func (c *Core) Init() {
 	}
 }
 
+// 获取Token
 func GetToken(code, sign, pushId string) (bool, error) {
 	client := utils.GetClient()
 	response, err := client.R().SetQueryParams(map[string]string{
@@ -113,13 +110,7 @@ func GetToken(code, sign, pushId string) (bool, error) {
 	return true, err
 }
 
-// GenerateCode
-/* @Description: 生成二维码
- * @receiver c
- * @return string 二维码连接
- * @return string 二维码回调查询的code
- * @return error
- */
+// 生成二维码
 func (c *Core) GenerateCode(pushID string) (string, string, error) {
 	client := utils.GetClient()
 	g := new(gennerateResp)
@@ -136,6 +127,7 @@ func (c *Core) GenerateCode(pushID string) (string, string, error) {
 	return codeURL, g.Result, err
 }
 
+// 检查二维码状态
 func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
 	client := utils.GetClient()
 	checkQrCode := func() (bool, string) {
@@ -191,13 +183,7 @@ func (c *Core) CheckQrCode(code, pushID string) (*model.User, bool, error) {
 	}
 }
 
-// L
-/**
- * @Description:
- * @receiver c
- * @return *model.User
- * @return error
- */
+// 轮询
 func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	_, codeData, err := c.GenerateCode(pushID)
 	if err != nil {
@@ -218,6 +204,7 @@ func (c *Core) L(retryTimes int, pushID string) (*model.User, error) {
 	return c.L(retryTimes-1, pushID)
 }
 
+// 初始化Windows系统
 func (c *Core) initWindows() {
 	_, err := os.Stat("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe")
 	if err != nil {
@@ -297,6 +284,7 @@ func (c *Core) initWindows() {
 	c.browser = browser
 }
 
+// 初始化非Windows系统
 func (c *Core) initNotWindows() {
 	dir, err := os.Getwd()
 	if err != nil {
@@ -369,6 +357,7 @@ func (c *Core) initNotWindows() {
 	c.browser = browser
 }
 
+// 关闭浏览器
 func (c *Core) Quit() {
 	err := c.browser.Close()
 	if err != nil {
@@ -381,6 +370,7 @@ func (c *Core) Quit() {
 	}
 }
 
+// 检查浏览器是否关闭
 func (c *Core) IsQuit() bool {
 	return !c.browser.IsConnected()
 }

@@ -103,8 +103,6 @@ func initWechat() {
 			log.Errorln("添加客服失败" + err.Error())
 			return
 		}
-	} else {
-
 	}
 	wx.HandleFunc("eventCLICK", func(wx *mp.WeiXin, w http.ResponseWriter, r *request.WeiXinRequest, timestamp, nonce string) {
 		if lastNonce == nonce {

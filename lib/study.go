@@ -36,6 +36,7 @@ var (
 		"https://www.xuexi.cn/lgdata/3o3ufqgl8rsn.json",
 		"https://www.xuexi.cn/lgdata/525pi8vcj24p.json",
 		"https://www.xuexi.cn/lgdata/1742g60067k.json"}
+
 	yp_url_list = []string{
 		"https://www.xuexi.cn/lgdata/1ode6kjlu7m.json",
 		"https://www.xuexi.cn/lgdata/1ggb81u8f7m.json",
@@ -66,6 +67,7 @@ type Link struct {
 	DataValid    bool     `json:"dataValid"`
 }
 
+// 获取学习链接列表
 func getLinks(model string) ([]Link, error) {
 	UID := rand.Intn(20000000) + 10000000
 	learnUrl := ""
@@ -98,12 +100,7 @@ func getLinks(model string) ([]Link, error) {
 	return links, err
 }
 
-// LearnArticle
-/**
- * @Description: 文章学习
- * @receiver c
- * @param cookies
- */
+// 文章学习
 func (c *Core) LearnArticle(user *model.User) {
 	defer func() {
 		err := recover()
@@ -215,12 +212,7 @@ func (c *Core) LearnArticle(user *model.User) {
 	}
 }
 
-// LearnVideo
-/**
- * @Description: 视频学习
- * @receiver c
- * @param cookies
- */
+// 视频学习
 func (c *Core) LearnVideo(user *model.User) {
 	defer func() {
 		err := recover()
@@ -326,9 +318,7 @@ func (c *Core) LearnVideo(user *model.User) {
 	}
 }
 
-/**
- * @Description: 音频
- */
+// 音频学习
 func (c *Core) RadioStation(user *model.User) {
 	defer func() {
 		err := recover()
@@ -348,9 +338,6 @@ func (c *Core) RadioStation(user *model.User) {
 	links, _ := getLinks("yp")
 	if !(score.Content["video"].CurrentScore >= score.Content["video"].MaxScore && score.Content["video_time"].CurrentScore >= score.Content["video_time"].MaxScore) {
 		log.Infoln("开始加载音频学习模块")
-		// core := Core{}
-		// core.Init()
-
 		context, err := c.browser.NewContext(playwright.BrowserNewContextOptions{
 			Viewport: &playwright.BrowserNewContextOptionsViewport{
 				Width:  playwright.Int(1920),

@@ -30,12 +30,7 @@ const (
 	SPECIALBUTTON = `#app > div > div.layout-body > div > div.my-points-section > div.my-points-content > div:nth-child(6) > div.my-points-card-footer > div.buttonbox > div`
 )
 
-// RespondDaily
-/* @Description:
- * @receiver c
- * @param user
- * @param model
- */
+// 每日答题
 func (c *Core) RespondDaily(user *model.User, model string) {
 
 	var title string
@@ -157,19 +152,6 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		}
 	case "special":
 		{
-			// 检测是否已经完成
-			if score.Content["special"].CurrentScore >= score.Content["special"].MaxScore {
-				log.Infoln("检测到特殊答题已经完成，即将退出答题")
-
-				return
-			}
-			// err = page.Click(SPECIALBUTTON)
-			// if err != nil {
-			//	log.Errorln("跳转到积分页面错误")
-			//
-			//	return
-			//}
-
 			//获取专项答题ID
 			id, err = getSpecialID(user.ToCookies())
 			if err != nil {
@@ -452,7 +434,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 	}
 }
 
-func getAnswerPage(page playwright.Page, model string) bool {
+func GetAnswerPage(page playwright.Page, model string) bool {
 	selectPages, err := page.QuerySelectorAll(`#app .ant-pagination .ant-pagination-item`)
 	if err != nil {
 		log.Errorln("获取到页码失败")
@@ -562,6 +544,7 @@ func radioCheck(page playwright.Page, answer []string) error {
 	return nil
 }
 
+// 获取选项
 func getOptions(page playwright.Page) ([]string, error) {
 	handles, err := page.QuerySelectorAll(`.q-answer.choosable`)
 	if err != nil {
@@ -579,6 +562,7 @@ func getOptions(page playwright.Page) ([]string, error) {
 	return options, err
 }
 
+// 获取问题提示
 func getTips(data string) []string {
 	data = strings.ReplaceAll(data, " ", "")
 	data = strings.ReplaceAll(data, "\n", "")
@@ -594,6 +578,7 @@ func getTips(data string) []string {
 	return tips
 }
 
+// 填空题
 func FillBlank(page playwright.Page, tips []string) error {
 	video := false
 	var answer []string
@@ -648,12 +633,13 @@ func FillBlank(page playwright.Page, tips []string) error {
 		r := rand2.Intn(4) + 1
 		time.Sleep(time.Duration(r) * time.Second)
 	}
-	r := rand2.Intn(1) + 1
+	r := rand2.Intn(2)
 	time.Sleep(time.Duration(r) * time.Second)
 	checkNextBotton(page)
 	return nil
 }
 
+// 检查下一题按钮
 func checkNextBotton(page playwright.Page) {
 	btns, err := page.QuerySelectorAll(`#app .action-row > button`)
 	if err != nil {
@@ -704,6 +690,7 @@ func RemoveRepByLoop(slc []string) []string {
 	return result
 }
 
+// 获取专项答题ID
 func getSpecialID(cookies []*http.Cookie) (int, error) {
 	c := req.C()
 	c.SetCommonCookies(cookies...)
@@ -754,6 +741,7 @@ func getSpecialID(cookies []*http.Cookie) (int, error) {
 	return 0, errors.New("未找到专项答题")
 }
 
+// 获取每周答题ID
 func getweekID(cookies []*http.Cookie) (int, error) {
 	c := req.C()
 	c.SetCommonCookies(cookies...)
@@ -819,7 +807,8 @@ func GetSpecialContent(cookies []*http.Cookie, id int) *SpecialContent {
 	return content
 }
 
-func getweekIDs(cookies []*http.Cookie) []int {
+// 获取每周答题ID列表
+func GetweekIDs(cookies []*http.Cookie) []int {
 	c := req.C()
 	c.SetCommonCookies(cookies...)
 	repo, err := c.R().SetQueryParams(map[string]string{"pageSize": "500", "pageNo": "1"}).Get(queryWeekList)
@@ -852,7 +841,9 @@ func getweekIDs(cookies []*http.Cookie) []int {
 	}
 	return ids
 }
-func getSpecialIDs(cookies []*http.Cookie) []int {
+
+// 获取专项答题ID列表
+func GetSpecialIDs(cookies []*http.Cookie) []int {
 	c := req.C()
 
 	c.SetCommonCookies(cookies...)

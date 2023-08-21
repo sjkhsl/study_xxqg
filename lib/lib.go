@@ -24,13 +24,10 @@ func Study(core2 *Core, u *model.User) {
 	core2.LearnArticle(u)
 
 	core2.RadioStation(u)
-
-	core2.RadioStation(u)
 	if config.Model == 2 {
 		core2.RespondDaily(u, "daily")
 	} else if config.Model == 3 {
 		core2.RespondDaily(u, "daily")
-		core2.RespondDaily(u, "weekly")
 		core2.RespondDaily(u, "special")
 	}
 	endTime := time.Now()
@@ -41,7 +38,6 @@ func Study(core2 *Core, u *model.User) {
 		return
 	}
 
-	score, _ = GetUserScore(u.ToCookies())
 	message := fmt.Sprintf("%v 学习完成,用时%.1f分钟\n%v", u.Nick, endTime.Sub(startTime).Minutes(), FormatScoreShort(score))
 	core2.Push(u.PushId, "flush", message)
 }

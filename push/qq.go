@@ -119,7 +119,7 @@ func qqStudy(event *Event, args []string) {
 	if len(users) == 1 {
 		user = users[0]
 	} else {
-		if len(args) < 0 {
+		if len(args) <= 0 {
 			event.Send("缺少序号参数，请输入 .study 序号")
 			return
 		} else {
