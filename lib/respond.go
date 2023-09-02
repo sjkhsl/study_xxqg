@@ -256,7 +256,7 @@ func (c *Core) RespondDaily(user *model.User, model string) {
 		case "special":
 			{
 				// 检测是否已经完成
-				if score.Content["special"].CurrentScore >= score.Content["special"].MaxScore {
+				if score.TodayScore >= 34 {
 					log.Infoln("检测到特殊答题已经完成，即将退出答题")
 
 					return
