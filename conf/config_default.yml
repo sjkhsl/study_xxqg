@@ -74,7 +74,7 @@ wechat:
   # 模板标题，随意  模板内容：  点我登录，然后在浏览器中打开！！
   login_temp_id: ""
   # 发送普通消息需要使用的消息模板
-  # 模板标题：随意 模板内容： {{data.DATA}}
+  # 模板标题：随意 模板内容： 提示:{{data.DATA}}
   normal_temp_id: ""
   # xxqg会每隔两小时左右检查所有用户的ck有效性，若开启该选项，会在检查失败时推送提醒消息
   push_login_warn: false
